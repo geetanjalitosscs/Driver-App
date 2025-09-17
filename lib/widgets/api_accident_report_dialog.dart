@@ -89,129 +89,141 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   Widget _buildAccidentDialog(AccidentReport accident, AccidentProvider provider) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: AppCard(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  children: [
-                    Icon(
-                      Icons.report_problem,
-                      color: AppTheme.accentOrange,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Accident Report #${accident.id}',
-                        style: AppTheme.heading3,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 400,
+          minWidth: 280,
+        ),
+        child: AppCard(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.report_problem,
+                        color: AppTheme.accentOrange,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Accident Report #${accident.id}',
+                          style: AppTheme.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close),
+                        color: AppTheme.textSecondary,
+                        iconSize: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Accident Details
+                  _buildDetailRow('Name', accident.fullname),
+                  _buildDetailRow('Phone', accident.phone),
+                  _buildDetailRow('Vehicle', accident.vehicle),
+                  _buildDetailRow('Location', accident.location),
+                  _buildDetailRow('Date', accident.createdAt),
+                  if (accident.description.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Description',
+                      style: AppTheme.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close),
-                      color: AppTheme.textSecondary,
+                    const SizedBox(height: 8),
+                    Text(
+                      accident.description,
+                      style: AppTheme.bodyMedium,
                     ),
                   ],
-                ),
-                const SizedBox(height: 20),
-
-                // Accident Details
-                _buildDetailRow('Name', accident.fullname),
-                _buildDetailRow('Phone', accident.phone),
-                _buildDetailRow('Vehicle', accident.vehicle),
-                _buildDetailRow('Location', accident.location),
-                _buildDetailRow('Date', accident.createdAt),
-                
-                if (accident.description.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    'Description',
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
+                  if (accident.photos.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Photos',
+                      style: AppTheme.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    accident.description,
-                    style: AppTheme.bodyMedium,
-                  ),
-                ],
-
-                // Photos
-                if (accident.photos.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    'Photos',
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: accident.photos.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                accident.photos[index],
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 100,
+                                    height: 100,
+                                    color: AppTheme.backgroundLight,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                      color: AppTheme.textSecondary,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: accident.photos.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              accident.photos[index],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: 100,
-                                  height: 100,
-                                  color: AppTheme.backgroundLight,
-                                  child: const Icon(
-                                    Icons.image_not_supported,
-                                    color: AppTheme.textSecondary,
-                                  ),
-                                );
-                              },
+                  ],
+                  const SizedBox(height: 24),
+                  // Action Buttons
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isSmallScreen = constraints.maxWidth < 300;
+                      final buttonSpacing = isSmallScreen ? 8.0 : 12.0;
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: AppButton(
+                              text: 'Reject',
+                              onPressed: _isProcessing ? null : () => _handleReject(provider),
+                              variant: AppButtonVariant.danger,
+                              icon: Icons.close,
+                              size: isSmallScreen ? AppButtonSize.small : AppButtonSize.medium,
                             ),
                           ),
-                        );
-                      },
-                    ),
+                          SizedBox(width: buttonSpacing),
+                          Expanded(
+                            child: AppButton(
+                              text: 'Accept',
+                              onPressed: _isProcessing ? null : () => _handleAccept(provider),
+                              variant: AppButtonVariant.secondary,
+                              icon: Icons.check,
+                              size: isSmallScreen ? AppButtonSize.small : AppButtonSize.medium,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
-
-                const SizedBox(height: 24),
-
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppButton(
-                        text: 'Reject',
-                        onPressed: _isProcessing ? null : () => _handleReject(provider),
-                        variant: AppButtonVariant.secondary,
-                        icon: Icons.close,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppButton(
-                        text: 'Accept',
-                        onPressed: _isProcessing ? null : () => _handleAccept(provider),
-                        variant: AppButtonVariant.primary,
-                        icon: Icons.check,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -226,10 +238,10 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 80,
+            width: 70,
             child: Text(
               '$label:',
-              style: AppTheme.bodyMedium.copyWith(
+              style: AppTheme.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppTheme.textSecondary,
               ),
@@ -238,7 +250,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
           Expanded(
             child: Text(
               value,
-              style: AppTheme.bodyMedium,
+              style: AppTheme.bodySmall,
             ),
           ),
         ],
