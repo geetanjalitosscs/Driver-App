@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../theme/app_theme.dart';
+import '../widgets/common/app_card.dart';
 
 class EarningsScreen extends StatelessWidget {
   const EarningsScreen({super.key});
@@ -7,9 +9,9 @@ class EarningsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1976D2),
+        backgroundColor: AppTheme.primaryBlue,
         elevation: 0,
         leading: IconButton(
           onPressed: () {
@@ -24,11 +26,7 @@ class EarningsScreen extends StatelessWidget {
         ),
         title: Text(
           'Earnings',
-          style: GoogleFonts.roboto(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: AppTheme.heading3.copyWith(color: Colors.white),
         ),
         centerTitle: true,
       ),
@@ -38,89 +36,180 @@ class EarningsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Today's Earnings Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Today's Earnings",
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildEarningCard(
-                            'Total Earnings',
-                            '₹1,850',
-                            Icons.currency_rupee,
-                            Colors.green,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildEarningCard(
-                            'Trips Today',
-                            '12',
-                            Icons.directions_car,
-                            Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildEarningCard(
-                            'Avg per Trip',
-                            '₹154',
-                            Icons.trending_up,
-                            Colors.orange,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildEarningCard(
-                            'Hours Worked',
-                            '8.5',
-                            Icons.access_time,
-                            Colors.purple,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Today's Earnings",
+                    style: AppTheme.heading3,
+                  ),
+                  const SizedBox(height: 16),
+                   LayoutBuilder(
+                     builder: (context, constraints) {
+                       if (constraints.maxWidth < 300) {
+                         // Stack vertically for very small screens
+                         return Column(
+                           children: [
+                             Center(
+                               child: SizedBox(
+                                 width: constraints.maxWidth * 0.8, // Use 80% of screen width
+                                 child: _buildEarningCard(
+                                   'Total Earnings',
+                                   '₹1,850',
+                                   Icons.currency_rupee,
+                                   AppTheme.accentGreen,
+                                 ),
+                               ),
+                             ),
+                             const SizedBox(height: 12),
+                             Center(
+                               child: SizedBox(
+                                 width: constraints.maxWidth * 0.8,
+                                 child: _buildEarningCard(
+                                   'Trips Today',
+                                   '12',
+                                   Icons.directions_car,
+                                   AppTheme.primaryBlue,
+                                 ),
+                               ),
+                             ),
+                             const SizedBox(height: 12),
+                             Center(
+                               child: SizedBox(
+                                 width: constraints.maxWidth * 0.8,
+                                 child: _buildEarningCard(
+                                   'Avg per Trip',
+                                   '₹154',
+                                   Icons.trending_up,
+                                   AppTheme.accentOrange,
+                                 ),
+                               ),
+                             ),
+                             const SizedBox(height: 12),
+                             Center(
+                               child: SizedBox(
+                                 width: constraints.maxWidth * 0.8,
+                                 child: _buildEarningCard(
+                                   'Hours Worked',
+                                   '8.5',
+                                   Icons.access_time,
+                                   Colors.purple,
+                                 ),
+                               ),
+                             ),
+                           ],
+                         );
+                       } else if (constraints.maxWidth < 500) {
+                         // Use 2x2 grid for medium screens
+                         return Column(
+                           children: [
+                             Row(
+                               children: [
+                                 Expanded(
+                                   child: _buildEarningCard(
+                                     'Total Earnings',
+                                     '₹1,850',
+                                     Icons.currency_rupee,
+                                     AppTheme.accentGreen,
+                                   ),
+                                 ),
+                                 const SizedBox(width: 12),
+                                 Expanded(
+                                   child: _buildEarningCard(
+                                     'Trips Today',
+                                     '12',
+                                     Icons.directions_car,
+                                     AppTheme.primaryBlue,
+                                   ),
+                                 ),
+                               ],
+                             ),
+                             const SizedBox(height: 12),
+                             Row(
+                               children: [
+                                 Expanded(
+                                   child: _buildEarningCard(
+                                     'Avg per Trip',
+                                     '₹154',
+                                     Icons.trending_up,
+                                     AppTheme.accentOrange,
+                                   ),
+                                 ),
+                                 const SizedBox(width: 12),
+                                 Expanded(
+                                   child: _buildEarningCard(
+                                     'Hours Worked',
+                                     '8.5',
+                                     Icons.access_time,
+                                     Colors.purple,
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ],
+                         );
+                       } else {
+                         // Use 4x1 row for wide screens
+                         return Row(
+                           children: [
+                             Expanded(
+                               child: _buildEarningCard(
+                                 'Total Earnings',
+                                 '₹1,850',
+                                 Icons.currency_rupee,
+                                 AppTheme.accentGreen,
+                               ),
+                             ),
+                             const SizedBox(width: 12),
+                             Expanded(
+                               child: _buildEarningCard(
+                                 'Trips Today',
+                                 '12',
+                                 Icons.directions_car,
+                                 AppTheme.primaryBlue,
+                               ),
+                             ),
+                             const SizedBox(width: 12),
+                             Expanded(
+                               child: _buildEarningCard(
+                                 'Avg per Trip',
+                                 '₹154',
+                                 Icons.trending_up,
+                                 AppTheme.accentOrange,
+                               ),
+                             ),
+                             const SizedBox(width: 12),
+                             Expanded(
+                               child: _buildEarningCard(
+                                 'Hours Worked',
+                                 '8.5',
+                                 Icons.access_time,
+                                 Colors.purple,
+                               ),
+                             ),
+                           ],
+                         );
+                       }
+                     },
+                   ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
             
             // Weekly Earnings
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Weekly Earnings',
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildWeeklyChart(),
-                  ],
-                ),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Weekly Earnings',
+                    style: AppTheme.heading3,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildWeeklyChart(),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -128,11 +217,7 @@ class EarningsScreen extends StatelessWidget {
             // Recent Transactions
             Text(
               'Recent Transactions',
-              style: GoogleFonts.roboto(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              style: AppTheme.heading3,
             ),
             const SizedBox(height: 12),
             
@@ -146,29 +231,28 @@ class EarningsScreen extends StatelessWidget {
 
   Widget _buildEarningCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 6),
           Text(
             value,
-            style: GoogleFonts.roboto(
-              fontSize: 18,
+            style: AppTheme.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
           Text(
             title,
-            style: GoogleFonts.roboto(
-              fontSize: 12,
-              color: Colors.grey[600],
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.neutralGreyLight,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -181,57 +265,97 @@ class EarningsScreen extends StatelessWidget {
     
     return Column(
       children: [
-        SizedBox(
-          height: 120,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: List.generate(days.length, (index) {
-              final height = (earnings[index] / 2500) * 100;
+         SizedBox(
+           height: 120,
+           child: LayoutBuilder(
+             builder: (context, constraints) {
+               double barWidth;
+               double chartHeight;
+               
+               if (constraints.maxWidth < 300) {
+                 barWidth = 15.0;
+                 chartHeight = 80.0;
+               } else if (constraints.maxWidth < 500) {
+                 barWidth = 20.0;
+                 chartHeight = 90.0;
+               } else {
+                 barWidth = 30.0;
+                 chartHeight = 100.0;
+               }
+               
+               return Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                 crossAxisAlignment: CrossAxisAlignment.end,
+                 children: List.generate(days.length, (index) {
+                   final height = (earnings[index] / 2500) * chartHeight;
+                   return Column(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       Container(
+                         width: barWidth,
+                         height: height,
+                         decoration: BoxDecoration(
+                           color: AppTheme.primaryBlue.withOpacity(0.7),
+                           borderRadius: BorderRadius.circular(4),
+                         ),
+                       ),
+                       const SizedBox(height: 6),
+                       Text(
+                         days[index],
+                         style: AppTheme.bodySmall.copyWith(
+                           color: AppTheme.neutralGreyLight,
+                           fontSize: constraints.maxWidth < 300 ? 10 : 12,
+                         ),
+                       ),
+                     ],
+                   );
+                 }),
+               );
+             },
+           ),
+         ),
+        const SizedBox(height: 16),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 300) {
               return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    width: 30,
-                    height: height,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(4),
+                  Text(
+                    '₹${earnings.reduce((a, b) => a + b)}',
+                    style: AppTheme.bodyLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.accentGreen,
                     ),
                   ),
-                  const SizedBox(height: 8),
                   Text(
-                    days[index],
-                    style: GoogleFonts.roboto(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+                    'Total This Week',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.neutralGreyLight,
                     ),
                   ),
                 ],
               );
-            }),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              '₹${earnings.reduce((a, b) => a + b)}',
-              style: GoogleFonts.roboto(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
-            ),
-            Text(
-              'Total This Week',
-              style: GoogleFonts.roboto(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
+            } else {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    '₹${earnings.reduce((a, b) => a + b)}',
+                    style: AppTheme.bodyLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.accentGreen,
+                    ),
+                  ),
+                  Text(
+                    'Total This Week',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.neutralGreyLight,
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ],
     );
@@ -248,61 +372,55 @@ class EarningsScreen extends StatelessWidget {
     
     final transaction = transactions[index];
     
-    return Card(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: transaction['type'] == 'Bonus' 
-                    ? Colors.orange.withOpacity(0.1)
-                    : Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Icon(
-                transaction['type'] == 'Bonus' ? Icons.card_giftcard : Icons.directions_car,
-                color: transaction['type'] == 'Bonus' ? Colors.orange : Colors.green,
-                size: 24,
-              ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: transaction['type'] == 'Bonus' 
+                  ? AppTheme.accentOrange.withOpacity(0.1)
+                  : AppTheme.accentGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    transaction['patient']!,
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+            child: Icon(
+              transaction['type'] == 'Bonus' ? Icons.card_giftcard : Icons.directions_car,
+              color: transaction['type'] == 'Bonus' ? AppTheme.accentOrange : AppTheme.accentGreen,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction['patient']!,
+                  style: AppTheme.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    transaction['time']!,
-                    style: GoogleFonts.roboto(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  transaction['time']!,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.neutralGreyLight,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Text(
-              transaction['amount']!,
-              style: GoogleFonts.roboto(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
+          ),
+          Text(
+            transaction['amount']!,
+            style: AppTheme.bodyMedium.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.accentGreen,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

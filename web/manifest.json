@@ -1,11 +1,11 @@
 {
-    "name": "app_driver_2",
-    "short_name": "app_driver_2",
+    "name": "Ambulance Driver App",
+    "short_name": "Ambulance Driver App",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Ambulance Driver App for emergency medical services.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
