@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
@@ -22,6 +23,63 @@ class ApiAccidentReportDialog extends StatefulWidget {
 
 class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   bool _isProcessing = false;
+  Timer? _timer;
+  int _countdown = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _countdown = 20;
+    _timer?.cancel();
+    print('Starting 20-second countdown timer for accident report');
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _countdown--;
+        });
+        
+        if (_countdown <= 0) {
+          _timer?.cancel();
+          print('Timer expired - auto-rejecting accident report');
+          _autoReject();
+        }
+      }
+    });
+  }
+
+  void _autoReject() async {
+    if (!mounted) return;
+    
+    print('Auto-rejecting accident report...');
+    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+    final success = await accidentProvider.rejectCurrentAccident();
+    
+    if (success && mounted) {
+      print('Auto-reject successful. Checking for more reports...');
+      // Show next report automatically or close if no more reports
+      if (accidentProvider.hasMoreAccidents) {
+        print('More reports available - starting timer for next report');
+        // Reset timer for next report
+        _startTimer();
+        // Refresh the dialog to show next report
+        setState(() {});
+      } else {
+        print('No more reports - closing dialog');
+        // No more reports, close dialog and return to home page
+        Navigator.of(context).pop();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +185,37 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                         iconSize: 20,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Countdown Timer
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _countdown <= 5 ? AppTheme.errorRed.withOpacity(0.1) : AppTheme.accentOrange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _countdown <= 5 ? AppTheme.errorRed : AppTheme.accentOrange,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.timer,
+                          color: _countdown <= 5 ? AppTheme.errorRed : AppTheme.accentOrange,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Auto-reject in ${_countdown}s',
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: _countdown <= 5 ? AppTheme.errorRed : AppTheme.accentOrange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   // Accident Details
@@ -259,6 +348,9 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   }
 
   Future<void> _handleAccept(AccidentProvider provider) async {
+    // Cancel timer since user took action
+    _timer?.cancel();
+    
     setState(() {
       _isProcessing = true;
     });
@@ -289,6 +381,9 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   }
 
   Future<void> _handleReject(AccidentProvider provider) async {
+    // Cancel timer since user took action
+    _timer?.cancel();
+    
     setState(() {
       _isProcessing = true;
     });
@@ -299,6 +394,8 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       if (success) {
         // Show next report automatically or close if no more reports
         if (provider.hasMoreAccidents) {
+          // Reset timer for next report
+          _startTimer();
           // Refresh the dialog to show next report
           setState(() {});
         } else {

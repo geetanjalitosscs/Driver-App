@@ -35,59 +35,32 @@ class NavigationService {
 
   // Open Google Maps with current location and destination
   static Future<void> openGoogleMapsWithCurrentLocation({
-    required double currentLat,
-    required double currentLng,
     required double destinationLat,
     required double destinationLng,
     String? destinationName,
   }) async {
     String url;
-    
-    // Use a URL format that forces "Your location" to be displayed
+
     if (destinationName != null && destinationName.isNotEmpty) {
       final String encodedDestination = Uri.encodeComponent(destinationName);
-      
-      // Use "My Location" as origin to force "Your location" display
-      url = 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=$encodedDestination&travelmode=driving';
-      
-      print('Opening Google Maps with URL: $url');
-      print('Current location: $currentLat, $currentLng');
-      print('Destination: $destinationName');
-      
-    } else if (_areValidCoordinates(currentLat, currentLng) && 
-               _areValidCoordinates(destinationLat, destinationLng)) {
-      // Use "My Location" as origin to force "Your location" display
-      url = 'https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=$destinationLat,$destinationLng&travelmode=driving';
-      
-      print('Opening Google Maps with URL: $url');
-      print('Current location: $currentLat, $currentLng');
-      print('Destination coordinates: $destinationLat, $destinationLng');
-      
+
+      // ❌ Do NOT include origin, so Google Maps shows "Your location"
+      url =
+          'https://www.google.com/maps/dir/?api=1&destination=$encodedDestination&travelmode=driving&dir_action=navigate';
+    } else if (_areValidCoordinates(destinationLat, destinationLng)) {
+      // ❌ Same here — no origin
+      url =
+          'https://www.google.com/maps/dir/?api=1&destination=$destinationLat,$destinationLng&travelmode=driving&dir_action=navigate';
     } else {
       throw Exception('Invalid coordinates provided');
     }
-    
+
     try {
       final Uri uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        // Fallback: Try alternative URL format with "My Location"
-        String fallbackUrl;
-        if (destinationName != null && destinationName.isNotEmpty) {
-          final String encodedDestination = Uri.encodeComponent(destinationName);
-          fallbackUrl = 'https://maps.google.com/maps?daddr=$encodedDestination&saddr=My+Location';
-        } else {
-          fallbackUrl = 'https://maps.google.com/maps?daddr=$destinationLat,$destinationLng&saddr=My+Location';
-        }
-        
-        print('Trying fallback URL: $fallbackUrl');
-        final Uri fallbackUri = Uri.parse(fallbackUrl);
-        if (await canLaunchUrl(fallbackUri)) {
-          await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
-        } else {
-          throw Exception('Could not launch Google Maps');
-        }
+        throw Exception('Could not launch Google Maps');
       }
     } catch (e) {
       throw Exception('Failed to open Google Maps: $e');

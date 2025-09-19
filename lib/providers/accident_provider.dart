@@ -59,23 +59,12 @@ class AccidentProvider extends ChangeNotifier {
       final success = await AccidentApiService.acceptAccidentReport(_currentAccident!.id);
 
       if (success) {
-        // Open location in Google Maps with current location for navigation
-        if (currentLat != null && currentLng != null) {
-          await NavigationService.openGoogleMapsWithCurrentLocation(
-            currentLat: currentLat,
-            currentLng: currentLng,
-            destinationLat: _currentAccident!.latitude,
-            destinationLng: _currentAccident!.longitude,
-            destinationName: _currentAccident!.location,
-          );
-        } else {
-          // Fallback to simple navigation without current location
-          await NavigationService.openGoogleMaps(
-            destinationLat: _currentAccident!.latitude,
-            destinationLng: _currentAccident!.longitude,
-            destinationName: _currentAccident!.location,
-          );
-        }
+        // Open location in Google Maps - will show "Your location" as origin
+        await NavigationService.openGoogleMapsWithCurrentLocation(
+          destinationLat: _currentAccident!.latitude,
+          destinationLng: _currentAccident!.longitude,
+          destinationName: _currentAccident!.location,
+        );
 
         _moveToNextAccident();
         return true;
