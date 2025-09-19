@@ -508,28 +508,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              String buttonText;
-              if (constraints.maxWidth < 300) {
-                buttonText = 'Emergency Sim';
-              } else if (constraints.maxWidth < 400) {
-                buttonText = 'Emergency Simulation';
-              } else {
-                buttonText = 'Create Emergency Simulation';
-              }
-              
-              return AppButton(
-                text: buttonText,
-                icon: Icons.science,
-                variant: AppButtonVariant.outline,
-                size: AppButtonSize.large,
-                isFullWidth: true,
-        onPressed: _showSimulationDialog,
-              );
-            },
-          ),
         ],
       ),
     );
