@@ -4,6 +4,7 @@ class ProfileData {
   final String contact;
   final String address;
   final String vehicleType;
+  final String vehicleNumber;
   final double averageRating;
   final int totalTrips;
 
@@ -13,6 +14,7 @@ class ProfileData {
     required this.contact,
     required this.address,
     required this.vehicleType,
+    required this.vehicleNumber,
     required this.averageRating,
     required this.totalTrips,
   });
@@ -22,9 +24,10 @@ class ProfileData {
     return ProfileData(
       driverName: 'Rajash Sharma',
       driverId: 'AMB789',
-      contact: '+91 9874210',
+      contact: '9876543210',
       address: '123, Gandhi Marg, Sue Delhi',
-      vehicleType: 'Force Traveller',
+      vehicleType: 'Ambulance',
+      vehicleNumber: 'DL01AB1234',
       averageRating: 4.8,
       totalTrips: 452,
     );
@@ -37,6 +40,7 @@ class ProfileData {
     String? contact,
     String? address,
     String? vehicleType,
+    String? vehicleNumber,
     double? averageRating,
     int? totalTrips,
   }) {
@@ -46,6 +50,7 @@ class ProfileData {
       contact: contact ?? this.contact,
       address: address ?? this.address,
       vehicleType: vehicleType ?? this.vehicleType,
+      vehicleNumber: vehicleNumber ?? this.vehicleNumber,
       averageRating: averageRating ?? this.averageRating,
       totalTrips: totalTrips ?? this.totalTrips,
     );
@@ -59,6 +64,7 @@ class ProfileData {
       'contact': contact,
       'address': address,
       'vehicleType': vehicleType,
+      'vehicleNumber': vehicleNumber,
       'averageRating': averageRating,
       'totalTrips': totalTrips,
     };
@@ -72,6 +78,7 @@ class ProfileData {
       contact: json['contact'] ?? '',
       address: json['address'] ?? '',
       vehicleType: json['vehicleType'] ?? '',
+      vehicleNumber: json['vehicleNumber'] ?? '',
       averageRating: (json['averageRating'] ?? 0.0).toDouble(),
       totalTrips: json['totalTrips'] ?? 0,
     );

@@ -21,6 +21,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _contactController;
   late TextEditingController _addressController;
   late TextEditingController _vehicleController;
+  late TextEditingController _vehicleNumberController;
+  
+  // Vehicle type selection
+  String _selectedVehicleType = 'Ambulance';
+  final List<String> _vehicleTypes = [
+    'Ambulance',
+    'Emergency Vehicle',
+    'Medical Transport',
+    'Rescue Vehicle',
+    'Mobile ICU',
+  ];
 
   @override
   void initState() {
@@ -29,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _contactController = TextEditingController();
     _addressController = TextEditingController();
     _vehicleController = TextEditingController();
+    _vehicleNumberController = TextEditingController();
     
     // Initialize controllers with current profile data
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -42,6 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _contactController.dispose();
     _addressController.dispose();
     _vehicleController.dispose();
+    _vehicleNumberController.dispose();
     super.dispose();
   }
 
@@ -53,6 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _contactController.text = profile.contact;
     _addressController.text = profile.address;
     _vehicleController.text = profile.vehicleType;
+    _vehicleNumberController.text = profile.vehicleNumber;
+    _selectedVehicleType = profile.vehicleType;
   }
 
   void _toggleEdit() {
@@ -65,14 +80,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  // Phone number validation
+  bool _isValidPhoneNumber(String phone) {
+    // Remove any non-digit characters
+    String digitsOnly = phone.replaceAll(RegExp(r'[^\d]'), '');
+    return digitsOnly.length == 10;
+  }
+
   Future<void> _saveChanges() async {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    // Validate phone number
+    if (!_isValidPhoneNumber(_contactController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid 10-digit phone number'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     final success = await profileProvider.updateProfileFields(
       driverName: _nameController.text,
       contact: _contactController.text,
       address: _addressController.text,
-      vehicleType: _vehicleController.text,
+      vehicleType: _selectedVehicleType,
+      vehicleNumber: _vehicleNumberController.text,
     );
     
     if (success) {
@@ -280,11 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 16),
           if (_isEditing) ...[
-            _buildEditableInfoRow(
-              icon: Icons.phone,
-              label: 'Contact',
-              controller: _contactController,
-            ),
+            _buildPhoneNumberField(),
             const SizedBox(height: 16),
             _buildEditableInfoRow(
               icon: Icons.location_on,
@@ -294,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ] else ...[
             _buildInfoRow(
               icon: Icons.phone,
-              text: 'Contact: ${profile.contact}',
+              text: 'Contact: +91 ${profile.contact}',
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
@@ -317,28 +346,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildInfoRow(
-                  icon: Icons.local_hospital,
-                  text: 'Ambulance',
-                ),
-              ),
-              Expanded(
-                child: _buildInfoRow(
-                  icon: Icons.description,
-                  text: 'Ambulance',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           if (_isEditing) ...[
+            _buildVehicleTypeDropdown(),
+            const SizedBox(height: 12),
             _buildEditableInfoRow(
-              icon: Icons.directions_car,
-              label: 'Vehicle Type',
-              controller: _vehicleController,
+              icon: Icons.confirmation_number,
+              label: 'Vehicle Number',
+              controller: _vehicleNumberController,
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
@@ -356,11 +370,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Expanded(
                   child: _buildInfoRow(
-                    icon: Icons.star,
-                    text: 'Model Average Rating ${profile.averageRating}',
+                    icon: Icons.confirmation_number,
+                    text: 'Number: ${profile.vehicleNumber}',
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            _buildInfoRow(
+              icon: Icons.star,
+              text: 'Model Average Rating ${profile.averageRating}',
             ),
           ],
         ],
@@ -545,6 +564,109 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         );
       },
+    );
+  }
+
+  // Phone number input field with validation
+  Widget _buildPhoneNumberField() {
+    return Row(
+      children: [
+        Icon(
+          Icons.phone,
+          color: AppTheme.neutralGreyLight,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: _contactController,
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
+            style: AppTheme.bodyMedium,
+            decoration: InputDecoration(
+              labelText: 'Phone Number (10 digits)',
+              prefixText: '+91 ',
+              prefixStyle: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.neutralGreyLight,
+              ),
+              labelStyle: AppTheme.bodySmall.copyWith(
+                color: AppTheme.neutralGreyLight,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppTheme.neutralGreyLight),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              counterText: '', // Hide character counter
+            ),
+            onChanged: (value) {
+              // Only allow digits and limit to 10 characters
+              String digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+              if (digitsOnly != value) {
+                _contactController.value = TextEditingValue(
+                  text: digitsOnly,
+                  selection: TextSelection.collapsed(offset: digitsOnly.length),
+                );
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Vehicle type dropdown
+  Widget _buildVehicleTypeDropdown() {
+    return Row(
+      children: [
+        Icon(
+          Icons.directions_car,
+          color: AppTheme.neutralGreyLight,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            value: _selectedVehicleType,
+            decoration: InputDecoration(
+              labelText: 'Vehicle Type',
+              labelStyle: AppTheme.bodySmall.copyWith(
+                color: AppTheme.neutralGreyLight,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppTheme.neutralGreyLight),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            items: _vehicleTypes.map((String vehicleType) {
+              return DropdownMenuItem<String>(
+                value: vehicleType,
+                child: Text(vehicleType),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _selectedVehicleType = newValue;
+                });
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

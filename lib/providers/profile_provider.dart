@@ -66,12 +66,14 @@ class ProfileProvider with ChangeNotifier {
     String? contact,
     String? address,
     String? vehicleType,
+    String? vehicleNumber,
   }) async {
     ProfileData updatedProfile = _profile.copyWith(
       driverName: driverName,
       contact: contact,
       address: address,
       vehicleType: vehicleType,
+      vehicleNumber: vehicleNumber,
     );
 
     return await updateProfile(updatedProfile);
