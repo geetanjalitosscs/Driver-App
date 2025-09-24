@@ -39,6 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentAddress = 'Getting location...';
   bool _isLoadingLocation = true;
   
+  // Detailed address variables
+  String _currentStreet = '';
+  String _currentCity = '';
+  String _currentState = '';
+  String _currentCountry = '';
+  String _currentPostalCode = '';
+  String _currentFormattedAddress = '';
+  
   // Timer for refreshing accident count
   Timer? _refreshTimer;
 
@@ -91,6 +99,15 @@ class _HomeScreenState extends State<HomeScreen> {
           _currentLatitude = locationData['latitude'];
           _currentLongitude = locationData['longitude'];
           _currentAddress = locationData['address'] ?? 'Unknown Location';
+          
+          // Store detailed address information
+          _currentStreet = locationData['street'] ?? '';
+          _currentCity = locationData['city'] ?? '';
+          _currentState = locationData['state'] ?? '';
+          _currentCountry = locationData['country'] ?? '';
+          _currentPostalCode = locationData['postalCode'] ?? '';
+          _currentFormattedAddress = locationData['formattedAddress'] ?? _currentAddress;
+          
           _isLoadingLocation = false;
         });
       } else {
@@ -352,34 +369,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Row(
                 children: [
-                  // Settings Icon
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryBlue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.settings,
-                          color: AppTheme.primaryBlue,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  
                   // Online/Offline Toggle
                   AnimatedContainer(
                     duration: AppAnimations.shortDuration,
@@ -415,6 +404,34 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  
+                  // Settings Icon
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.settings,
+                          color: AppTheme.primaryBlue,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -518,20 +535,54 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Main address display
                             Text(
                               _currentAddress,
                               style: AppTheme.bodyMedium.copyWith(
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            if (_currentLatitude != null && _currentLongitude != null) ...[
+                            
+                            // Detailed address breakdown if available
+                            if (_currentStreet.isNotEmpty || _currentCity.isNotEmpty || _currentState.isNotEmpty) ...[
                               const SizedBox(height: 4),
-                              Text(
-                                '${_currentLatitude!.toStringAsFixed(4)}, ${_currentLongitude!.toStringAsFixed(4)}',
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.neutralGreyLight,
+                              if (_currentStreet.isNotEmpty)
+                                Text(
+                                  '📍 $_currentStreet',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.primaryBlue,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
+                              if (_currentCity.isNotEmpty && _currentState.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  '🏙️ $_currentCity, $_currentState',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.accentGreen,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ] else if (_currentCity.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  '🏙️ $_currentCity',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.accentGreen,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                              if (_currentCountry.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  '🌍 $_currentCountry',
+                                  style: AppTheme.bodySmall.copyWith(
+                                    color: AppTheme.accentOrange,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ],
                           ],
                         ),

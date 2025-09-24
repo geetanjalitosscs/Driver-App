@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
-import '../services/geocoding_service.dart';
 import '../services/location_picker_service.dart';
 
 class TripCompletionDialog extends StatefulWidget {
@@ -45,11 +44,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
         _endLongitude = location['longitude'];
         
         // Get address from coordinates
-        final address = await GeocodingService.getAddressFromCoordinates(
-          location['latitude'],
-          location['longitude'],
-        );
-        _endLocation = address;
+        _endLocation = location['address'] ?? 'Unknown Location';
       } else {
         _errorMessage = 'Unable to get current location';
       }
@@ -79,7 +74,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       final result = await tripProvider.completeTrip(
-        tripId: widget.trip.tripId,
+        tripId: widget.trip.historyId,
         driverId: widget.trip.driverId,
         endLatitude: _endLatitude!,
         endLongitude: _endLongitude!,
@@ -90,7 +85,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
         Navigator.of(context).pop(true); // Return true to indicate success
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Trip completed successfully! Fare: ₹${widget.trip.fareAmount}'),
+            content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -168,9 +163,9 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildDetailRow('From:', widget.trip.startLocation),
-                  _buildDetailRow('To:', widget.trip.endLocation),
-                  _buildDetailRow('Fare:', '₹${widget.trip.fareAmount}'),
+                  _buildDetailRow('Location:', widget.trip.location),
+                  _buildDetailRow('Client:', widget.trip.clientName),
+                  _buildDetailRow('Fare:', '₹${widget.trip.amount}'),
                   if (widget.trip.startTime != null)
                     _buildDetailRow('Started:', _formatDateTime(widget.trip.startTime!)),
                 ],

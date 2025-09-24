@@ -295,11 +295,11 @@ class TripProvider extends ChangeNotifier {
   }
 
   // Set current trip
-  void _setCurrentTrip(int tripId) {
+  void _setCurrentTrip(int historyId) {
     _currentTrip = _allTrips.firstWhere(
-      (trip) => trip.tripId == tripId,
+      (trip) => trip.historyId == historyId,
       orElse: () => _ongoingTrips.firstWhere(
-        (trip) => trip.tripId == tripId,
+        (trip) => trip.historyId == historyId,
       ),
     );
     notifyListeners();
@@ -347,7 +347,7 @@ class TripProvider extends ChangeNotifier {
         final data = json.decode(response.body);
         if (data['success'] == true) {
           // Update local trip data
-          final tripIndex = _allTrips.indexWhere((trip) => trip.tripId == tripId);
+          final tripIndex = _allTrips.indexWhere((trip) => trip.historyId == tripId);
           if (tripIndex != -1) {
             _allTrips[tripIndex] = _allTrips[tripIndex].copyWith(
               currentLatitude: latitude,

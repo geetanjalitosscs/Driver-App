@@ -1,15 +1,13 @@
 class Trip {
-  final int tripId;
+  final int historyId;
   final int driverId;
-  final int userId;
-  final String startLocation;
-  final String endLocation;
+  final String clientName;
+  final String location;
+  final DateTime? timing;
+  final double amount;
+  final int duration; // in minutes
   final DateTime? startTime;
   final DateTime? endTime;
-  final double? distanceKm;
-  final double fareAmount;
-  final String status; // 'pending', 'ongoing', 'completed', 'cancelled'
-  final bool verified;
   final DateTime createdAt;
   
   // Location tracking fields
@@ -22,17 +20,15 @@ class Trip {
   final DateTime? lastLocationUpdate;
 
   Trip({
-    required this.tripId,
+    required this.historyId,
     required this.driverId,
-    required this.userId,
-    required this.startLocation,
-    required this.endLocation,
+    required this.clientName,
+    required this.location,
+    this.timing,
+    required this.amount,
+    required this.duration,
     this.startTime,
     this.endTime,
-    this.distanceKm,
-    required this.fareAmount,
-    required this.status,
-    required this.verified,
     required this.createdAt,
     this.startLatitude,
     this.startLongitude,
@@ -45,17 +41,15 @@ class Trip {
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
-      tripId: json['trip_id'] ?? 0,
+      historyId: json['history_id'] ?? 0,
       driverId: json['driver_id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      startLocation: json['start_location'] ?? '',
-      endLocation: json['end_location'] ?? '',
+      clientName: json['client_name'] ?? '',
+      location: json['location'] ?? '',
+      timing: json['timing'] != null ? DateTime.parse(json['timing']) : null,
+      amount: (json['amount'] ?? 0).toDouble(),
+      duration: json['duration'] ?? 0,
       startTime: json['start_time'] != null ? DateTime.parse(json['start_time']) : null,
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
-      distanceKm: json['distance_km']?.toDouble(),
-      fareAmount: (json['fare_amount'] ?? 0).toDouble(),
-      status: json['status'] ?? 'pending',
-      verified: json['verified'] == 1 || json['verified'] == true,
       createdAt: DateTime.parse(json['created_at']),
       startLatitude: json['start_latitude']?.toDouble(),
       startLongitude: json['start_longitude']?.toDouble(),
@@ -69,33 +63,29 @@ class Trip {
 
   Map<String, dynamic> toJson() {
     return {
-      'trip_id': tripId,
+      'history_id': historyId,
       'driver_id': driverId,
-      'user_id': userId,
-      'start_location': startLocation,
-      'end_location': endLocation,
+      'client_name': clientName,
+      'location': location,
+      'timing': timing?.toIso8601String(),
+      'amount': amount,
+      'duration': duration,
       'start_time': startTime?.toIso8601String(),
       'end_time': endTime?.toIso8601String(),
-      'distance_km': distanceKm,
-      'fare_amount': fareAmount,
-      'status': status,
-      'verified': verified ? 1 : 0,
       'created_at': createdAt.toIso8601String(),
     };
   }
 
   Trip copyWith({
-    int? tripId,
+    int? historyId,
     int? driverId,
-    int? userId,
-    String? startLocation,
-    String? endLocation,
+    String? clientName,
+    String? location,
+    DateTime? timing,
+    double? amount,
+    int? duration,
     DateTime? startTime,
     DateTime? endTime,
-    double? distanceKm,
-    double? fareAmount,
-    String? status,
-    bool? verified,
     DateTime? createdAt,
     double? startLatitude,
     double? startLongitude,
@@ -106,17 +96,15 @@ class Trip {
     DateTime? lastLocationUpdate,
   }) {
     return Trip(
-      tripId: tripId ?? this.tripId,
+      historyId: historyId ?? this.historyId,
       driverId: driverId ?? this.driverId,
-      userId: userId ?? this.userId,
-      startLocation: startLocation ?? this.startLocation,
-      endLocation: endLocation ?? this.endLocation,
+      clientName: clientName ?? this.clientName,
+      location: location ?? this.location,
+      timing: timing ?? this.timing,
+      amount: amount ?? this.amount,
+      duration: duration ?? this.duration,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      distanceKm: distanceKm ?? this.distanceKm,
-      fareAmount: fareAmount ?? this.fareAmount,
-      status: status ?? this.status,
-      verified: verified ?? this.verified,
       createdAt: createdAt ?? this.createdAt,
       startLatitude: startLatitude ?? this.startLatitude,
       startLongitude: startLongitude ?? this.startLongitude,
@@ -128,10 +116,9 @@ class Trip {
     );
   }
 
-  bool get isCompleted => status == 'completed';
-  bool get isOngoing => status == 'ongoing';
-  bool get isPending => status == 'pending';
-  bool get isCancelled => status == 'cancelled';
+  bool get isCompleted => endTime != null;
+  bool get isOngoing => startTime != null && endTime == null;
+  bool get isPending => startTime == null && endTime == null;
 
   Duration? get tripDuration {
     if (startTime != null && endTime != null) {
@@ -141,21 +128,15 @@ class Trip {
   }
 
   String get formattedDuration {
-    final duration = tripDuration;
-    if (duration == null) return 'N/A';
+    if (duration == 0) return 'N/A';
     
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes % 60;
+    final hours = duration ~/ 60;
+    final minutes = duration % 60;
     
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     } else {
       return '${minutes}m';
     }
-  }
-
-  String get formattedDistance {
-    if (distanceKm == null) return 'N/A';
-    return '${distanceKm!.toStringAsFixed(1)} km';
   }
 }

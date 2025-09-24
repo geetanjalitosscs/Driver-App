@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/emergency_request.dart';
 import '../providers/emergency_provider.dart';
-import '../services/geocoding_service.dart';
 import '../services/location_picker_service.dart';
 import 'package:provider/provider.dart';
 import 'location_picker_dialog.dart';
@@ -43,15 +42,14 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
     });
 
     try {
-      final result = await GeocodingService.validateAndGeocodeLocationSimulation(location);
-      
+      // Simple validation - just check if location is not empty
       if (mounted) {
         setState(() {
           _isValidatingLocation = false;
-          if (result['isValid'] == true) {
+          if (location.trim().isNotEmpty) {
             _locationError = null;
           } else {
-            _locationError = result['error'];
+            _locationError = 'Please enter a valid location';
           }
         });
       }
@@ -163,15 +161,18 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
       });
 
       try {
-        // Get coordinates for the location
-        final coordinates = await GeocodingService.getCoordinates(_locationController.text.trim());
+        // Use mock coordinates for simulation
+        final coordinates = {
+          'latitude': 23.0225, // Default coordinates for simulation
+          'longitude': 81.3784,
+        };
         
         // Debug: Print coordinates being set
         print("=== EMERGENCY SIMULATION DEBUG ===");
         print("Location entered: ${_locationController.text.trim()}");
         print("Coordinates received: $coordinates");
-        print("Latitude: ${coordinates?['latitude'] ?? 23.0225}");
-        print("Longitude: ${coordinates?['longitude'] ?? 81.3784}");
+        print("Latitude: ${coordinates['latitude']}");
+        print("Longitude: ${coordinates['longitude']}");
         
         // Create emergency request
         final emergencyRequest = EmergencyRequest.fromForm(

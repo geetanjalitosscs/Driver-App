@@ -1,6 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:io';
+import 'google_maps_url_service.dart';
 
 class LocationPickerService {
   // Get current location with high accuracy
@@ -54,30 +55,51 @@ class LocationPickerService {
       print('Position obtained: ${position.latitude}, ${position.longitude}');
       print('Accuracy: ${position.accuracy}m');
 
-      // Reverse geocode to get address
-      print('Reverse geocoding...');
+      // Reverse geocode to get address using Google Maps URL API (no API key required)
+      print('Reverse geocoding with Google Maps URL API...');
       String address = 'Unknown Location';
+      Map<String, String>? addressDetails;
       
       try {
-        List<Placemark> placemarks = await placemarkFromCoordinates(
+        // Try Google Maps URL service first (no API key required)
+        addressDetails = await GoogleMapsUrlService.getLocationFromCoordinates(
           position.latitude,
           position.longitude,
         );
-
-        print('Placemarks received: ${placemarks.length}');
-        if (placemarks.isNotEmpty) {
-          Placemark place = placemarks[0];
-          print('Placemark details:');
-          print('  Street: ${place.street}');
-          print('  Locality: ${place.locality}');
-          print('  AdministrativeArea: ${place.administrativeArea}');
-          print('  Country: ${place.country}');
-          
-          address = _formatAddress(place);
-          print('Address found: $address');
+        
+        if (addressDetails != null) {
+          address = addressDetails['shortAddress'] ?? addressDetails['formattedAddress'] ?? 'Unknown Location';
+          print('Google Maps URL API address found: $address');
         } else {
-          print('No address found, using mock address');
-          address = _getMockAddressFromCoordinates(position.latitude, position.longitude);
+          print('Google Maps URL API failed, trying local geocoding...');
+          
+          // Fallback to local geocoding
+          try {
+            List<Placemark> placemarks = await placemarkFromCoordinates(
+              position.latitude,
+              position.longitude,
+            );
+
+            print('Placemarks received: ${placemarks.length}');
+            if (placemarks.isNotEmpty) {
+              Placemark place = placemarks[0];
+              print('Placemark details:');
+              print('  Street: ${place.street}');
+              print('  Locality: ${place.locality}');
+              print('  AdministrativeArea: ${place.administrativeArea}');
+              print('  Country: ${place.country}');
+              
+              address = _formatAddress(place);
+              print('Local geocoding address found: $address');
+            } else {
+              print('No address found, using mock address');
+              address = _getMockAddressFromCoordinates(position.latitude, position.longitude);
+            }
+          } catch (localGeocodingError) {
+            print('Local geocoding also failed: $localGeocodingError');
+            print('Using mock address as final fallback');
+            address = _getMockAddressFromCoordinates(position.latitude, position.longitude);
+          }
         }
       } catch (geocodingError) {
         print('Geocoding error: $geocodingError');
@@ -95,6 +117,15 @@ class LocationPickerService {
         'address': address,
         'accuracy': position.accuracy,
         'timestamp': position.timestamp,
+        // Add detailed address information if available
+        'street': addressDetails?['street'] ?? '',
+        'city': addressDetails?['city'] ?? '',
+        'state': addressDetails?['state'] ?? '',
+        'country': addressDetails?['country'] ?? '',
+        'postalCode': addressDetails?['postalCode'] ?? '',
+        'formattedAddress': addressDetails?['formattedAddress'] ?? address,
+        'shortAddress': addressDetails?['shortAddress'] ?? address,
+        'fullAddress': addressDetails?['fullAddress'] ?? address,
       };
     } catch (e) {
       print('=== LOCATION ERROR ===');

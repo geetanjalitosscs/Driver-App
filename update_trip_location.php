@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 // Database configuration
 $host = '127.0.0.1';
-$dbname = 'apatkal_driver_app';
+$dbname = 'edueyeco_apatkal';
 $username = 'root';
 $password = '';
 

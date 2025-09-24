@@ -3,6 +3,8 @@
 /// Update this file with your actual Google Maps API key
 class MapsConfig {
   // Google Maps API Key - Replace with your actual API key
+  // Get your API key from: https://console.cloud.google.com/
+  // Enable: Geocoding API, Directions API, Maps JavaScript API
   static const String googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
   
   // Directions API settings

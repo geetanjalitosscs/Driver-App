@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/accident_provider.dart';
 import '../models/accident_report.dart';
-import '../services/navigation_service.dart';
 
 class AccidentReportDialog extends StatefulWidget {
   const AccidentReportDialog({super.key});
@@ -274,11 +274,12 @@ class _AccidentReportDialogState extends State<AccidentReportDialog> {
 
   void _openLocationInMaps(AccidentReport accident) async {
     try {
-      await NavigationService.openGoogleMaps(
-        destinationLat: accident.latitude,
-        destinationLng: accident.longitude,
-        destinationName: accident.location,
-      );
+      final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${accident.latitude},${accident.longitude}&travelmode=driving';
+      if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+        await launchUrl(Uri.parse(googleMapsUrl));
+      } else {
+        throw Exception('Could not launch Google Maps');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

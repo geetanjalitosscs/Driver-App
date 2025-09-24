@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 // Database configuration
 $host = '127.0.0.1';
-$dbname = 'apatkal_driver_app';
+$dbname = 'edueyeco_apatkal';
 $username = 'root';
 $password = '';
 
@@ -34,18 +34,17 @@ if ($driverId <= 0) {
 try {
     $stmt = $pdo->prepare("
         SELECT 
-            e.earning_id,
+            e.id,
             e.driver_id,
-            e.trip_id,
             e.amount,
             e.earning_date,
-            e.created_at,
-            t.start_location,
-            t.end_location
+            e.created_time,
+            t.location,
+            t.client_name
         FROM earnings e
-        LEFT JOIN trips t ON e.trip_id = t.trip_id
+        LEFT JOIN trips t ON e.driver_id = t.driver_id
         WHERE e.driver_id = ?
-        ORDER BY e.created_at DESC
+        ORDER BY e.created_time DESC
         LIMIT ?
     ");
     

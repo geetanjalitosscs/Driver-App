@@ -6,7 +6,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // Database configuration
 $host = '127.0.0.1';
-$dbname = 'apatkal_driver_app';
+$dbname = 'edueyeco_apatkal';
 $username = 'root';
 $password = '';
 
@@ -27,23 +27,21 @@ if ($driver_id <= 0) {
 }
 
 try {
-    // Fetch completed trips for the driver
+    // Fetch completed trips for the driver (assuming trips with end_time are completed)
     $stmt = $pdo->prepare("
         SELECT 
-            trip_id,
+            history_id,
             driver_id,
-            user_id,
-            start_location,
-            end_location,
+            client_name,
+            location,
+            timing,
+            amount,
+            duration,
             start_time,
             end_time,
-            distance_km,
-            fare_amount,
-            status,
-            verified,
             created_at
         FROM trips 
-        WHERE driver_id = ? AND status = 'completed'
+        WHERE driver_id = ? AND end_time IS NOT NULL
         ORDER BY created_at DESC
     ");
     
@@ -52,12 +50,10 @@ try {
     
     // Convert data types
     foreach ($trips as &$trip) {
-        $trip['trip_id'] = (int)$trip['trip_id'];
+        $trip['history_id'] = (int)$trip['history_id'];
         $trip['driver_id'] = (int)$trip['driver_id'];
-        $trip['user_id'] = (int)$trip['user_id'];
-        $trip['distance_km'] = $trip['distance_km'] ? (float)$trip['distance_km'] : null;
-        $trip['fare_amount'] = (float)$trip['fare_amount'];
-        $trip['verified'] = (bool)$trip['verified'];
+        $trip['amount'] = (float)$trip['amount'];
+        $trip['duration'] = (int)$trip['duration'];
     }
     
     echo json_encode($trips);

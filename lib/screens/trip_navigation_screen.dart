@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -75,7 +74,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       }
 
       // Parse end location from trip
-      _endLocation = await _parseLocationFromString(widget.trip.endLocation);
+      _endLocation = await _parseLocationFromString(widget.trip.location);
       
       if (_endLocation == null) {
         throw Exception('Could not parse end location');
@@ -217,7 +216,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
     // Update backend with current location
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     tripProvider.updateTripLocation(
-      widget.trip.tripId,
+      widget.trip.historyId,
       location.latitude,
       location.longitude,
     );
@@ -246,7 +245,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
 
     // Update trip status to ongoing
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
-    await tripProvider.acceptTrip(widget.trip.tripId, widget.trip.driverId);
+    await tripProvider.acceptTrip(widget.trip.historyId, widget.trip.driverId);
   }
 
   Future<void> _completeTrip() async {
@@ -297,7 +296,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
         children: [
           Text('Trip Duration: ${_formatDuration(_tripDuration)}'),
           Text('Distance Traveled: ${_tripDistance.toStringAsFixed(1)} km'),
-          Text('Fare: ₹${widget.trip.fareAmount}'),
+          Text('Fare: ₹${widget.trip.amount}'),
           const SizedBox(height: 16),
           const Text('Are you sure you want to complete this trip?'),
         ],
@@ -323,18 +322,18 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       final result = await tripProvider.completeTrip(
-        tripId: widget.trip.tripId,
+        tripId: widget.trip.historyId,
         driverId: widget.trip.driverId,
         endLatitude: _currentLocation!.latitude,
         endLongitude: _currentLocation!.longitude,
-        endLocation: widget.trip.endLocation,
+        endLocation: widget.trip.location,
       );
 
       if (result['success'] == true) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Trip completed successfully! Fare: ₹${widget.trip.fareAmount}'),
+            content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -460,7 +459,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                       ),
                       Expanded(
                         child: Text(
-                          'Trip #${widget.trip.tripId}',
+                          'Trip #${widget.trip.historyId}',
                           style: GoogleFonts.roboto(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -469,7 +468,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                         ),
                       ),
                       Text(
-                        '₹${widget.trip.fareAmount}',
+                        '₹${widget.trip.amount}',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
