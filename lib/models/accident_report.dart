@@ -74,6 +74,11 @@ class AccidentReport {
     );
   }
 
+  /// Factory method for JSON data
+  factory AccidentReport.fromJson(Map<String, dynamic> map) {
+    return AccidentReport.fromApiMap(map);
+  }
+
   /// Factory method for API data
   factory AccidentReport.fromApiMap(Map<String, dynamic> map) {
     String safeString(dynamic value) {

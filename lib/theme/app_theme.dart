@@ -20,6 +20,10 @@ class AppTheme {
   static const Color accentOrangeDark = Color(0xFFF57C00);
   static const Color accentOrangeLight = Color(0xFFFFB74D);
   
+  static const Color accentPurple = Color(0xFF9C27B0);
+  static const Color accentPurpleDark = Color(0xFF7B1FA2);
+  static const Color accentPurpleLight = Color(0xFFBA68C8);
+  
   static const Color neutralGrey = Color(0xFF424242);
   static const Color neutralGreyLight = Color(0xFF757575);
   static const Color neutralGreyDark = Color(0xFF212121);

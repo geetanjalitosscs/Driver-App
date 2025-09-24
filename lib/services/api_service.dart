@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/accident_report.dart';
 
 class ApiService {
   static const String baseUrl = "http://your-domain.com"; // change
 
-  static Future<List<Accident>> fetchAccidents() async {
+  static Future<List<AccidentReport>> fetchAccidents() async {
     final response = await http.get(Uri.parse("$baseUrl/get_accidents.php"));
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      return data.map((e) => Accident.fromJson(e)).toList();
+      return data.map((e) => AccidentReport.fromJson(e)).toList();
     } else {
       throw Exception("Failed to load accidents");
     }

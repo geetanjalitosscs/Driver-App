@@ -7,7 +7,10 @@ class DatabaseConfig {
   static const int port = 3306;                    // Alternative MySQL port
   static const String user = 'root';          // XAMPP default user
   static const String password = '';  // XAMPP default (no password)
-  static const String database = 'apatkal';        // Database name
+  static const String database = 'apatkal_driver_app';        // Driver app database name
+  
+  // API Base URL for trip operations
+  static const String baseUrl = 'http://localhost/apatkal_driver_app/api';
   
   /// Get connection settings as a map
   static Map<String, dynamic> get connectionSettings => {

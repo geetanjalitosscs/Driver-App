@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
+import '../providers/earnings_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/navigation_provider.dart';
+import '../models/earning.dart';
 
-class EarningsScreen extends StatelessWidget {
+class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
+
+  @override
+  State<EarningsScreen> createState() => _EarningsScreenState();
+}
+
+class _EarningsScreenState extends State<EarningsScreen> {
+  String _selectedPeriod = 'today';
+  final List<Map<String, String>> _periods = [
+    {'value': 'today', 'label': 'Today'},
+    {'value': 'week', 'label': 'This Week'},
+    {'value': 'month', 'label': 'This Month'},
+    {'value': 'year', 'label': 'This Year'},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEarnings();
+  }
+
+  Future<void> _loadEarnings() async {
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+    
+    if (profileProvider.profile.driverId.isNotEmpty) {
+      await earningsProvider.loadDriverEarnings(
+        int.parse(profileProvider.profile.driverId),
+        _selectedPeriod,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +50,11 @@ class EarningsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            // Navigate back to home screen using NavigationProvider
+            final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+            navigationProvider.navigateToHome();
           },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-            size: 24,
-          ),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
           padding: const EdgeInsets.all(16),
         ),
         title: Text(
@@ -29,202 +62,254 @@ class EarningsScreen extends StatelessWidget {
           style: AppTheme.heading3.copyWith(color: Colors.white),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _loadEarnings,
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            padding: const EdgeInsets.all(16),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Today's Earnings Card
-            AppCard(
+      body: Consumer2<EarningsProvider, ProfileProvider>(
+        builder: (context, earningsProvider, profileProvider, child) {
+          if (earningsProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (earningsProvider.errorMessage != null) {
+            return Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(Icons.error_outline, color: AppTheme.accentRed, size: 48),
+                  const SizedBox(height: 16),
                   Text(
-                    "Today's Earnings",
-                    style: AppTheme.heading3,
+                    earningsProvider.errorMessage!,
+                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.accentRed),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                   LayoutBuilder(
-                     builder: (context, constraints) {
-                       if (constraints.maxWidth < 300) {
-                         // Stack vertically for very small screens
-                         return Column(
-                           children: [
-                             Center(
-                               child: SizedBox(
-                                 width: constraints.maxWidth * 0.8, // Use 80% of screen width
-                                 child: _buildEarningCard(
-                                   'Total Earnings',
-                                   '₹1,850',
-                                   Icons.currency_rupee,
-                                   AppTheme.accentGreen,
-                                 ),
-                               ),
-                             ),
-                             const SizedBox(height: 12),
-                             Center(
-                               child: SizedBox(
-                                 width: constraints.maxWidth * 0.8,
-                                 child: _buildEarningCard(
-                                   'Trips Today',
-                                   '12',
-                                   Icons.directions_car,
-                                   AppTheme.primaryBlue,
-                                 ),
-                               ),
-                             ),
-                             const SizedBox(height: 12),
-                             Center(
-                               child: SizedBox(
-                                 width: constraints.maxWidth * 0.8,
-                                 child: _buildEarningCard(
-                                   'Avg per Trip',
-                                   '₹154',
-                                   Icons.trending_up,
-                                   AppTheme.accentOrange,
-                                 ),
-                               ),
-                             ),
-                             const SizedBox(height: 12),
-                             Center(
-                               child: SizedBox(
-                                 width: constraints.maxWidth * 0.8,
-                                 child: _buildEarningCard(
-                                   'Hours Worked',
-                                   '8.5',
-                                   Icons.access_time,
-                                   Colors.purple,
-                                 ),
-                               ),
-                             ),
-                           ],
-                         );
-                       } else if (constraints.maxWidth < 500) {
-                         // Use 2x2 grid for medium screens
-                         return Column(
-                           children: [
-                             Row(
-                               children: [
-                                 Expanded(
-                                   child: _buildEarningCard(
-                                     'Total Earnings',
-                                     '₹1,850',
-                                     Icons.currency_rupee,
-                                     AppTheme.accentGreen,
-                                   ),
-                                 ),
-                                 const SizedBox(width: 12),
-                                 Expanded(
-                                   child: _buildEarningCard(
-                                     'Trips Today',
-                                     '12',
-                                     Icons.directions_car,
-                                     AppTheme.primaryBlue,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             const SizedBox(height: 12),
-                             Row(
-                               children: [
-                                 Expanded(
-                                   child: _buildEarningCard(
-                                     'Avg per Trip',
-                                     '₹154',
-                                     Icons.trending_up,
-                                     AppTheme.accentOrange,
-                                   ),
-                                 ),
-                                 const SizedBox(width: 12),
-                                 Expanded(
-                                   child: _buildEarningCard(
-                                     'Hours Worked',
-                                     '8.5',
-                                     Icons.access_time,
-                                     Colors.purple,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                           ],
-                         );
-                       } else {
-                         // Use 4x1 row for wide screens
-                         return Row(
-                           children: [
-                             Expanded(
-                               child: _buildEarningCard(
-                                 'Total Earnings',
-                                 '₹1,850',
-                                 Icons.currency_rupee,
-                                 AppTheme.accentGreen,
-                               ),
-                             ),
-                             const SizedBox(width: 12),
-                             Expanded(
-                               child: _buildEarningCard(
-                                 'Trips Today',
-                                 '12',
-                                 Icons.directions_car,
-                                 AppTheme.primaryBlue,
-                               ),
-                             ),
-                             const SizedBox(width: 12),
-                             Expanded(
-                               child: _buildEarningCard(
-                                 'Avg per Trip',
-                                 '₹154',
-                                 Icons.trending_up,
-                                 AppTheme.accentOrange,
-                               ),
-                             ),
-                             const SizedBox(width: 12),
-                             Expanded(
-                               child: _buildEarningCard(
-                                 'Hours Worked',
-                                 '8.5',
-                                 Icons.access_time,
-                                 Colors.purple,
-                               ),
-                             ),
-                           ],
-                         );
-                       }
-                     },
-                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Weekly Earnings
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Weekly Earnings',
-                    style: AppTheme.heading3,
+                  ElevatedButton(
+                    onPressed: _loadEarnings,
+                    child: const Text('Retry'),
                   ),
-                  const SizedBox(height: 16),
-                  _buildWeeklyChart(),
                 ],
               ),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Period Selector
+                _buildPeriodSelector(),
+                const SizedBox(height: 16),
+
+                // Summary Cards
+                _buildSummaryCards(earningsProvider),
+                const SizedBox(height: 16),
+
+                // Weekly Chart (if applicable)
+                if (_selectedPeriod == 'week' || _selectedPeriod == 'month' || _selectedPeriod == 'year')
+                  _buildWeeklyChart(earningsProvider),
+                if (_selectedPeriod == 'week' || _selectedPeriod == 'month' || _selectedPeriod == 'year')
+                  const SizedBox(height: 16),
+
+                // Recent Earnings Section
+                _buildRecentEarningsSection(earningsProvider),
+              ],
             ),
-            const SizedBox(height: 16),
-            
-            // Recent Transactions
-            Text(
-              'Recent Transactions',
-              style: AppTheme.heading3,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPeriodSelector() {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Period',
+            style: AppTheme.heading3,
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedPeriod,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
-            const SizedBox(height: 12),
-            
-            // Transaction List
-            ...List.generate(5, (index) => _buildTransactionCard(index)),
-          ],
-        ),
+            items: _periods.map((period) {
+              return DropdownMenuItem<String>(
+                value: period['value'],
+                child: Text(period['label']!),
+              );
+            }).toList(),
+            onChanged: (String? newValue) async {
+              if (newValue != null && newValue != _selectedPeriod) {
+                setState(() {
+                  _selectedPeriod = newValue;
+                });
+                
+                final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+                final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+                
+                if (profileProvider.profile.driverId.isNotEmpty) {
+                  await earningsProvider.changePeriod(
+                    int.parse(profileProvider.profile.driverId),
+                    newValue,
+                  );
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCards(EarningsProvider earningsProvider) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${earningsProvider.getPeriodDisplayName()} Earnings',
+            style: AppTheme.heading3,
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 300) {
+                return Column(
+                  children: [
+                    _buildEarningCard(
+                      'Total Earnings',
+                      '₹${earningsProvider.totalEarnings.toStringAsFixed(2)}',
+                      Icons.currency_rupee,
+                      AppTheme.accentGreen,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEarningCard(
+                      'Total Trips',
+                      '${earningsProvider.totalTrips}',
+                      Icons.directions_car,
+                      AppTheme.primaryBlue,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEarningCard(
+                      'Avg per Trip',
+                      '₹${earningsProvider.averagePerTrip.toStringAsFixed(2)}',
+                      Icons.trending_up,
+                      AppTheme.accentOrange,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEarningCard(
+                      'Hours Worked',
+                      '${earningsProvider.totalHours.toStringAsFixed(1)}',
+                      Icons.access_time,
+                      Colors.purple,
+                    ),
+                  ],
+                );
+              } else if (constraints.maxWidth < 500) {
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildEarningCard(
+                            'Total Earnings',
+                            '₹${earningsProvider.totalEarnings.toStringAsFixed(2)}',
+                            Icons.currency_rupee,
+                            AppTheme.accentGreen,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildEarningCard(
+                            'Total Trips',
+                            '${earningsProvider.totalTrips}',
+                            Icons.directions_car,
+                            AppTheme.primaryBlue,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildEarningCard(
+                            'Avg per Trip',
+                            '₹${earningsProvider.averagePerTrip.toStringAsFixed(2)}',
+                            Icons.trending_up,
+                            AppTheme.accentOrange,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildEarningCard(
+                            'Hours Worked',
+                            '${earningsProvider.totalHours.toStringAsFixed(1)}',
+                            Icons.access_time,
+                            Colors.purple,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              } else {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: _buildEarningCard(
+                        'Total Earnings',
+                        '₹${earningsProvider.totalEarnings.toStringAsFixed(2)}',
+                        Icons.currency_rupee,
+                        AppTheme.accentGreen,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildEarningCard(
+                        'Total Trips',
+                        '${earningsProvider.totalTrips}',
+                        Icons.directions_car,
+                        AppTheme.primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildEarningCard(
+                        'Avg per Trip',
+                        '₹${earningsProvider.averagePerTrip.toStringAsFixed(2)}',
+                        Icons.trending_up,
+                        AppTheme.accentOrange,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildEarningCard(
+                        'Hours Worked',
+                        '${earningsProvider.totalHours.toStringAsFixed(1)}',
+                        Icons.access_time,
+                        Colors.purple,
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -259,61 +344,88 @@ class EarningsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeeklyChart() {
-    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final earnings = [1200, 1500, 1800, 1600, 1900, 2200, 1850];
-    
+  Widget _buildWeeklyChart(EarningsProvider earningsProvider) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Weekly Earnings',
+            style: AppTheme.heading3,
+          ),
+          const SizedBox(height: 16),
+          if (earningsProvider.weeklyData.isEmpty)
+            Center(
+              child: Text(
+                'No weekly data available',
+                style: AppTheme.bodyMedium.copyWith(color: AppTheme.neutralGrey),
+              ),
+            )
+          else
+            _buildChart(earningsProvider),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChart(EarningsProvider earningsProvider) {
+    final maxAmount = earningsProvider.weeklyData.isNotEmpty
+        ? earningsProvider.weeklyData.map((e) => e['amount'] as double).reduce((a, b) => a > b ? a : b)
+        : 1.0;
+
     return Column(
       children: [
-         SizedBox(
-           height: 120,
-           child: LayoutBuilder(
-             builder: (context, constraints) {
-               double barWidth;
-               double chartHeight;
-               
-               if (constraints.maxWidth < 300) {
-                 barWidth = 15.0;
-                 chartHeight = 80.0;
-               } else if (constraints.maxWidth < 500) {
-                 barWidth = 20.0;
-                 chartHeight = 90.0;
-               } else {
-                 barWidth = 30.0;
-                 chartHeight = 100.0;
-               }
-               
-               return Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                 crossAxisAlignment: CrossAxisAlignment.end,
-                 children: List.generate(days.length, (index) {
-                   final height = (earnings[index] / 2500) * chartHeight;
-                   return Column(
-                     mainAxisAlignment: MainAxisAlignment.end,
-                     children: [
-                       Container(
-                         width: barWidth,
-                         height: height,
-                         decoration: BoxDecoration(
-                           color: AppTheme.primaryBlue.withOpacity(0.7),
-                           borderRadius: BorderRadius.circular(4),
-                         ),
-                       ),
-                       const SizedBox(height: 6),
-                       Text(
-                         days[index],
-                         style: AppTheme.bodySmall.copyWith(
-                           color: AppTheme.neutralGreyLight,
-                           fontSize: constraints.maxWidth < 300 ? 10 : 12,
-                         ),
-                       ),
-                     ],
-                   );
-                 }),
-               );
-             },
-           ),
-         ),
+        SizedBox(
+          height: 120,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              double barWidth;
+              double chartHeight;
+
+              if (constraints.maxWidth < 300) {
+                barWidth = 15.0;
+                chartHeight = 80.0;
+              } else if (constraints.maxWidth < 500) {
+                barWidth = 20.0;
+                chartHeight = 90.0;
+              } else {
+                barWidth = 30.0;
+                chartHeight = 100.0;
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: earningsProvider.weeklyData.map((dayData) {
+                  final amount = dayData['amount'] as double;
+                  final height = maxAmount > 0 ? (amount / maxAmount) * chartHeight : 0.0;
+                  
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: barWidth,
+                        height: height,
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        dayData['day_short'] as String,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.neutralGreyLight,
+                          fontSize: constraints.maxWidth < 300 ? 10 : 12,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ),
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -321,7 +433,7 @@ class EarningsScreen extends StatelessWidget {
               return Column(
                 children: [
                   Text(
-                    '₹${earnings.reduce((a, b) => a + b)}',
+                    '₹${earningsProvider.weeklyTotal.toStringAsFixed(2)}',
                     style: AppTheme.bodyLarge.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppTheme.accentGreen,
@@ -340,7 +452,7 @@ class EarningsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    '₹${earnings.reduce((a, b) => a + b)}',
+                    '₹${earningsProvider.weeklyTotal.toStringAsFixed(2)}',
                     style: AppTheme.bodyLarge.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppTheme.accentGreen,
@@ -361,17 +473,37 @@ class EarningsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionCard(int index) {
-    final transactions = [
-      {'patient': 'John Doe', 'amount': '₹180', 'time': '2:30 PM', 'type': 'Trip'},
-      {'patient': 'Jane Smith', 'amount': '₹220', 'time': '1:15 PM', 'type': 'Trip'},
-      {'patient': 'Mike Johnson', 'amount': '₹160', 'time': '11:45 AM', 'type': 'Trip'},
-      {'patient': 'Bonus', 'amount': '₹100', 'time': '10:00 AM', 'type': 'Bonus'},
-      {'patient': 'Sarah Wilson', 'amount': '₹200', 'time': '9:20 AM', 'type': 'Trip'},
-    ];
-    
-    final transaction = transactions[index];
-    
+  Widget _buildRecentEarningsSection(EarningsProvider earningsProvider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Recent Earnings',
+          style: AppTheme.heading3,
+        ),
+        const SizedBox(height: 12),
+        if (earningsProvider.recentEarnings.isEmpty)
+          AppCard(
+            child: Center(
+              child: Column(
+                children: [
+                  Icon(Icons.receipt_long, color: AppTheme.neutralGreyLight, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No recent earnings found',
+                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.neutralGrey),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          ...earningsProvider.recentEarnings.map((earning) => _buildEarningItemCard(earning)).toList(),
+      ],
+    );
+  }
+
+  Widget _buildEarningItemCard(Earning earning) {
     return AppCard(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -381,14 +513,12 @@ class EarningsScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: transaction['type'] == 'Bonus' 
-                  ? AppTheme.accentOrange.withOpacity(0.1)
-                  : AppTheme.accentGreen.withOpacity(0.1),
+              color: AppTheme.accentGreen.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
-              transaction['type'] == 'Bonus' ? Icons.card_giftcard : Icons.directions_car,
-              color: transaction['type'] == 'Bonus' ? AppTheme.accentOrange : AppTheme.accentGreen,
+              Icons.directions_car,
+              color: AppTheme.accentGreen,
               size: 20,
             ),
           ),
@@ -398,14 +528,14 @@ class EarningsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction['patient']!,
+                  'Trip #${earning.tripId}',
                   style: AppTheme.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  transaction['time']!,
+                  _formatDateTime(earning.createdAt),
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.neutralGreyLight,
                   ),
@@ -414,7 +544,7 @@ class EarningsScreen extends StatelessWidget {
             ),
           ),
           Text(
-            transaction['amount']!,
+            '₹${earning.amount.toStringAsFixed(2)}',
             style: AppTheme.bodyMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppTheme.accentGreen,
@@ -423,5 +553,20 @@ class EarningsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else {
+      return 'Just now';
+    }
   }
 }

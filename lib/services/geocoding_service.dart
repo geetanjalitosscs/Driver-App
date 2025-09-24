@@ -6,6 +6,29 @@ class GeocodingService {
   static const String _apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
   static const String _baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
 
+  // Get address from coordinates
+  static Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl?latlng=$latitude,$longitude&key=$_apiKey'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+          return data['results'][0]['formatted_address'];
+        } else {
+          return 'Unknown Location';
+        }
+      } else {
+        return 'Unknown Location';
+      }
+    } catch (e) {
+      return 'Unknown Location';
+    }
+  }
+
   // Validate and geocode location
   static Future<Map<String, dynamic>> validateAndGeocodeLocation(String location) async {
     try {

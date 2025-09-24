@@ -3,7 +3,7 @@ import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
 import '../services/accident_api_service.dart';
 import '../services/database_helper.dart';
-import '../services/navigation_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AccidentProvider extends ChangeNotifier {
   List<AccidentReport> _accidentList = [];
@@ -150,11 +150,12 @@ class AccidentProvider extends ChangeNotifier {
 
       if (success) {
         // Open location in Google Maps - will show "Your location" as origin
-        await NavigationService.openGoogleMapsWithCurrentLocation(
-          destinationLat: _currentAccident!.latitude,
-          destinationLng: _currentAccident!.longitude,
-          destinationName: _currentAccident!.location,
-        );
+        final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${_currentAccident!.latitude},${_currentAccident!.longitude}&travelmode=driving';
+        if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+          await launchUrl(Uri.parse(googleMapsUrl));
+        } else {
+          throw Exception('Could not launch Google Maps');
+        }
 
         _moveToNextAccident();
         return true;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
@@ -9,12 +10,16 @@ import '../widgets/emergency_simulation_dialog.dart';
 import '../providers/profile_provider.dart';
 import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
-import '../services/navigation_service.dart';
+import '../providers/trip_provider.dart';
+import '../providers/earnings_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/location_picker_service.dart';
-import '../services/notification_service.dart';
 import '../widgets/api_accident_report_dialog.dart';
+import '../widgets/trip_completion_dialog.dart';
+import '../models/trip.dart';
 import 'profile_screen.dart';
 import 'accident_list_screen.dart';
+import 'trip_navigation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,8 +30,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isOnDuty = false;
-  final int _todayCalls = 12;
-  final double _dailyEarnings = 1850.0;
   final String _nextShift = 'Tomorrow, 07:00 AM';
   
   // Location variables
@@ -44,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _getCurrentLocation();
     _startRefreshTimer();
     _loadInitialAccidentCount();
+    _loadOngoingTrips();
+    _loadStatisticsData();
   }
 
   @override
@@ -106,6 +111,52 @@ class _HomeScreenState extends State<HomeScreen> {
     await _getCurrentLocation();
   }
 
+  Future<void> _loadOngoingTrips() async {
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    
+    if (profileProvider.profile.driverId.isNotEmpty) {
+      await tripProvider.loadOngoingTrips(int.parse(profileProvider.profile.driverId));
+    }
+  }
+
+  Future<void> _loadStatisticsData() async {
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+    
+    if (profileProvider.profile.driverId.isNotEmpty) {
+      final driverId = int.parse(profileProvider.profile.driverId);
+      
+      // Load completed trips for today
+      await tripProvider.loadCompletedTrips(driverId);
+      
+      // Load today's earnings
+      await earningsProvider.loadDriverEarnings(driverId, 'today');
+    }
+  }
+
+  Future<void> _navigateToTrip(trip) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TripNavigationScreen(trip: trip),
+      ),
+    );
+  }
+
+  Future<void> _showTripCompletionDialog(trip) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => TripCompletionDialog(trip: trip),
+    );
+    
+    if (result == true) {
+      // Trip completed successfully, refresh ongoing trips
+      await _loadOngoingTrips();
+    }
+  }
+
   void _showAccidentReports() {
     showDialog(
       context: context,
@@ -157,11 +208,12 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         
         // Use destination-only navigation to avoid confusion with current location
-        await NavigationService.openGoogleMaps(
-          destinationLat: emergency.latitude!,
-          destinationLng: emergency.longitude!,
-          destinationName: emergency.location,
-        );
+        final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${emergency.latitude},${emergency.longitude}&travelmode=driving';
+        if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+          await launchUrl(Uri.parse(googleMapsUrl));
+        } else {
+          throw Exception('Could not launch Google Maps');
+        }
         
         print("Navigation opened successfully to: ${emergency.location}");
         print("=== EMERGENCY NAVIGATION DEBUG END ===");
@@ -223,6 +275,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Action Buttons (only when online)
                   if (_isOnDuty) _buildActionButtons(),
                   if (_isOnDuty) const SizedBox(height: 16),
+                  
+                  // Ongoing Trips Section
+                  _buildOngoingTripsSection(),
                   
                   // Emergency Request Card (dynamic)
                   if (emergencyProvider.hasActiveEmergency)
@@ -811,69 +866,269 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildStatisticsCards() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-          children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < 400) {
-                // Stack vertically for small screens
-                return Column(
-                  children: [
-                    _buildStatCard(
-                      'Today\'s Trips',
-                      '$_todayCalls',
-                      Icons.directions_car,
-                      AppTheme.primaryBlue,
-                      '+2 from yesterday',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatCard(
-                      'Earnings',
-                      '₹$_dailyEarnings',
-                      Icons.currency_rupee,
-                      AppTheme.accentGreen,
-                      '+₹150 today',
-                    ),
-                  ],
-                );
-              } else {
-                // Use horizontal layout for larger screens
-                return Row(
+      child: Consumer2<TripProvider, EarningsProvider>(
+        builder: (context, tripProvider, earningsProvider, child) {
+          // Get today's completed trips count
+          final todayTrips = _getTodayTripsCount(tripProvider.completedTrips);
+          
+          // Get today's earnings
+          final todayEarnings = earningsProvider.totalEarnings ?? 0.0;
+          
+          return Column(
             children: [
-              Expanded(
-                child: _buildStatCard(
-                  'Today\'s Trips',
-                  '$_todayCalls',
-                  Icons.directions_car,
-                        AppTheme.primaryBlue,
-                  '+2 from yesterday',
-                ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 400) {
+                    // Stack vertically for small screens
+                    return Column(
+                      children: [
+                        _buildStatCard(
+                          'Today\'s Trips',
+                          '$todayTrips',
+                          Icons.directions_car,
+                          AppTheme.primaryBlue,
+                          _getTripsSubtitle(todayTrips),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatCard(
+                          'Earnings',
+                          '₹${todayEarnings.toStringAsFixed(2)}',
+                          Icons.currency_rupee,
+                          AppTheme.accentGreen,
+                          _getEarningsSubtitle(todayEarnings),
+                        ),
+                      ],
+                    );
+                  } else {
+                    // Use horizontal layout for larger screens
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            'Today\'s Trips',
+                            '$todayTrips',
+                            Icons.directions_car,
+                            AppTheme.primaryBlue,
+                            _getTripsSubtitle(todayTrips),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildStatCard(
+                            'Earnings',
+                            '₹${todayEarnings.toStringAsFixed(2)}',
+                            Icons.currency_rupee,
+                            AppTheme.accentGreen,
+                            _getEarningsSubtitle(todayEarnings),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  'Earnings',
-                  '₹$_dailyEarnings',
-                  Icons.currency_rupee,
-                        AppTheme.accentGreen,
-                  '+₹150 today',
-                ),
+              const SizedBox(height: 12),
+              InfoCard(
+                icon: Icons.schedule,
+                title: 'Next Shift',
+                subtitle: _nextShift,
+                iconColor: AppTheme.accentOrange,
               ),
             ],
-                );
-              }
-            },
-          ),
-          const SizedBox(height: 12),
-          InfoCard(
-            icon: Icons.schedule,
-            title: 'Next Shift',
-            subtitle: _nextShift,
-            iconColor: AppTheme.accentOrange,
-          ),
-        ],
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildOngoingTripsSection() {
+    return Consumer<TripProvider>(
+      builder: (context, tripProvider, child) {
+        final ongoingTrips = tripProvider.ongoingTrips;
+        
+        if (ongoingTrips.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Ongoing Trips',
+                style: GoogleFonts.roboto(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryBlue,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...ongoingTrips.map((trip) => _buildOngoingTripCard(trip)).toList(),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildOngoingTripCard(trip) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: AppCard(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.local_taxi,
+                    color: AppTheme.primaryBlue,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Trip #${trip.tripId}',
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ),
+                      Text(
+                        'Fare: ₹${trip.fareAmount}',
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => _navigateToTrip(trip),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Navigate',
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Colors.grey[600], size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    trip.startLocation,
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Colors.grey[600], size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    trip.endLocation,
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            if (trip.startTime != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.grey[600], size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Started: ${_formatDateTime(trip.startTime!)}',
+                    style: GoogleFonts.roboto(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  int _getTodayTripsCount(List<Trip> completedTrips) {
+    final today = DateTime.now();
+    return completedTrips.where((trip) {
+      return trip.endTime != null &&
+             trip.endTime!.year == today.year &&
+             trip.endTime!.month == today.month &&
+             trip.endTime!.day == today.day;
+    }).length;
+  }
+
+  String _getTripsSubtitle(int todayTrips) {
+    if (todayTrips == 0) {
+      return 'No trips today';
+    } else if (todayTrips == 1) {
+      return '1 trip completed';
+    } else {
+      return '$todayTrips trips completed';
+    }
+  }
+
+  String _getEarningsSubtitle(double todayEarnings) {
+    if (todayEarnings == 0) {
+      return 'No earnings today';
+    } else if (todayEarnings < 100) {
+      return '₹${todayEarnings.toStringAsFixed(2)} earned';
+    } else {
+      return '₹${todayEarnings.toStringAsFixed(2)} earned';
+    }
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color, String subtitle) {

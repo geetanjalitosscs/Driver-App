@@ -2,11 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
+import '../providers/trip_provider.dart';
+import '../providers/profile_provider.dart';
 import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
+import '../models/trip.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/accident_filter_widget.dart';
+import '../screens/trip_navigation_screen.dart';
 import '../theme/app_theme.dart';
 
 class ApiAccidentReportDialog extends StatefulWidget {
@@ -377,8 +381,20 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       );
       
       if (success) {
-        // Close dialog and return to home page immediately
+        // Create a trip from the accepted accident report
+        final trip = await _createTripFromAccident(provider.currentAccident!);
+        
+        // Close accident dialog
         Navigator.of(context).pop();
+        
+        // Navigate to trip navigation screen
+        if (trip != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TripNavigationScreen(trip: trip),
+            ),
+          );
+        }
         
         // Refresh the pending count in the background
         provider.refreshPendingCount();
@@ -391,6 +407,47 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       setState(() {
         _isProcessing = false;
       });
+    }
+  }
+
+  Future<Trip?> _createTripFromAccident(AccidentReport accident) async {
+    try {
+      final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      
+      if (profileProvider.profile.driverId.isNotEmpty) {
+        final driverId = int.parse(profileProvider.profile.driverId);
+        
+        // Create a trip with the accident details
+        final tripData = {
+          'driver_id': driverId,
+          'user_id': 1, // Default user ID for accident reports
+          'start_location': accident.location,
+          'end_location': accident.location, // Same location for accident response
+          'fare_amount': 500.0, // Default fare for accident response
+          'status': 'ongoing',
+          'start_time': DateTime.now().toIso8601String(),
+        };
+        
+        // Accept the trip (this will create it in the database)
+        await tripProvider.acceptTrip(
+          accident.id, // Use accident ID as trip ID for now
+          driverId,
+        );
+        
+        // Refresh ongoing trips
+        await tripProvider.loadOngoingTrips(driverId);
+        
+        // Return the created trip
+        final ongoingTrips = tripProvider.ongoingTrips;
+        if (ongoingTrips.isNotEmpty) {
+          return ongoingTrips.first;
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error creating trip from accident: $e');
+      return null;
     }
   }
 

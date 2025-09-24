@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
+import '../providers/navigation_provider.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
@@ -165,7 +167,9 @@ class _HelpScreenState extends State<HelpScreen> {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            // Navigate back to home screen using NavigationProvider
+            final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+            navigationProvider.navigateToHome();
           },
           icon: const Icon(
             Icons.arrow_back,

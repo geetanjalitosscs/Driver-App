@@ -25,9 +25,9 @@ class AccidentDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Name: ${accident.fullName}"),
-            Text("Phone: ${accident.phoneNumber}"),
-            Text("Vehicle: ${accident.vehicleNumber}"),
+            Text("Name: ${accident.fullname}"),
+            Text("Phone: ${accident.phone}"),
+            Text("Vehicle: ${accident.vehicle}"),
             Text("Location: ${accident.location}"),
             Text("Description: ${accident.description}"),
             const SizedBox(height: 20),
