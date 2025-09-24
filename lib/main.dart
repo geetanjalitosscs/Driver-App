@@ -15,6 +15,7 @@ import 'providers/trip_provider.dart';
 import 'providers/earnings_provider.dart';
 import 'providers/wallet_provider.dart';
 import 'providers/navigation_provider.dart';
+import 'providers/settings_provider.dart';
 import 'services/notification_service.dart';
 import 'widgets/notification_banner.dart';
 
@@ -49,6 +50,7 @@ class AmbulanceDriverApp extends StatelessWidget {
             ChangeNotifierProvider(create: (context) => EarningsProvider()),
             ChangeNotifierProvider(create: (context) => WalletProvider()),
             ChangeNotifierProvider(create: (context) => NavigationProvider()),
+            ChangeNotifierProvider(create: (context) => SettingsProvider()),
           ],
       child: MaterialApp(
         title: 'Ambulance Driver App',

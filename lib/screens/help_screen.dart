@@ -17,14 +17,146 @@ class _HelpScreenState extends State<HelpScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // FAQ Categories data
+  // FAQ Categories data with detailed content
   final List<Map<String, dynamic>> _faqCategories = [
-    {'title': 'Account Issues', 'icon': Icons.person, 'color': Colors.blue, 'keywords': 'account profile login signup'},
-    {'title': 'Trip Problems', 'icon': Icons.work, 'color': Colors.orange, 'keywords': 'trip ride journey travel'},
-    {'title': 'Payment Issues', 'icon': Icons.schedule, 'color': Colors.purple, 'keywords': 'payment money wallet cash'},
-    {'title': 'Trip History', 'icon': Icons.description, 'color': Colors.teal, 'keywords': 'history past trips record'},
-    {'title': 'Earnings & Payouts', 'icon': Icons.currency_rupee, 'color': Colors.green, 'keywords': 'earnings money payout income'},
-    {'title': 'Technical Support', 'icon': Icons.computer, 'color': Colors.red, 'keywords': 'technical support help bug error'},
+    {
+      'title': 'Account Issues', 
+      'icon': Icons.person, 
+      'color': Colors.blue, 
+      'keywords': 'account profile login signup',
+      'content': {
+        'common_issues': [
+          'How to update my profile information?',
+          'What if I forgot my password?',
+          'How to change my phone number?',
+          'Account verification problems',
+          'Profile photo upload issues'
+        ],
+        'solutions': [
+          'Go to Profile → Edit Profile → Update information',
+          'Use "Forgot Password" on login screen',
+          'Contact support for phone number changes',
+          'Check email for verification link',
+          'Use clear, well-lit photos under 5MB'
+        ],
+        'contact_info': 'For account issues, contact support at +91-7834920469'
+      }
+    },
+    {
+      'title': 'Trip Problems', 
+      'icon': Icons.work, 
+      'color': Colors.orange, 
+      'keywords': 'trip ride journey travel',
+      'content': {
+        'common_issues': [
+          'Trip not starting properly',
+          'Navigation not working',
+          'Location tracking issues',
+          'Trip completion problems',
+          'Route optimization issues'
+        ],
+        'solutions': [
+          'Ensure GPS is enabled and location permissions granted',
+          'Check internet connection and restart app',
+          'Allow location access in device settings',
+          'Complete trip within valid area',
+          'Use recommended routes for better efficiency'
+        ],
+        'contact_info': 'Trip support available 24/7 at +91-7834920469'
+      }
+    },
+    {
+      'title': 'Payment Issues', 
+      'icon': Icons.schedule, 
+      'color': Colors.purple, 
+      'keywords': 'payment money wallet cash',
+      'content': {
+        'common_issues': [
+          'Payment not received',
+          'Wallet balance incorrect',
+          'Withdrawal pending',
+          'Payment method issues',
+          'Transaction history problems'
+        ],
+        'solutions': [
+          'Check bank account for pending transfers',
+          'Refresh wallet and check transaction history',
+          'Withdrawals process within 2-3 business days',
+          'Update payment method in wallet settings',
+          'Contact support for transaction disputes'
+        ],
+        'contact_info': 'Payment support: apatkal.admin@gmail.com'
+      }
+    },
+    {
+      'title': 'Trip History', 
+      'icon': Icons.description, 
+      'color': Colors.teal, 
+      'keywords': 'history past trips record',
+      'content': {
+        'common_issues': [
+          'Missing trip records',
+          'Incorrect trip details',
+          'History not loading',
+          'Trip status issues',
+          'Earnings calculation problems'
+        ],
+        'solutions': [
+          'Refresh trip history and check internet connection',
+          'Verify trip details with support team',
+          'Clear app cache and restart',
+          'Check trip completion status',
+          'Review earnings breakdown in earnings section'
+        ],
+        'contact_info': 'Trip history support available via WhatsApp'
+      }
+    },
+    {
+      'title': 'Earnings & Payouts', 
+      'icon': Icons.currency_rupee, 
+      'color': Colors.green, 
+      'keywords': 'earnings money payout income',
+      'content': {
+        'common_issues': [
+          'Earnings not showing',
+          'Payout delays',
+          'Incorrect earnings calculation',
+          'Tax document issues',
+          'Bonus payment problems'
+        ],
+        'solutions': [
+          'Check earnings section for latest updates',
+          'Payouts process within 2-3 business days',
+          'Review trip completion and fare calculation',
+          'Download tax documents from earnings section',
+          'Check bonus eligibility in app notifications'
+        ],
+        'contact_info': 'Earnings support: +91-7834920469'
+      }
+    },
+    {
+      'title': 'Technical Support', 
+      'icon': Icons.computer, 
+      'color': Colors.red, 
+      'keywords': 'technical support help bug error',
+      'content': {
+        'common_issues': [
+          'App crashes or freezes',
+          'Login problems',
+          'Notification issues',
+          'GPS accuracy problems',
+          'App performance issues'
+        ],
+        'solutions': [
+          'Update app to latest version',
+          'Clear app data and re-login',
+          'Check notification permissions',
+          'Calibrate GPS and check signal strength',
+          'Restart device and clear cache'
+        ],
+        'contact_info': 'Technical support: apatkal.admin@gmail.com'
+      }
+    },
   ];
 
   @override
@@ -78,7 +210,7 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Future<void> _sendEmail() async {
-    const email = 'geetanjali.tosscs@gmail.com';
+    const email = 'apatkal.admin@gmail.com';
     final url = 'mailto:$email?subject=Driver App Support';
     try {
       final uri = Uri.parse(url);
@@ -304,6 +436,7 @@ class _HelpScreenState extends State<HelpScreen> {
                           category['title'],
                           category['icon'],
                           category['color'],
+                          _getFilteredCategories().indexOf(category),
                           isVertical: true,
                         ),
                       ),
@@ -376,6 +509,7 @@ class _HelpScreenState extends State<HelpScreen> {
               category['title'],
               category['icon'],
               category['color'],
+              _getFilteredCategories().indexOf(category),
               isSmall: isSmall,
               isMedium: isMedium,
               isLarge: isLarge,
@@ -398,7 +532,7 @@ class _HelpScreenState extends State<HelpScreen> {
     return rows;
   }
 
-  Widget _buildFAQCategory(String title, IconData icon, Color color, {bool isVertical = false, bool isSmall = false, bool isMedium = false, bool isLarge = false}) {
+  Widget _buildFAQCategory(String title, IconData icon, Color color, int index, {bool isVertical = false, bool isSmall = false, bool isMedium = false, bool isLarge = false}) {
     // Determine sizes based on screen type
     double iconSize;
     double iconPadding;
@@ -445,7 +579,7 @@ class _HelpScreenState extends State<HelpScreen> {
     
     return GestureDetector(
       onTap: () {
-        // Handle FAQ category tap
+        _showFAQPopup(index);
       },
       child: AppCard(
         padding: EdgeInsets.all(cardPadding),
@@ -477,6 +611,229 @@ class _HelpScreenState extends State<HelpScreen> {
       ),
     );
   }
+
+  void _showFAQPopup(int index) {
+    final category = _getFilteredCategories()[index];
+    final content = category['content'] as Map<String, dynamic>;
+    
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        category['icon'],
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        category['title'],
+                        style: AppTheme.heading3.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Common Issues Section
+                      Text(
+                        'Common Issues:',
+                        style: AppTheme.heading3.copyWith(
+                          color: AppTheme.primaryBlue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...(content['common_issues'] as List<String>).map((issue) => 
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 6),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryBlue,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  issue,
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.neutralGreyLight,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Solutions Section
+                      Text(
+                        'Solutions:',
+                        style: AppTheme.heading3.copyWith(
+                          color: AppTheme.accentGreen,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...(content['solutions'] as List<String>).map((solution) => 
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 6),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.accentGreen,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  solution,
+                                  style: AppTheme.bodyMedium.copyWith(
+                                    color: AppTheme.neutralGreyLight,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Contact Info Section
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppTheme.primaryBlue.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.contact_support,
+                              color: AppTheme.primaryBlue,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                content['contact_info'] as String,
+                                style: AppTheme.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppTheme.primaryBlue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Footer with Close Button
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('Close'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildContactSupportSection() {
     return Column(

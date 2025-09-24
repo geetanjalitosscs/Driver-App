@@ -20,6 +20,7 @@ import '../models/trip.dart';
 import 'profile_screen.dart';
 import 'accident_list_screen.dart';
 import 'trip_navigation_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -349,41 +350,74 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              AnimatedContainer(
-                duration: AppAnimations.shortDuration,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _isOnDuty ? AppTheme.accentGreen : AppTheme.accentRed,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (_isOnDuty ? AppTheme.accentGreen : AppTheme.accentRed).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+              Row(
+                children: [
+                  // Settings Icon
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.settings,
+                          color: AppTheme.primaryBlue,
+                          size: 20,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _isOnDuty ? 'Online' : 'Offline',
-                      style: AppTheme.bodySmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  
+                  // Online/Offline Toggle
+                  AnimatedContainer(
+                    duration: AppAnimations.shortDuration,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _isOnDuty ? AppTheme.accentGreen : AppTheme.accentRed,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_isOnDuty ? AppTheme.accentGreen : AppTheme.accentRed).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isOnDuty ? 'Online' : 'Offline',
+                          style: AppTheme.bodySmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
