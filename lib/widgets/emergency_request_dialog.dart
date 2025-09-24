@@ -10,7 +10,7 @@ class EmergencyRequestDialog extends StatefulWidget {
 }
 
 class _EmergencyRequestDialogState extends State<EmergencyRequestDialog> {
-  int _countdown = 20;
+  int _countdown = 30;
   Timer? _timer;
 
   @override

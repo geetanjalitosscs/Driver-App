@@ -13,7 +13,7 @@ class AppConstants {
   static const double buttonHeight = 48.0;
   
   // Timer
-  static const int emergencyRequestTimeout = 20; // seconds
+  static const int emergencyRequestTimeout = 30; // seconds
   
   // Sample Data
   static const String driverName = 'Rajesh Sharma';

@@ -1,49 +1,139 @@
 import 'package:flutter/foundation.dart';
 import '../models/accident_report.dart';
-import '../services/accident_service.dart';
+import '../models/accident_filter.dart';
 import '../services/accident_api_service.dart';
 import '../services/database_helper.dart';
 import '../services/navigation_service.dart';
 
 class AccidentProvider extends ChangeNotifier {
   List<AccidentReport> _accidentList = [];
+  List<AccidentReport> _allAccidents = []; // Store all accidents for filtering
   AccidentReport? _currentAccident;
   bool _isLoading = false;
   String? _errorMessage;
   int _pendingCount = 0;
+  AccidentFilter _currentFilter = AccidentFilter();
 
   // Getters
   List<AccidentReport> get accidentList => _accidentList;
+  List<AccidentReport> get allAccidents => _allAccidents;
   AccidentReport? get currentAccident => _currentAccident;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get pendingCount => _pendingCount;
   bool get hasCurrentAccident => _currentAccident != null;
   bool get hasMoreAccidents => _accidentList.length > 1;
+  AccidentFilter get currentFilter => _currentFilter;
 
-  /// Load all pending accidents from API
+  /// Load all accidents from API
   Future<void> loadAccidents() async {
     _setLoading(true);
     _clearError();
 
     try {
-      final allAccidents = await AccidentApiService.fetchAccidentReports();
+      _allAccidents = await AccidentApiService.fetchAccidentReports();
       
-      // Filter only pending accidents
-      _accidentList = allAccidents.where((accident) => accident.status == 'pending').toList();
-      _pendingCount = _accidentList.length;
-      
-      if (_accidentList.isNotEmpty) {
-        _currentAccident = _accidentList[0];
-      } else {
-        _currentAccident = null;
-      }
+      // Apply current filter
+      _applyFilter();
       
       notifyListeners();
     } catch (e) {
       _setError('Failed to load accidents: $e');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  /// Apply current filter to accidents
+  void _applyFilter() {
+    List<AccidentReport> filteredAccidents = List.from(_allAccidents);
+    
+    // Apply city filter
+    if (_currentFilter.city != null && _currentFilter.city!.isNotEmpty) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        return accident.location.toLowerCase().contains(_currentFilter.city!.toLowerCase());
+      }).toList();
+    }
+    
+    // Apply status filter
+    if (_currentFilter.status != null && _currentFilter.status!.isNotEmpty) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        return accident.status.toLowerCase() == _currentFilter.status!.toLowerCase();
+      }).toList();
+    }
+    
+    // Apply description filter
+    if (_currentFilter.description != null && _currentFilter.description!.isNotEmpty) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        return accident.description.toLowerCase().contains(_currentFilter.description!.toLowerCase());
+      }).toList();
+    }
+    
+    // Apply vehicle filter
+    if (_currentFilter.vehicle != null && _currentFilter.vehicle!.isNotEmpty) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        return accident.vehicle.toLowerCase().contains(_currentFilter.vehicle!.toLowerCase());
+      }).toList();
+    }
+    
+    // Apply severity filter (based on description keywords)
+    if (_currentFilter.severity != null && _currentFilter.severity!.isNotEmpty) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        return _matchesSeverity(accident.description, _currentFilter.severity!);
+      }).toList();
+    }
+    
+    // Apply date filters
+    if (_currentFilter.dateFrom != null) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        try {
+          final accidentDate = DateTime.parse(accident.accidentDate);
+          return accidentDate.isAfter(_currentFilter.dateFrom!) || 
+                 accidentDate.isAtSameMomentAs(_currentFilter.dateFrom!);
+        } catch (e) {
+          return true; // If date parsing fails, include the accident
+        }
+      }).toList();
+    }
+    
+    if (_currentFilter.dateTo != null) {
+      filteredAccidents = filteredAccidents.where((accident) {
+        try {
+          final accidentDate = DateTime.parse(accident.accidentDate);
+          return accidentDate.isBefore(_currentFilter.dateTo!) || 
+                 accidentDate.isAtSameMomentAs(_currentFilter.dateTo!);
+        } catch (e) {
+          return true; // If date parsing fails, include the accident
+        }
+      }).toList();
+    }
+    
+    _accidentList = filteredAccidents;
+    _pendingCount = _accidentList.where((accident) => accident.status == 'pending').length;
+    
+    if (_accidentList.isNotEmpty) {
+      _currentAccident = _accidentList[0];
+    } else {
+      _currentAccident = null;
+    }
+  }
+
+  /// Check if accident description matches severity level
+  bool _matchesSeverity(String description, String severity) {
+    final desc = description.toLowerCase();
+    
+    switch (severity.toLowerCase()) {
+      case 'low':
+        return desc.contains('minor') || desc.contains('small') || desc.contains('light');
+      case 'medium':
+        return desc.contains('moderate') || desc.contains('medium') || desc.contains('some');
+      case 'high':
+        return desc.contains('serious') || desc.contains('major') || desc.contains('severe');
+      case 'critical':
+        return desc.contains('critical') || desc.contains('emergency') || desc.contains('urgent') || 
+               desc.contains('life') || desc.contains('death') || desc.contains('fatal');
+      default:
+        return true;
     }
   }
 
@@ -107,21 +197,25 @@ class AccidentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Apply filter to accidents
+  void applyFilter(AccidentFilter filter) {
+    _currentFilter = filter;
+    _applyFilter();
+    notifyListeners();
+  }
+
+  /// Clear all filters
+  void clearFilters() {
+    _currentFilter = AccidentFilter();
+    _applyFilter();
+    notifyListeners();
+  }
+
   /// Refresh pending count from API
   Future<void> refreshPendingCount() async {
     try {
-      final allAccidents = await AccidentApiService.fetchAccidentReports();
-      
-      // Filter only pending accidents
-      _accidentList = allAccidents.where((accident) => accident.status == 'pending').toList();
-      _pendingCount = _accidentList.length;
-      
-      if (_accidentList.isNotEmpty && _currentAccident == null) {
-        _currentAccident = _accidentList[0];
-      } else if (_accidentList.isEmpty) {
-        _currentAccident = null;
-      }
-      
+      _allAccidents = await AccidentApiService.fetchAccidentReports();
+      _applyFilter();
       notifyListeners();
     } catch (e) {
       print('Error refreshing pending count: $e');

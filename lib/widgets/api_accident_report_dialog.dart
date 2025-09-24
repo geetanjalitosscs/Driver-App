@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
 import '../models/accident_report.dart';
+import '../models/accident_filter.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
+import '../widgets/accident_filter_widget.dart';
 import '../theme/app_theme.dart';
 
 class ApiAccidentReportDialog extends StatefulWidget {
@@ -24,7 +26,7 @@ class ApiAccidentReportDialog extends StatefulWidget {
 class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   bool _isProcessing = false;
   Timer? _timer;
-  int _countdown = 20;
+  int _countdown = 30;
 
   @override
   void initState() {
@@ -39,9 +41,9 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
   }
 
   void _startTimer() {
-    _countdown = 20;
+    _countdown = 30;
     _timer?.cancel();
-    print('Starting 20-second countdown timer for accident report');
+    print('Starting 30-second countdown timer for accident report');
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
@@ -177,6 +179,18 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
+                      ),
+                      // Filter button
+                      IconButton(
+                        onPressed: _showFilterDialog,
+                        icon: Icon(
+                          Icons.filter_list,
+                          color: provider.currentFilter.hasActiveFilters 
+                              ? AppTheme.primaryBlue 
+                              : Colors.grey,
+                        ),
+                        tooltip: 'Filter Reports',
+                        iconSize: 20,
                       ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
@@ -422,5 +436,30 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
         backgroundColor: AppTheme.errorRed,
       ),
     );
+  }
+
+  Future<void> _showFilterDialog() async {
+    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+    final newFilter = await FilterBottomSheet.show(
+      context,
+      accidentProvider.currentFilter,
+    );
+    
+    if (newFilter != null) {
+      accidentProvider.applyFilter(newFilter);
+      
+      // Show feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newFilter.hasActiveFilters 
+                ? 'Filters applied: ${newFilter.filterSummary}'
+                : 'All filters cleared',
+          ),
+          backgroundColor: AppTheme.primaryBlue,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }

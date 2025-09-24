@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/accident.dart';
 
 class ApiService {
   static const String baseUrl = "http://your-domain.com"; // change

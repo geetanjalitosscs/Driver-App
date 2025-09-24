@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../models/accident.dart';
+import '../models/accident_report.dart';
 
 class AccidentDetailPage extends StatelessWidget {
-  final Accident accident;
+  final AccidentReport accident;
   const AccidentDetailPage({required this.accident});
 
   void updateStatus(BuildContext context, String status) async {

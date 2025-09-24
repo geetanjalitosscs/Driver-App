@@ -10,6 +10,8 @@ import 'screens/help_screen.dart';
 import 'providers/profile_provider.dart';
 import 'providers/emergency_provider.dart';
 import 'providers/accident_provider.dart';
+import 'services/notification_service.dart';
+import 'widgets/notification_banner.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -17,9 +19,13 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize local notifications (legacy)
   var androidInit = const AndroidInitializationSettings('@mipmap/ic_launcher');
   var initSettings = InitializationSettings(android: androidInit);
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // Initialize Firebase and notification service
+  await NotificationService.initialize();
 
   runApp(const AmbulanceDriverApp());
 }
@@ -38,7 +44,9 @@ class AmbulanceDriverApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Ambulance Driver App',
         theme: AppTheme.lightTheme,
-        home: const MainScreen(),
+        home: const NotificationBannerOverlay(
+          child: MainScreen(),
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );

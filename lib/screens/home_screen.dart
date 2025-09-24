@@ -11,8 +11,10 @@ import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
 import '../services/navigation_service.dart';
 import '../services/location_picker_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/api_accident_report_dialog.dart';
 import 'profile_screen.dart';
+import 'accident_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -505,6 +507,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   );
                 },
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          // View All Reports button
+          AppButton(
+            text: 'View All Reports',
+            icon: Icons.list_alt,
+            variant: AppButtonVariant.outline,
+            size: AppButtonSize.medium,
+            isFullWidth: true,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AccidentListScreen(),
+                ),
               );
             },
           ),

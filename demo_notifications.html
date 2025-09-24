@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver App - Notification Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .demo-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-accident {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+        
+        .btn-emergency {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            color: white;
+        }
+        
+        .btn-test {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .status {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .status-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #1976D2;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .instructions ol {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: none;
+            color: #666;
+            margin-top: 15px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚑</div>
+        <h1>Driver App</h1>
+        <p class="subtitle">Push Notification Demo</p>
+        
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">App Status:</span>
+                <span class="status-value" id="appStatus">Ready</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Notifications:</span>
+                <span class="status-value" id="notificationStatus">Enabled</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Last Test:</span>
+                <span class="status-value" id="lastTest">Never</span>
+            </div>
+        </div>
+        
+        <div class="demo-buttons">
+            <button class="demo-btn btn-accident" onclick="sendNotification('accident')">
+                🚨 Send Accident Report
+            </button>
+            <button class="demo-btn btn-emergency" onclick="sendNotification('emergency')">
+                🏥 Send Emergency Alert
+            </button>
+            <button class="demo-btn btn-test" onclick="sendNotification('test')">
+                📱 Send Test Notification
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Sending notification...
+        </div>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="instructions">
+            <h3>📋 How to Test:</h3>
+            <ol>
+                <li>Install the Driver App on your phone</li>
+                <li>Open the app and tap "Go Online"</li>
+                <li>Click any button above to send a notification</li>
+                <li>Check your phone for the notification</li>
+                <li>You should see both system notification and in-app banner</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let notificationCount = 0;
+        
+        async function sendNotification(type) {
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const lastTest = document.getElementById('lastTest');
+            
+            // Show loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            // Prepare notification data based on type
+            let notificationData;
+            
+            switch(type) {
+                case 'accident':
+                    notificationData = {
+                        title: 'New Accident Report',
+                        body: 'Accident reported on Main Street - Driver assistance needed',
+                        data: {
+                            accident_id: `ACC-${Date.now()}`,
+                            location: 'Main Street, Downtown',
+                            severity: 'high',
+                            type: 'accident_report'
+                        }
+                    };
+                    break;
+                case 'emergency':
+                    notificationData = {
+                        title: 'Emergency Alert',
+                        body: 'Critical emergency reported - Immediate response required',
+                        data: {
+                            emergency_id: `EMG-${Date.now()}`,
+                            location: 'City Hospital Area',
+                            severity: 'critical',
+                            type: 'emergency'
+                        }
+                    };
+                    break;
+                case 'test':
+                    notificationData = {
+                        title: 'Test Notification',
+                        body: 'This is a test notification from Driver App',
+                        data: {
+                            test_id: `TEST-${Date.now()}`,
+                            type: 'test'
+                        }
+                    };
+                    break;
+            }
+            
+            try {
+                const response = await fetch('send_notification.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(notificationData)
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `✅ ${notificationData.title} sent successfully!`;
+                    
+                    // Update status
+                    notificationCount++;
+                    lastTest.textContent = new Date().toLocaleTimeString();
+                    
+                    // Update app status
+                    document.getElementById('appStatus').textContent = 'Active';
+                    
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ Failed to send notification: ${data.message}`;
+                }
+                
+            } catch (error) {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                result.className = 'result error';
+                result.innerHTML = `❌ Network error: ${error.message}`;
+            }
+        }
+        
+        // Update notification status
+        function updateNotificationStatus() {
+            const status = document.getElementById('notificationStatus');
+            if (notificationCount > 0) {
+                status.textContent = `${notificationCount} sent`;
+                status.style.color = '#4CAF50';
+            }
+        }
+        
+        // Simulate real-time updates
+        setInterval(() => {
+            updateNotificationStatus();
+        }, 1000);
+    </script>
+</body>
+</html>

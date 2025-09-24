@@ -4,7 +4,7 @@ import '../models/emergency_request.dart';
 class EmergencyProvider with ChangeNotifier {
   EmergencyRequest? _currentEmergency;
   bool _isSimulationMode = false;
-  int _timerSeconds = 20; // Start with 20 seconds
+  int _timerSeconds = 30; // Start with 30 seconds
   bool _isTimerRunning = false;
   bool _isAccepted = false;
   bool _isDeclined = false;
@@ -36,7 +36,7 @@ class EmergencyProvider with ChangeNotifier {
     _currentEmergency = request;
     _isAccepted = false;
     _isDeclined = false;
-    _timerSeconds = 20; // Reset to 20 seconds
+    _timerSeconds = 30; // Reset to 30 seconds
     _startTimer();
     notifyListeners();
   }
@@ -67,7 +67,7 @@ class EmergencyProvider with ChangeNotifier {
   void cancelDecision() {
     _isAccepted = false;
     _isDeclined = false;
-    _timerSeconds = 20; // Reset timer
+    _timerSeconds = 30; // Reset timer
     _startTimer();
     notifyListeners();
   }
@@ -81,7 +81,7 @@ class EmergencyProvider with ChangeNotifier {
 
   // Start timer
   void _startTimer() {
-    _timerSeconds = 20;
+    _timerSeconds = 30;
     _isTimerRunning = true;
     _updateTimer();
   }
