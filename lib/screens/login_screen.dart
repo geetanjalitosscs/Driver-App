@@ -136,6 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Email',
                           prefixIcon: const Icon(Icons.email_outlined),
@@ -168,6 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock_outlined),
@@ -271,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Email: rajesh.sharma90@gmail.com\nPassword: Rajesh@123',
+                      'Email: rajesh.sharma90@gmail.com\nPassword: Raj@123',
                       style: GoogleFonts.roboto(
                         fontSize: 14,
                         color: Colors.grey[700],

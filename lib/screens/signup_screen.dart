@@ -164,6 +164,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Name Field
                       TextFormField(
                         controller: _nameController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: true,
                         decoration: InputDecoration(
                           labelText: 'Full Name',
                           prefixIcon: const Icon(Icons.person_outlined),
@@ -193,6 +196,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Email',
                           prefixIcon: const Icon(Icons.email_outlined),
@@ -225,6 +230,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
                           prefixIcon: const Icon(Icons.phone_outlined),
@@ -255,6 +263,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Address Field
                       TextFormField(
                         controller: _addressController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: true,
                         decoration: InputDecoration(
                           labelText: 'Address',
                           prefixIcon: const Icon(Icons.location_on_outlined),
@@ -282,6 +293,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Vehicle Type Field
                       TextFormField(
                         controller: _vehicleTypeController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: true,
                         decoration: InputDecoration(
                           labelText: 'Vehicle Type (e.g., Sedan, SUV)',
                           prefixIcon: const Icon(Icons.directions_car_outlined),
@@ -309,6 +323,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Vehicle Number Field
                       TextFormField(
                         controller: _vehicleNumberController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Vehicle Number',
                           prefixIcon: const Icon(Icons.confirmation_number_outlined),
@@ -378,6 +395,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock_outlined),
@@ -421,6 +441,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         decoration: InputDecoration(
                           labelText: 'Confirm Password',
                           prefixIcon: const Icon(Icons.lock_outlined),

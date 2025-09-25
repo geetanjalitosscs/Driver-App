@@ -19,29 +19,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Text controllers
   late TextEditingController _nameController;
+  late TextEditingController _emailController;
   late TextEditingController _contactController;
   late TextEditingController _addressController;
-  late TextEditingController _vehicleController;
-  late TextEditingController _vehicleNumberController;
   
-  // Vehicle type selection
-  String _selectedVehicleType = 'Ambulance';
-  final List<String> _vehicleTypes = [
-    'Ambulance',
-    'Emergency Vehicle',
-    'Medical Transport',
-    'Rescue Vehicle',
-    'Mobile ICU',
-  ];
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
+    _emailController = TextEditingController();
     _contactController = TextEditingController();
     _addressController = TextEditingController();
-    _vehicleController = TextEditingController();
-    _vehicleNumberController = TextEditingController();
     
     // Initialize controllers with current profile data
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,10 +41,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
     _contactController.dispose();
     _addressController.dispose();
-    _vehicleController.dispose();
-    _vehicleNumberController.dispose();
     super.dispose();
   }
 
@@ -65,11 +53,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     
     if (profile != null) {
       _nameController.text = profile.driverName;
+      _emailController.text = profile.email;
       _contactController.text = profile.contact;
       _addressController.text = profile.address;
-      _vehicleController.text = profile.vehicleType;
-      _vehicleNumberController.text = profile.vehicleNumber;
-      _selectedVehicleType = profile.vehicleType;
     }
   }
 
@@ -103,12 +89,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final currentProfile = authProvider.currentUser;
     final success = await authProvider.updateProfile(
       name: _nameController.text,
+      email: _emailController.text,
       phone: _contactController.text,
       address: _addressController.text,
-      vehicleType: _selectedVehicleType,
-      vehicleNumber: _vehicleNumberController.text,
+      vehicleType: currentProfile?.vehicleType ?? '', // Keep original values
+      vehicleNumber: currentProfile?.vehicleNumber ?? '', // Keep original values
     );
     
     if (success) {
@@ -316,14 +304,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 16),
           if (_isEditing) ...[
+            // Full Name Field
+            TextFormField(
+              controller: _nameController,
+              enableInteractiveSelection: true,
+              enableSuggestions: true,
+              autocorrect: true,
+              decoration: InputDecoration(
+                labelText: 'Full Name',
+                prefixIcon: const Icon(Icons.person_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppTheme.primaryBlue,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Email Field
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              enableInteractiveSelection: true,
+              enableSuggestions: true,
+              autocorrect: false,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon: const Icon(Icons.email_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppTheme.primaryBlue,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Phone Number Field
             _buildPhoneNumberField(),
-            const SizedBox(height: 16),
-            _buildEditableInfoRow(
-              icon: Icons.location_on,
-              label: 'Address',
+            const SizedBox(height: 12),
+            
+            // Address Field
+            TextFormField(
               controller: _addressController,
+              enableInteractiveSelection: true,
+              enableSuggestions: true,
+              autocorrect: true,
+              decoration: InputDecoration(
+                labelText: 'Address',
+                prefixIcon: const Icon(Icons.location_on_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppTheme.primaryBlue,
+                    width: 2,
+                  ),
+                ),
+              ),
             ),
           ] else ...[
+            _buildInfoRow(
+              icon: Icons.person,
+              text: 'Name: ${profile.driverName}',
+            ),
+            const SizedBox(height: 12),
+            _buildInfoRow(
+              icon: Icons.email,
+              text: 'Email: ${profile.email}',
+            ),
+            const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.phone,
               text: 'Contact: +91 ${profile.contact}',
@@ -349,42 +412,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
-          if (_isEditing) ...[
-            _buildVehicleTypeDropdown(),
-            const SizedBox(height: 12),
-            _buildEditableInfoRow(
-              icon: Icons.confirmation_number,
-              label: 'Vehicle Number',
-              controller: _vehicleNumberController,
-            ),
-            const SizedBox(height: 12),
-            _buildInfoRow(
-              icon: Icons.star,
-              text: 'Model Average Rating ${profile.averageRating}',
-            ),
-          ] else ...[
-            Row(
-              children: [
-                Expanded(
-                  child: _buildInfoRow(
-                    icon: Icons.directions_car,
-                    text: 'Type: ${profile.vehicleType}',
-                  ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildInfoRow(
+                  icon: Icons.directions_car,
+                  text: 'Type: ${profile.vehicleType}',
                 ),
-                Expanded(
-                  child: _buildInfoRow(
-                    icon: Icons.confirmation_number,
-                    text: 'Number: ${profile.vehicleNumber}',
-                  ),
+              ),
+              Expanded(
+                child: _buildInfoRow(
+                  icon: Icons.confirmation_number,
+                  text: 'Number: ${profile.vehicleNumber}',
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildInfoRow(
-              icon: Icons.star,
-              text: 'Model Average Rating ${profile.averageRating}',
-            ),
-          ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildInfoRow(
+            icon: Icons.star,
+            text: 'Model Average Rating ${profile.averageRating}',
+          ),
         ],
       ),
     );
@@ -470,43 +518,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEditableInfoRow({
-    required IconData icon,
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: AppTheme.neutralGreyLight,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            style: AppTheme.bodyMedium,
-            decoration: InputDecoration(
-              labelText: label,
-              labelStyle: AppTheme.bodySmall.copyWith(
-                color: AppTheme.neutralGreyLight,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppTheme.neutralGreyLight),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildLogOutButton(BuildContext context) {
     return AppButton(
@@ -631,50 +642,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Vehicle type dropdown
-  Widget _buildVehicleTypeDropdown() {
-    return Row(
-      children: [
-        Icon(
-          Icons.directions_car,
-          color: AppTheme.neutralGreyLight,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            value: _selectedVehicleType,
-            decoration: InputDecoration(
-              labelText: 'Vehicle Type',
-              labelStyle: AppTheme.bodySmall.copyWith(
-                color: AppTheme.neutralGreyLight,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppTheme.neutralGreyLight),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            items: _vehicleTypes.map((String vehicleType) {
-              return DropdownMenuItem<String>(
-                value: vehicleType,
-                child: Text(vehicleType),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedVehicleType = newValue;
-                });
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
 }

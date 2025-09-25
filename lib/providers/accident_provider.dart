@@ -9,6 +9,7 @@ class AccidentProvider extends ChangeNotifier {
   List<AccidentReport> _accidentList = [];
   List<AccidentReport> _allAccidents = []; // Store all accidents for filtering
   AccidentReport? _currentAccident;
+  AccidentReport? _acceptedAccident; // Store accepted accident for home screen display
   bool _isLoading = false;
   String? _errorMessage;
   int _pendingCount = 0;
@@ -18,10 +19,12 @@ class AccidentProvider extends ChangeNotifier {
   List<AccidentReport> get accidentList => _accidentList;
   List<AccidentReport> get allAccidents => _allAccidents;
   AccidentReport? get currentAccident => _currentAccident;
+  AccidentReport? get acceptedAccident => _acceptedAccident;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get pendingCount => _pendingCount;
   bool get hasCurrentAccident => _currentAccident != null;
+  bool get hasAcceptedAccident => _acceptedAccident != null;
   bool get hasMoreAccidents => _accidentList.length > 1;
   AccidentFilter get currentFilter => _currentFilter;
 
@@ -149,10 +152,17 @@ class AccidentProvider extends ChangeNotifier {
       final success = await AccidentApiService.acceptAccidentReport(_currentAccident!.id);
 
       if (success) {
-        // Open location in Google Maps - will show "Your location" as origin
+        // Store the accepted accident for home screen display
+        _acceptedAccident = _currentAccident;
+        notifyListeners();
+
+        // Open location in Google Maps app (prefer native app over browser)
         final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${_currentAccident!.latitude},${_currentAccident!.longitude}&travelmode=driving';
         if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-          await launchUrl(Uri.parse(googleMapsUrl));
+          await launchUrl(
+            Uri.parse(googleMapsUrl),
+            mode: LaunchMode.externalApplication, // Force native app
+          );
         } else {
           throw Exception('Could not launch Google Maps');
         }
@@ -165,6 +175,18 @@ class AccidentProvider extends ChangeNotifier {
       _setError('Failed to accept accident: $e');
       return false;
     }
+  }
+
+  /// Continue with accepted accident (navigate to trip navigation)
+  void continueWithAcceptedAccident() {
+    // This will be handled by the home screen to navigate to trip navigation
+    notifyListeners();
+  }
+
+  /// Cancel accepted accident
+  void cancelAcceptedAccident() {
+    _acceptedAccident = null;
+    notifyListeners();
   }
 
   /// Reject current accident report

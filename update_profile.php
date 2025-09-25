@@ -18,6 +18,7 @@ if (!$input || !isset($input['driver_id'])) {
 
 $driverId = (int)$input['driver_id'];
 $driverName = $input['driver_name'] ?? '';
+$email = $input['email'] ?? '';
 $phone = $input['number'] ?? '';
 $address = $input['address'] ?? '';
 $vehicleType = $input['vehicle_type'] ?? '';
@@ -29,6 +30,7 @@ try {
         UPDATE drivers 
         SET 
             driver_name = ?,
+            email = ?,
             number = ?,
             address = ?,
             vehicle_type = ?,
@@ -38,6 +40,7 @@ try {
     
     $stmt->execute([
         $driverName,
+        $email,
         $phone,
         $address,
         $vehicleType,

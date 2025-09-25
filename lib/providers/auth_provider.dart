@@ -56,7 +56,12 @@ class AuthProvider extends ChangeNotifier {
           return false;
         }
       } else {
-        _setError('Server error: ${response.statusCode}');
+        // Handle specific error codes
+        if (response.statusCode == 400 || response.statusCode == 401) {
+          _setError('Invalid credentials');
+        } else {
+          _setError('Server error: ${response.statusCode}');
+        }
         _setLoading(false);
         return false;
       }
@@ -114,7 +119,12 @@ class AuthProvider extends ChangeNotifier {
           return false;
         }
       } else {
-        _setError('Server error: ${response.statusCode}');
+        // Handle specific error codes
+        if (response.statusCode == 400 || response.statusCode == 409) {
+          _setError('Invalid information provided');
+        } else {
+          _setError('Server error: ${response.statusCode}');
+        }
         _setLoading(false);
         return false;
       }
@@ -135,6 +145,7 @@ class AuthProvider extends ChangeNotifier {
   // Update profile method
   Future<bool> updateProfile({
     required String name,
+    required String email,
     required String phone,
     required String address,
     required String vehicleType,
@@ -152,6 +163,7 @@ class AuthProvider extends ChangeNotifier {
         body: json.encode({
           'driver_id': _currentUser!.driverId,
           'driver_name': name,
+          'email': email,
           'number': phone,
           'address': address,
           'vehicle_type': vehicleType,
@@ -174,6 +186,60 @@ class AuthProvider extends ChangeNotifier {
         }
       } else {
         _setError('Server error: ${response.statusCode}');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('Network error: $e');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Change password method
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    if (_currentUser == null) {
+      _setError('No user logged in');
+      return false;
+    }
+
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await http.post(
+        Uri.parse('${DatabaseConfig.baseUrl}/change_password.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'driver_id': int.parse(_currentUser!.driverId),
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['success'] == true) {
+          _setLoading(false);
+          return true;
+        } else {
+          _setError(data['error'] ?? 'Password change failed');
+          _setLoading(false);
+          return false;
+        }
+      } else {
+        // Handle specific error codes
+        if (response.statusCode == 401) {
+          _setError('Current password is incorrect');
+        } else if (response.statusCode == 400) {
+          _setError('Invalid password format');
+        } else {
+          _setError('Server error: ${response.statusCode}');
+        }
         _setLoading(false);
         return false;
       }

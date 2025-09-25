@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../providers/trip_provider.dart';
+import '../providers/accident_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
 import '../services/directions_service.dart';
@@ -330,6 +332,10 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       );
 
       if (result['success'] == true) {
+        // Clear the accepted accident since trip is completed
+        final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+        accidentProvider.cancelAcceptedAccident();
+        
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -365,28 +371,150 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
     }
   }
 
+  Widget _buildMapWidget() {
+    // Check if running on Windows desktop
+    if (kIsWeb || defaultTargetPlatform == TargetPlatform.windows) {
+      // Fallback for Windows/Web - show trip details without map
+      return _buildWindowsFallback();
+    }
+    
+    // Use Google Maps for mobile platforms
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: _currentLocation!,
+        zoom: MapsConfig.defaultZoom,
+      ),
+      onMapCreated: (GoogleMapController controller) {
+        _mapController = controller;
+      },
+      markers: _markers,
+      polylines: _polylines,
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+    );
+  }
+
+  Widget _buildWindowsFallback() {
+    return Container(
+      color: Colors.grey[100],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.map,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Trip Navigation',
+              style: GoogleFonts.roboto(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Maps not supported on Windows',
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                color: Colors.grey[500],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Trip Details',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildTripDetailRow('Client', widget.trip.clientName),
+                  _buildTripDetailRow('Location', widget.trip.location.split(',')[0]), // Show only address part
+                  _buildTripDetailRow('Fare', '₹${widget.trip.amount}'),
+                  _buildTripDetailRow('Duration', _formatDuration(_tripDuration)),
+                  _buildTripDetailRow('Distance', '${_tripDistance.toStringAsFixed(1)} km'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _completeTrip,
+              icon: const Icon(Icons.check_circle),
+              label: const Text('Complete Trip'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.accentGreen,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTripDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: GoogleFonts.roboto(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.roboto(
+                color: Colors.grey[800],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       body: Stack(
         children: [
-          // Map
+          // Map - Platform specific handling
           if (!_isLoading && _currentLocation != null)
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _currentLocation!,
-                zoom: MapsConfig.defaultZoom,
-              ),
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-              },
-              markers: _markers,
-              polylines: _polylines,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-            ),
+            _buildMapWidget(),
           
           // Loading overlay
           if (_isLoading)

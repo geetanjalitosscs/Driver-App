@@ -12,11 +12,13 @@ import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/earnings_provider.dart';
+import '../providers/navigation_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/location_picker_service.dart';
 import '../widgets/api_accident_report_dialog.dart';
 import '../widgets/trip_completion_dialog.dart';
 import '../models/trip.dart';
+import '../models/accident_report.dart';
 import 'profile_screen.dart';
 import 'accident_list_screen.dart';
 import 'trip_navigation_screen.dart';
@@ -160,6 +162,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Navigation methods
+  void _navigateToTrips() {
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider.navigateToScreen(1); // Trips section index
+  }
+
+  void _navigateToEarnings() {
+    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+    navigationProvider.navigateToScreen(2); // Earnings section index
+  }
+
+  // Refresh button method
+  Future<void> _refreshData() async {
+    await _loadStatisticsData();
+    await _loadOngoingTrips();
+  }
+
   Future<void> _navigateToTrip(trip) async {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -299,6 +318,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Action Buttons (only when online)
                   if (_isOnDuty) _buildActionButtons(),
                   if (_isOnDuty) const SizedBox(height: 16),
+                  
+                  // Accepted Accident Display
+                  Consumer<AccidentProvider>(
+                    builder: (context, accidentProvider, child) {
+                      if (accidentProvider.hasAcceptedAccident) {
+                        return Column(
+                          children: [
+                            _buildAcceptedAccidentCard(accidentProvider.acceptedAccident!),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                   
                   // Ongoing Trips Section
                   _buildOngoingTripsSection(),
@@ -967,6 +1001,10 @@ class _HomeScreenState extends State<HomeScreen> {
           
           return Column(
             children: [
+              // Refresh Button
+              _buildRefreshButton(),
+              const SizedBox(height: 16),
+              
               LayoutBuilder(
                 builder: (context, constraints) {
                   if (constraints.maxWidth < 400) {
@@ -979,6 +1017,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Icons.directions_car,
                           AppTheme.primaryBlue,
                           _getTripsSubtitle(todayTrips),
+                          onTap: () => _navigateToTrips(),
                         ),
                         const SizedBox(height: 12),
                         _buildStatCard(
@@ -987,6 +1026,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Icons.currency_rupee,
                           AppTheme.accentGreen,
                           _getEarningsSubtitle(todayEarnings),
+                          onTap: () => _navigateToEarnings(),
                         ),
                       ],
                     );
@@ -1001,6 +1041,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icons.directions_car,
                             AppTheme.primaryBlue,
                             _getTripsSubtitle(todayTrips),
+                            onTap: () => _navigateToTrips(),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -1011,6 +1052,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icons.currency_rupee,
                             AppTheme.accentGreen,
                             _getEarningsSubtitle(todayEarnings),
+                            onTap: () => _navigateToEarnings(),
                           ),
                         ),
                       ],
@@ -1222,57 +1264,258 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color, String subtitle) {
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, String subtitle, {VoidCallback? onTap}) {
+    return MouseRegion(
+      cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AppCard(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: color, size: 20),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    onTap != null ? Icons.arrow_forward_ios : Icons.trending_up,
+                    color: onTap != null ? color : AppTheme.accentGreen,
+                    size: 16,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                value,
+                style: AppTheme.heading2.copyWith(
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.neutralGreyLight,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.accentGreen,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRefreshButton() {
+    return Consumer2<TripProvider, EarningsProvider>(
+      builder: (context, tripProvider, earningsProvider, child) {
+        final isLoading = tripProvider.isLoading || earningsProvider.isLoading;
+        
+        return AppButton(
+          text: 'Refresh Data',
+          icon: Icons.refresh,
+          variant: AppButtonVariant.secondary,
+          isLoading: isLoading,
+          onPressed: isLoading ? null : _refreshData,
+          isFullWidth: true,
+        );
+      },
+    );
+  }
+
+  Widget _buildAcceptedAccidentCard(AccidentReport accident) {
     return AppCard(
-      margin: EdgeInsets.zero,
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: const Icon(
+                  Icons.warning,
+                  color: Colors.red,
+                  size: 20,
+                ),
               ),
-              const Spacer(),
-              Icon(
-                Icons.trending_up,
-                color: AppTheme.accentGreen,
-                size: 16,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Accepted Accident Report',
+                      style: AppTheme.heading3.copyWith(
+                        color: Colors.red,
+                      ),
+                    ),
+                    Text(
+                      'Report #${accident.id}',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.neutralGreyLight,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: AppTheme.heading2.copyWith(
-              color: color,
+          const SizedBox(height: 16),
+
+          // Accident Details
+          _buildAccidentDetailRow('Location', accident.location),
+          _buildAccidentDetailRow('Victim', accident.fullname),
+          _buildAccidentDetailRow('Phone', accident.phone),
+          _buildAccidentDetailRow('Vehicle', accident.vehicle),
+          _buildAccidentDetailRow('Time', _formatDateTime(DateTime.parse(accident.createdAt))),
+          
+          if (accident.description.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _buildAccidentDetailRow('Description', accident.description),
+          ],
+
+          const SizedBox(height: 16),
+
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  text: 'Continue',
+                  icon: Icons.navigation,
+                  variant: AppButtonVariant.primary,
+                  onPressed: () => _continueWithAccident(accident),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton(
+                  text: 'Cancel',
+                  icon: Icons.cancel,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: () => _cancelAccident(),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccidentDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: AppTheme.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppTheme.neutralGreyDark,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.neutralGreyLight,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.accentGreen,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              value,
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.neutralGreyDark,
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _continueWithAccident(AccidentReport accident) async {
+    try {
+      // Create a trip from the accepted accident report
+      final trip = await _createTripFromAccident(accident);
+      
+      if (trip != null) {
+        // Navigate to trip navigation screen
+        // Don't clear the accepted accident yet - let it persist until trip is completed
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => TripNavigationScreen(trip: trip),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _cancelAccident() {
+    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+    accidentProvider.cancelAcceptedAccident();
+  }
+
+  Future<Trip?> _createTripFromAccident(AccidentReport accident) async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      if (authProvider.currentUser != null) {
+        final driverId = int.parse(authProvider.currentUser!.driverId);
+        
+        // Create a Trip object with the accident details
+        // Format location string to include coordinates for trip navigation
+        final locationString = '${accident.location}, Lat: ${accident.latitude}, Lng: ${accident.longitude}';
+        
+        final trip = Trip(
+          historyId: DateTime.now().millisecondsSinceEpoch, // Use timestamp as ID
+          driverId: driverId,
+          clientName: accident.fullname,
+          location: locationString, // Include coordinates for parsing
+          amount: 500.0, // Default fare for accident response
+          duration: 0, // Will be updated when trip is completed
+          startTime: DateTime.now(),
+          endTime: null,
+          createdAt: DateTime.now(),
+          endLatitude: accident.latitude, // Add end coordinates
+          endLongitude: accident.longitude,
+        );
+
+        return trip;
+      }
+      return null;
+    } catch (e) {
+      print('Error creating trip from accident: $e');
+      return null;
+    }
   }
 }

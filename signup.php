@@ -76,10 +76,13 @@ try {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     
+    // Hash the password before storing
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    
     $stmt->execute([
         $driverName,
         $email,
-        $password, // In production, hash this password
+        $hashedPassword, // Store hashed password
         $phone,
         $address,
         $vehicleType,

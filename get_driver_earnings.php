@@ -49,15 +49,17 @@ try {
 
     $stmt = $pdo->prepare("
         SELECT 
-            id,
-            driver_id,
-            trip_id,
-            amount,
-            earning_date,
-            created_time
-        FROM earnings 
-        WHERE driver_id = ? AND $dateCondition $tripCondition
-        ORDER BY earning_date DESC, created_time DESC
+            e.id,
+            e.driver_id,
+            e.trip_id,
+            e.amount,
+            e.earning_date,
+            e.created_time,
+            t.end_time as trip_completion_time
+        FROM earnings e
+        LEFT JOIN trips t ON e.trip_id = t.history_id
+        WHERE e.driver_id = ? AND $dateCondition $tripCondition
+        ORDER BY COALESCE(t.end_time, e.created_time) DESC
     ");
     
     $stmt->execute([$driverId]);
@@ -72,6 +74,7 @@ try {
             'amount' => (float)$earning['amount'],
             'earning_date' => $earning['earning_date'],
             'created_time' => $earning['created_time'],
+            'trip_completion_time' => $earning['trip_completion_time'],
         ];
     }, $earnings);
 

@@ -195,93 +195,180 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   Widget _buildTripSummaryCard(TripProvider tripProvider, EarningsProvider earningsProvider) {
     return AppCard(
       margin: EdgeInsets.zero,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Trip Summary',
-            style: GoogleFonts.roboto(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.primaryBlue,
-            ),
+            style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
-          
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  'Total Trips',
-                  '${tripProvider.filteredCompletedTrips.length}',
-                  Icons.local_taxi,
-                  AppTheme.primaryBlue,
-                ),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  'Total Earnings',
-                  '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
-                  Icons.account_balance_wallet,
-                  AppTheme.accentGreen,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  'Today',
-                  '₹${earningsProvider.todayEarnings.toStringAsFixed(0)}',
-                  Icons.today,
-                  AppTheme.accentOrange,
-                ),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  'This Week',
-                  '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
-                  Icons.date_range,
-                  AppTheme.accentPurple,
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Define card data
+              final cards = [
+                {
+                  'title': 'Total Trips',
+                  'value': '${tripProvider.filteredCompletedTrips.length}',
+                  'icon': Icons.local_taxi,
+                  'color': AppTheme.primaryBlue,
+                },
+                {
+                  'title': 'Total Earnings',
+                  'value': '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
+                  'icon': Icons.account_balance_wallet,
+                  'color': AppTheme.accentGreen,
+                },
+                {
+                  'title': 'Today',
+                  'value': '₹${earningsProvider.todayEarnings.toStringAsFixed(0)}',
+                  'icon': Icons.today,
+                  'color': AppTheme.accentOrange,
+                },
+                {
+                  'title': 'This Week',
+                  'value': '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
+                  'icon': Icons.date_range,
+                  'color': AppTheme.accentPurple,
+                },
+              ];
+
+              if (constraints.maxWidth < 350) {
+                // Very small screens: Single column, centered
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int i = 0; i < cards.length; i++) ...[
+                        SizedBox(
+                          width: constraints.maxWidth * 0.8, // 80% of screen width
+                          child: _buildSummaryCard(
+                            cards[i]['title'] as String,
+                            cards[i]['value'] as String,
+                            cards[i]['icon'] as IconData,
+                            cards[i]['color'] as Color,
+                          ),
+                        ),
+                        if (i < cards.length - 1) const SizedBox(height: 8),
+                      ],
+                    ],
+                  ),
+                );
+              } else if (constraints.maxWidth < 600) {
+                // Medium screens: 2x2 grid, centered
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
+                            child: _buildSummaryCard(
+                              cards[0]['title'] as String,
+                              cards[0]['value'] as String,
+                              cards[0]['icon'] as IconData,
+                              cards[0]['color'] as Color,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
+                            child: _buildSummaryCard(
+                              cards[1]['title'] as String,
+                              cards[1]['value'] as String,
+                              cards[1]['icon'] as IconData,
+                              cards[1]['color'] as Color,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
+                            child: _buildSummaryCard(
+                              cards[2]['title'] as String,
+                              cards[2]['value'] as String,
+                              cards[2]['icon'] as IconData,
+                              cards[2]['color'] as Color,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
+                            child: _buildSummaryCard(
+                              cards[3]['title'] as String,
+                              cards[3]['value'] as String,
+                              cards[3]['icon'] as IconData,
+                              cards[3]['color'] as Color,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Large screens: Horizontal row, centered with max width
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800), // Max width for very large screens
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (int i = 0; i < cards.length; i++) ...[
+                          Expanded(
+                            child: _buildSummaryCard(
+                              cards[i]['title'] as String,
+                              cards[i]['value'] as String,
+                              cards[i]['icon'] as IconData,
+                              cards[i]['color'] as Color,
+                            ),
+                          ),
+                          if (i < cards.length - 1) const SizedBox(width: 12),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryItem(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 6),
           Text(
             value,
-            style: GoogleFonts.roboto(
-              fontSize: 18,
+            style: AppTheme.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
               color: color,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
           Text(
             title,
-            style: GoogleFonts.roboto(
-              fontSize: 12,
-              color: Colors.grey[600],
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.neutralGreyLight,
             ),
             textAlign: TextAlign.center,
           ),

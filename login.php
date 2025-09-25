@@ -46,8 +46,8 @@ try {
         sendErrorResponse('Invalid email or password');
     }
 
-    // Verify password (in production, use password_verify with hashed passwords)
-    if ($password !== $driver['password']) {
+    // Verify password using password_verify (for hashed passwords)
+    if (!password_verify($password, $driver['password'])) {
         sendErrorResponse('Invalid email or password');
     }
 

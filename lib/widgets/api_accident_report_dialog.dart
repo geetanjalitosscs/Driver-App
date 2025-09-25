@@ -381,20 +381,11 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       );
       
       if (success) {
-        // Create a trip from the accepted accident report
-        final trip = await _createTripFromAccident(provider.currentAccident!);
-        
-        // Close accident dialog
+        // Close accident dialog and redirect to home screen
         Navigator.of(context).pop();
         
-        // Navigate to trip navigation screen
-        if (trip != null) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => TripNavigationScreen(trip: trip),
-            ),
-          );
-        }
+        // The accepted accident will be stored in AccidentProvider
+        // and displayed on the home screen with continue/cancel buttons
         
         // Refresh the pending count in the background
         provider.refreshPendingCount();
