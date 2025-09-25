@@ -90,7 +90,9 @@ class AppButton extends StatelessWidget {
       );
     }
 
-    return Text(text, style: textStyle);
+    return Center(
+      child: Text(text, style: textStyle),
+    );
   }
 
   ButtonStyle _getButtonStyle() {

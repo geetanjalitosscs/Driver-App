@@ -70,7 +70,7 @@ class ProfileProvider with ChangeNotifier {
   }) async {
     ProfileData updatedProfile = _profile.copyWith(
       driverName: driverName,
-      contact: contact,
+      phone: contact,
       address: address,
       vehicleType: vehicleType,
       vehicleNumber: vehicleNumber,

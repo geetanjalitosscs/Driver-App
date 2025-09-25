@@ -32,6 +32,19 @@ if ($driver_id <= 0) {
 }
 
 try {
+    // Calculate total earnings for this driver
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) as total_earnings FROM earnings WHERE driver_id = ?");
+    $stmt->execute([$driver_id]);
+    $totalEarnings = $stmt->fetch(PDO::FETCH_ASSOC)['total_earnings'];
+
+    // Calculate total withdrawals for this driver
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) as total_withdrawals FROM withdrawals WHERE driver_id = ? AND status = 'completed'");
+    $stmt->execute([$driver_id]);
+    $totalWithdrawals = $stmt->fetch(PDO::FETCH_ASSOC)['total_withdrawals'];
+
+    // Calculate current balance: Total Earnings - Total Withdrawals
+    $currentBalance = $totalEarnings - $totalWithdrawals;
+
     // Check if wallet exists for this driver
     $stmt = $pdo->prepare("SELECT * FROM wallet WHERE driver_id = ?");
     $stmt->execute([$driver_id]);
@@ -39,10 +52,19 @@ try {
 
     if (!$wallet) {
         // Create a new wallet for the driver if it doesn't exist
-        $stmt = $pdo->prepare("INSERT INTO wallet (driver_id, balance, created_at, updated_at) VALUES (?, 0.00, NOW(), NOW())");
-        $stmt->execute([$driver_id]);
+        $stmt = $pdo->prepare("INSERT INTO wallet (driver_id, balance, total_earned, total_withdrawn, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())");
+        $stmt->execute([$driver_id, $currentBalance, $totalEarnings, $totalWithdrawals]);
         
         // Get the newly created wallet
+        $stmt = $pdo->prepare("SELECT * FROM wallet WHERE driver_id = ?");
+        $stmt->execute([$driver_id]);
+        $wallet = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        // Update the existing wallet with correct balance
+        $stmt = $pdo->prepare("UPDATE wallet SET balance = ?, total_earned = ?, total_withdrawn = ?, updated_at = NOW() WHERE driver_id = ?");
+        $stmt->execute([$currentBalance, $totalEarnings, $totalWithdrawals, $driver_id]);
+        
+        // Get the updated wallet
         $stmt = $pdo->prepare("SELECT * FROM wallet WHERE driver_id = ?");
         $stmt->execute([$driver_id]);
         $wallet = $stmt->fetch(PDO::FETCH_ASSOC);

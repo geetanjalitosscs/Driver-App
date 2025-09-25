@@ -74,14 +74,18 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        padding: const EdgeInsets.all(24),
-        constraints: const BoxConstraints(maxHeight: 600),
+        padding: const EdgeInsets.all(12),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.6, // 60% of screen height for very small screens
+          maxWidth: MediaQuery.of(context).size.width * 0.9,   // 90% of screen width
+        ),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // Header
               Row(
                 children: [
@@ -118,7 +122,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
 
               // Amount Field
               TextFormField(
@@ -156,7 +160,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
               // Bank Account Selection
               if (_isLoadingAccounts)
@@ -166,7 +170,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
               else
                 _buildNewAccountForm(),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
 
               // Action Buttons
               Row(
@@ -203,6 +207,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                 ],
               ),
             ],
+            ),
           ),
         ),
       ),

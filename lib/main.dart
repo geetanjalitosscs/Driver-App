@@ -3,11 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
-import 'screens/profile_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/trip_history_screen.dart';
 import 'screens/earnings_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'screens/help_screen.dart';
+import 'providers/auth_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/emergency_provider.dart';
 import 'providers/accident_provider.dart';
@@ -43,6 +44,7 @@ class AmbulanceDriverApp extends StatelessWidget {
   Widget build(BuildContext context) {
         return MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (context) => AuthProvider()),
             ChangeNotifierProvider(create: (context) => ProfileProvider()),
             ChangeNotifierProvider(create: (context) => EmergencyProvider()),
             ChangeNotifierProvider(create: (context) => AccidentProvider()),
@@ -53,10 +55,10 @@ class AmbulanceDriverApp extends StatelessWidget {
             ChangeNotifierProvider(create: (context) => SettingsProvider()),
           ],
       child: MaterialApp(
-        title: 'Ambulance Driver App',
+        title: 'Driver App',
         theme: AppTheme.lightTheme,
         home: const NotificationBannerOverlay(
-          child: MainScreen(),
+          child: AuthWrapper(),
         ),
         debugShowCheckedModeBanner: false,
       ),
@@ -137,6 +139,23 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
         );
+      },
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        if (authProvider.isAuthenticated) {
+          return const MainScreen();
+        } else {
+          return const LoginScreen();
+        }
       },
     );
   }

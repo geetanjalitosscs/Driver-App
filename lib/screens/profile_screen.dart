@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
-import '../providers/profile_provider.dart';
+import '../providers/auth_provider.dart';
 import 'help_screen.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -59,15 +60,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _updateControllers() {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-    final profile = profileProvider.profile;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final profile = authProvider.currentUser;
     
-    _nameController.text = profile.driverName;
-    _contactController.text = profile.contact;
-    _addressController.text = profile.address;
-    _vehicleController.text = profile.vehicleType;
-    _vehicleNumberController.text = profile.vehicleNumber;
-    _selectedVehicleType = profile.vehicleType;
+    if (profile != null) {
+      _nameController.text = profile.driverName;
+      _contactController.text = profile.contact;
+      _addressController.text = profile.address;
+      _vehicleController.text = profile.vehicleType;
+      _vehicleNumberController.text = profile.vehicleNumber;
+      _selectedVehicleType = profile.vehicleType;
+    }
   }
 
   void _toggleEdit() {
@@ -99,10 +102,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-    final success = await profileProvider.updateProfileFields(
-      driverName: _nameController.text,
-      contact: _contactController.text,
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.updateProfile(
+      name: _nameController.text,
+      phone: _contactController.text,
       address: _addressController.text,
       vehicleType: _selectedVehicleType,
       vehicleNumber: _vehicleNumberController.text,
@@ -125,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(profileProvider.error ?? 'Failed to update profile'),
+            content: Text(authProvider.errorMessage ?? 'Failed to update profile'),
             backgroundColor: Colors.red,
           ),
         );
@@ -135,9 +138,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProfileProvider>(
-      builder: (context, profileProvider, child) {
-        final profile = profileProvider.profile;
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final profile = authProvider.currentUser;
         
         return Scaffold(
           backgroundColor: AppTheme.backgroundLight,
@@ -180,13 +183,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 TextButton(
-                  onPressed: profileProvider.isLoading ? null : _saveChanges,
+                  onPressed: authProvider.isLoading ? null : _saveChanges,
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: profileProvider.isLoading
+                  child: authProvider.isLoading
                       ? const SizedBox(
                           width: 16,
                           height: 16,
@@ -405,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _buildInfoRow(
                       icon: Icons.emoji_events,
-                      text: 'Total Trips: ${profile.totalTrips}',
+                      text: 'Total Trips: N/A',
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -547,6 +550,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
                 // Handle logout logic here
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                authProvider.logout();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Logged out successfully'),

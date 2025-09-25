@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/wallet_provider.dart';
-import '../providers/profile_provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../models/withdrawal.dart';
 import '../widgets/withdrawal_dialog.dart';
@@ -46,12 +46,12 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   Future<void> _loadWalletData() async {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
     
-    if (profileProvider.profile.driverId.isNotEmpty) {
+    if (authProvider.currentUser != null) {
       await walletProvider.loadWalletData(
-        1, // Using driver ID = 1 for testing
+        int.parse(authProvider.currentUser!.driverId),
         period: _selectedPeriod,
         status: _selectedStatus,
       );
@@ -87,8 +87,8 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
         ],
       ),
-      body: Consumer2<WalletProvider, ProfileProvider>(
-        builder: (context, walletProvider, profileProvider, child) {
+      body: Consumer<WalletProvider>(
+        builder: (context, walletProvider, child) {
           if (walletProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -210,11 +210,12 @@ class _WalletScreenState extends State<WalletScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Recent Withdrawals',
-              style: AppTheme.heading3,
+            Expanded(
+              child: Text(
+                'Recent Withdrawals',
+                style: AppTheme.heading3,
+              ),
             ),
             _buildPeriodDropdown(),
           ],

@@ -7,7 +7,7 @@ import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/loading_widget.dart';
 import '../widgets/emergency_simulation_dialog.dart';
-import '../providers/profile_provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
@@ -136,21 +136,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadOngoingTrips() async {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     
-    if (profileProvider.profile.driverId.isNotEmpty) {
-      await tripProvider.loadOngoingTrips(1); // Using driver ID = 1 for testing
+    if (authProvider.currentUser != null) {
+      await tripProvider.loadOngoingTrips(int.parse(authProvider.currentUser!.driverId));
     }
   }
 
   Future<void> _loadStatisticsData() async {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
-    if (profileProvider.profile.driverId.isNotEmpty) {
-      final driverId = 1; // Using driver ID = 1 for testing
+    if (authProvider.currentUser != null) {
+      final driverId = int.parse(authProvider.currentUser!.driverId);
       
       // Load completed trips for today
       await tripProvider.loadCompletedTrips(driverId);
@@ -321,9 +321,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
-    return Consumer<ProfileProvider>(
-      builder: (context, profileProvider, child) {
-        final profile = profileProvider.profile;
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final profile = authProvider.currentUser;
         
         return AppCard(
           margin: EdgeInsets.zero,
@@ -365,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      profile.driverName,
+                      profile?.driverName ?? 'Driver',
                       style: AppTheme.heading3,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -455,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Driver Status',
+            'Your Status',
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 20),

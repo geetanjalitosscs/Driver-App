@@ -1,0 +1,82 @@
+<?php
+require_once 'db_config.php';
+
+setApiHeaders();
+
+try {
+    $pdo = getDatabaseConnection();
+} catch (PDOException $e) {
+    sendErrorResponse('Database connection failed: ' . $e->getMessage());
+}
+
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input || !isset($input['email']) || !isset($input['password'])) {
+    sendErrorResponse('Email and password are required');
+}
+
+$email = $input['email'];
+$password = $input['password'];
+
+try {
+    // Check if driver exists
+    $stmt = $pdo->prepare("
+        SELECT 
+            id,
+            driver_name,
+            email,
+            password,
+            number,
+            address,
+            vehicle_type,
+            vehicle_number,
+            model_rating,
+            aadhar_photo,
+            licence_photo,
+            rc_photo,
+            created_at
+        FROM drivers 
+        WHERE email = ?
+    ");
+    $stmt->execute([$email]);
+    $driver = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$driver) {
+        sendErrorResponse('Invalid email or password');
+    }
+
+    // Verify password (in production, use password_verify with hashed passwords)
+    if ($password !== $driver['password']) {
+        sendErrorResponse('Invalid email or password');
+    }
+
+    // Remove password from response
+    unset($driver['password']);
+
+    // Format driver data for response (matching ProfileData.fromJson expectations)
+    $driverData = [
+        'driver_id' => $driver['id'],
+        'driver_name' => $driver['driver_name'],
+        'email' => $driver['email'],
+        'phone' => $driver['number'],
+        'address' => $driver['address'],
+        'vehicle_type' => $driver['vehicle_type'],
+        'vehicle_number' => $driver['vehicle_number'],
+        'model_rating' => (float)($driver['model_rating'] ?? 0.0),
+        'aadhar_photo' => $driver['aadhar_photo'],
+        'licence_photo' => $driver['licence_photo'],
+        'rc_photo' => $driver['rc_photo'],
+        'created_at' => $driver['created_at'],
+    ];
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Login successful',
+        'driver' => $driverData
+    ]);
+
+} catch (PDOException $e) {
+    sendErrorResponse('Database operation failed: ' . $e->getMessage());
+}
+?>
