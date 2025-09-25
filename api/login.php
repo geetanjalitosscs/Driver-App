@@ -1,5 +1,5 @@
 <?php
-require_once 'db_config.php';
+require_once '../db_config.php';
 
 setApiHeaders();
 
@@ -12,52 +12,21 @@ try {
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!$input || !isset($input['driver_id'])) {
-    sendErrorResponse('Driver ID is required');
+if (!$input || !isset($input['email']) || !isset($input['password'])) {
+    sendErrorResponse('Email and password are required');
 }
 
-$driverId = (int)$input['driver_id'];
-$driverName = $input['driver_name'] ?? '';
-$email = $input['email'] ?? '';
-$phone = $input['number'] ?? '';
-$address = $input['address'] ?? '';
-$vehicleType = $input['vehicle_type'] ?? '';
-$vehicleNumber = $input['vehicle_number'] ?? '';
+$email = $input['email'];
+$password = $input['password'];
 
 try {
-    // Update driver profile
-    $stmt = $pdo->prepare("
-        UPDATE drivers 
-        SET 
-            driver_name = ?,
-            email = ?,
-            number = ?,
-            address = ?,
-            vehicle_type = ?,
-            vehicle_number = ?
-        WHERE id = ?
-    ");
-    
-    $stmt->execute([
-        $driverName,
-        $email,
-        $phone,
-        $address,
-        $vehicleType,
-        $vehicleNumber,
-        $driverId
-    ]);
-
-    if ($stmt->rowCount() === 0) {
-        sendErrorResponse('Driver not found');
-    }
-
-    // Get updated driver data
+    // Check if driver exists
     $stmt = $pdo->prepare("
         SELECT 
             id,
             driver_name,
             email,
+            password,
             number,
             address,
             vehicle_type,
@@ -68,14 +37,22 @@ try {
             rc_photo,
             created_at
         FROM drivers 
-        WHERE id = ?
+        WHERE email = ?
     ");
-    $stmt->execute([$driverId]);
+    $stmt->execute([$email]);
     $driver = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$driver) {
-        sendErrorResponse('Driver not found');
+        sendErrorResponse('Invalid email or password');
     }
+
+    // Verify password using password_verify (for hashed passwords)
+    if (!password_verify($password, $driver['password'])) {
+        sendErrorResponse('Invalid email or password');
+    }
+
+    // Remove password from response
+    unset($driver['password']);
 
     // Format driver data for response (matching ProfileData.fromJson expectations)
     $driverData = [
@@ -95,7 +72,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Profile updated successfully',
+        'message' => 'Login successful',
         'driver' => $driverData
     ]);
 

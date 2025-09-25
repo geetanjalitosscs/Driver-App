@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2025 at 01:33 PM
+-- Generation Time: Sep 25, 2025 at 12:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -384,7 +384,8 @@ CREATE TABLE `drivers` (
 --
 
 INSERT INTO `drivers` (`id`, `driver_name`, `email`, `password`, `number`, `address`, `vehicle_type`, `vehicle_number`, `model_rating`, `aadhar_photo`, `licence_photo`, `rc_photo`, `created_at`, `updated_at`) VALUES
-(1, 'Rajash Sharma', 'rajash.sharma@example.com', 'testpass123', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', 4.8, 'aadhar_rajash.jpg', 'licence_rajash.jpg', 'rc_rajash.jpg', '2025-09-24 11:22:18', '2025-09-24 11:22:18');
+(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', 4.8, 'aadhar_rajash.jpg', 'licence_rajash.jpg', 'rc_rajash.jpg', '2025-09-24 11:22:18', '2025-09-25 09:12:54'),
+(2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'beohari mp', 'Ambulance', 'mp20mz4528', NULL, 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-tossconsultancyservices-atlassian-net-jira-software-projects-AWA-boards-101-2025-09-23-11_43_19.png', '2025-09-25 09:50:15', '2025-09-25 09:50:15');
 
 -- --------------------------------------------------------
 
@@ -395,10 +396,20 @@ INSERT INTO `drivers` (`id`, `driver_name`, `email`, `password`, `number`, `addr
 CREATE TABLE `earnings` (
   `id` int(11) NOT NULL,
   `driver_id` int(11) NOT NULL,
+  `trip_id` int(11) DEFAULT NULL,
   `amount` decimal(8,2) NOT NULL,
   `earning_date` date NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `earnings`
+--
+
+INSERT INTO `earnings` (`id`, `driver_id`, `trip_id`, `amount`, `earning_date`, `created_time`) VALUES
+(1, 1, 5, 1500.00, '2025-09-20', '2025-09-20 03:50:00'),
+(2, 1, 7, 1800.00, '2025-09-23', '2025-09-22 11:00:00'),
+(3, 1, 9, 1800.00, '2025-09-25', '2025-09-25 04:25:00');
 
 -- --------------------------------------------------------
 
@@ -682,7 +693,58 @@ INSERT INTO `trips` (`history_id`, `driver_id`, `client_name`, `location`, `timi
 (5, 1, 'Ravi Sharma', 'Apollo Hospital, Bengaluru', '2025-09-20 03:00:00', 1500.00, 45, '2025-09-20 03:05:00', '2025-09-20 03:50:00', '2025-09-24 11:23:52'),
 (6, 1, 'Meera Patel', 'Fortis Hospital, Bengaluru', '2025-09-21 06:30:00', 2200.00, 60, '2025-09-21 06:35:00', NULL, '2025-09-24 11:23:52'),
 (7, 1, 'Amit Verma', 'Manipal Hospital, Bengaluru', '2025-09-22 10:15:00', 1800.00, 40, '2025-09-22 10:20:00', '2025-09-22 11:00:00', '2025-09-24 11:23:52'),
-(8, 1, 'Priya Singh', 'Narayana Hrudayalaya, Bengaluru', '2025-09-25 04:30:00', 2500.00, 75, NULL, NULL, '2025-09-24 11:23:52');
+(8, 1, 'Priya Singh', 'Narayana Hrudayalaya, Bengaluru', '2025-09-25 04:30:00', 2500.00, 75, NULL, NULL, '2025-09-24 11:23:52'),
+(9, 1, 'Sarah Johnson', 'Apollo Hospital, Bengaluru', '2025-09-25 03:30:00', 1800.00, 50, '2025-09-25 03:35:00', '2025-09-25 04:25:00', '2025-09-25 04:30:00');
+
+--
+-- Triggers `trips`
+--
+DELIMITER $$
+CREATE TRIGGER `after_trip_completion` AFTER UPDATE ON `trips` FOR EACH ROW BEGIN
+    
+    IF OLD.end_time IS NULL AND NEW.end_time IS NOT NULL THEN
+        
+        INSERT INTO earnings (
+            driver_id, 
+            trip_id, 
+            amount, 
+            earning_date, 
+            created_time
+        ) VALUES (
+            NEW.driver_id,
+            NEW.history_id,
+            NEW.amount,
+            DATE(NEW.end_time),
+            NEW.end_time
+        );
+        
+        
+        INSERT INTO wallet (driver_id, balance, total_earned, total_withdrawn)
+        VALUES (NEW.driver_id, 0.00, 0.00, 0.00)
+        ON DUPLICATE KEY UPDATE 
+            balance = balance + NEW.amount,
+            total_earned = total_earned + NEW.amount;
+            
+        
+        INSERT INTO wallet_transactions (
+            driver_id, 
+            amount, 
+            transaction_type, 
+            description, 
+            type, 
+            created_at
+        ) VALUES (
+            NEW.driver_id,
+            NEW.amount,
+            'earning',
+            CONCAT('Trip Earning #', NEW.history_id),
+            'credit',
+            NEW.end_time
+        );
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -801,6 +863,14 @@ CREATE TABLE `wallet` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `wallet`
+--
+
+INSERT INTO `wallet` (`wallet_id`, `driver_id`, `balance`, `total_earned`, `total_withdrawn`, `created_at`, `updated_at`) VALUES
+(1, 1, 2900.00, 5100.00, 2200.00, '2025-09-25 05:04:00', '2025-09-25 10:23:10'),
+(3, 2, 0.00, 0.00, 0.00, '2025-09-25 09:50:15', '2025-09-25 10:18:18');
+
 -- --------------------------------------------------------
 
 --
@@ -834,6 +904,17 @@ CREATE TABLE `withdrawals` (
   `processed_at` timestamp NULL DEFAULT NULL,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `withdrawals`
+--
+
+INSERT INTO `withdrawals` (`withdrawal_id`, `driver_id`, `amount`, `bank_account_number`, `bank_name`, `ifsc_code`, `account_holder_name`, `status`, `requested_at`, `processed_at`, `notes`) VALUES
+(1, 1, 500.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-20 05:00:00', '2025-09-21 08:50:00', 'Monthly withdrawal - September'),
+(2, 1, 450.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-15 11:15:00', '2025-09-16 06:00:00', 'Emergency withdrawal'),
+(3, 1, 400.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-25 13:00:00', NULL, 'Current withdrawal request'),
+(4, 1, 600.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-05 08:50:00', '2025-09-06 04:45:00', 'Weekly withdrawal'),
+(5, 1, 250.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-08-30 06:15:00', '2025-08-31 04:00:00', 'Emergency withdrawal');
 
 -- --------------------------------------------------------
 
@@ -955,7 +1036,8 @@ ALTER TABLE `drivers`
 --
 ALTER TABLE `earnings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `driver_id` (`driver_id`);
+  ADD KEY `driver_id` (`driver_id`),
+  ADD KEY `idx_earnings_trip_completion` (`trip_id`,`created_time`);
 
 --
 -- Indexes for table `emergency_contacts`
@@ -1037,7 +1119,8 @@ ALTER TABLE `site_settings`
 --
 ALTER TABLE `trips`
   ADD PRIMARY KEY (`history_id`),
-  ADD KEY `driver_id` (`driver_id`);
+  ADD KEY `driver_id` (`driver_id`),
+  ADD KEY `idx_trips_completion` (`end_time`,`driver_id`);
 
 --
 -- Indexes for table `users`
@@ -1149,13 +1232,13 @@ ALTER TABLE `contact_submissions`
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `earnings`
 --
 ALTER TABLE `earnings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `emergency_contacts`
@@ -1221,7 +1304,7 @@ ALTER TABLE `site_settings`
 -- AUTO_INCREMENT for table `trips`
 --
 ALTER TABLE `trips`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1245,7 +1328,7 @@ ALTER TABLE `vehicles`
 -- AUTO_INCREMENT for table `wallet`
 --
 ALTER TABLE `wallet`
-  MODIFY `wallet_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `wallet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `website_config`
@@ -1257,7 +1340,7 @@ ALTER TABLE `website_config`
 -- AUTO_INCREMENT for table `withdrawals`
 --
 ALTER TABLE `withdrawals`
-  MODIFY `withdrawal_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `withdrawal_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
