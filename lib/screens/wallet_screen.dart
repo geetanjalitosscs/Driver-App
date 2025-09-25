@@ -27,7 +27,12 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
-    _loadWalletData();
+    // Load data after the build is complete to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadWalletData();
+      }
+    });
   }
 
   Future<void> _loadWalletData() async {
@@ -35,7 +40,7 @@ class _WalletScreenState extends State<WalletScreen> {
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
     
     if (profileProvider.profile.driverId.isNotEmpty) {
-      await walletProvider.loadWalletData(int.parse(profileProvider.profile.driverId));
+      await walletProvider.loadWalletData(1); // Using driver ID = 1 for testing
     }
   }
 

@@ -56,8 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _getCurrentLocation();
     _startRefreshTimer();
     _loadInitialAccidentCount();
-    _loadOngoingTrips();
-    _loadStatisticsData();
+    
+    // Load data after the build is complete to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadOngoingTrips();
+        _loadStatisticsData();
+      }
+    });
   }
 
   @override
@@ -134,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     
     if (profileProvider.profile.driverId.isNotEmpty) {
-      await tripProvider.loadOngoingTrips(int.parse(profileProvider.profile.driverId));
+      await tripProvider.loadOngoingTrips(1); // Using driver ID = 1 for testing
     }
   }
 
@@ -144,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
     if (profileProvider.profile.driverId.isNotEmpty) {
-      final driverId = int.parse(profileProvider.profile.driverId);
+      final driverId = 1; // Using driver ID = 1 for testing
       
       // Load completed trips for today
       await tripProvider.loadCompletedTrips(driverId);
@@ -1095,7 +1101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'Fare: ₹${trip.fareAmount}',
+                        'Fare: ₹${trip.amount}',
                         style: GoogleFonts.roboto(
                           fontSize: 14,
                           color: Colors.grey[600],

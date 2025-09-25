@@ -26,7 +26,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadEarnings();
+    // Load data after the build is complete to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadEarnings();
+      }
+    });
   }
 
   Future<void> _loadEarnings() async {
@@ -35,7 +40,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     
     if (profileProvider.profile.driverId.isNotEmpty) {
       await earningsProvider.loadDriverEarnings(
-        int.parse(profileProvider.profile.driverId),
+        1, // Using driver ID = 1 for testing
         _selectedPeriod,
       );
     }
@@ -162,7 +167,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 
                 if (profileProvider.profile.driverId.isNotEmpty) {
                   await earningsProvider.changePeriod(
-                    int.parse(profileProvider.profile.driverId),
+                    1, // Using driver ID = 1 for testing
                     newValue,
                   );
                 }

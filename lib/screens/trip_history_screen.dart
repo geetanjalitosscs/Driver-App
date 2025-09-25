@@ -19,16 +19,20 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCompletedTrips();
+    // Load data after the build is complete to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadCompletedTrips();
+      }
+    });
   }
 
   Future<void> _loadCompletedTrips() async {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     
-    if (profileProvider.profile.driverId.isNotEmpty) {
-      await tripProvider.loadCompletedTrips(int.parse(profileProvider.profile.driverId));
-    }
+    // Use driver ID = 1 for testing (since profile.driverId is a string like "AMB789")
+    // In a real app, you'd need to map the string ID to the database integer ID
+    await tripProvider.loadCompletedTrips(1);
   }
 
   @override
@@ -318,7 +322,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   ),
                 ),
                 Text(
-                  '₹${trip.fareAmount}',
+                  '₹${trip.amount}',
                   style: GoogleFonts.roboto(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

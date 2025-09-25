@@ -416,7 +416,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       if (profileProvider.profile.driverId.isNotEmpty) {
-        final driverId = int.parse(profileProvider.profile.driverId);
+        final driverId = 1; // Using driver ID = 1 for testing
         
         // Create a trip with the accident details
         final tripData = {

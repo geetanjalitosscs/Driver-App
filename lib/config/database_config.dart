@@ -10,7 +10,7 @@ class DatabaseConfig {
   static const String database = 'edueyeco_apatkal';        // Driver app database name
   
   // API Base URL for trip operations
-  static const String baseUrl = 'http://localhost/apatkal';
+  static const String baseUrl = 'http://localhost/Driver-App';
   
   /// Get connection settings as a map
   static Map<String, dynamic> get connectionSettings => {

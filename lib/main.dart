@@ -43,7 +43,7 @@ class AmbulanceDriverApp extends StatelessWidget {
   Widget build(BuildContext context) {
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => ProfileProvider()..loadProfile()),
+            ChangeNotifierProvider(create: (context) => ProfileProvider()),
             ChangeNotifierProvider(create: (context) => EmergencyProvider()),
             ChangeNotifierProvider(create: (context) => AccidentProvider()),
             ChangeNotifierProvider(create: (context) => TripProvider()),
@@ -79,6 +79,18 @@ class _MainScreenState extends State<MainScreen> {
     const WalletScreen(),
     const HelpScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Load profile after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+        profileProvider.loadProfile();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

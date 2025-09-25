@@ -139,4 +139,16 @@ class Trip {
       return '${minutes}m';
     }
   }
+
+  // Getter for tripId - returns historyId for compatibility
+  int get tripId => historyId;
+
+  // Location getters for UI compatibility
+  String get startLocation => location; // Using location as start location
+  String get endLocation => location; // Using location as end location for now
+  
+  // Distance getters (placeholder - would need actual distance calculation)
+  double? get distanceKm => null; // Placeholder - would need to calculate from coordinates
+  
+  String get formattedDistance => 'N/A'; // Placeholder
 }
