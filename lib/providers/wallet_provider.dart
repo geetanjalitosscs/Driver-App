@@ -196,6 +196,16 @@ class WalletProvider extends ChangeNotifier {
     _errorMessage = null;
   }
 
+  // Clear all data (for logout)
+  void clearAllData() {
+    _wallet = null;
+    _withdrawals.clear();
+    _currentPeriod = 'all';
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
   // Get wallet statistics for different time periods
   Map<String, double> getWalletStatistics(String period) {
     final now = DateTime.now();

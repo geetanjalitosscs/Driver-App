@@ -193,4 +193,14 @@ class EarningsProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  // Clear all data (for logout)
+  void clearAllData() {
+    _earnings.clear();
+    _summary = {};
+    _selectedPeriod = 'all';
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+  }
 }

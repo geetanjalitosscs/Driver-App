@@ -233,6 +233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         enableInteractiveSelection: true,
                         enableSuggestions: false,
                         autocorrect: false,
+                        maxLength: 10,
                         decoration: InputDecoration(
                           labelText: 'Phone Number',
                           prefixIcon: const Icon(Icons.phone_outlined),
@@ -251,8 +252,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your phone number';
                           }
-                          if (value.length < 10) {
-                            return 'Please enter a valid phone number';
+                          // Remove any spaces or special characters
+                          String cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
+                          if (cleanValue.length != 10) {
+                            return 'Phone number must be exactly 10 digits';
+                          }
+                          if (!RegExp(r'^[6-9][0-9]{9}$').hasMatch(cleanValue)) {
+                            return 'Phone number must start with 6, 7, 8, or 9';
                           }
                           return null;
                         },

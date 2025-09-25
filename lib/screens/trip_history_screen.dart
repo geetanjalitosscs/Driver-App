@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/earnings_provider.dart';
+import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
 
@@ -37,15 +38,17 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   }
 
   Future<void> _loadTrips() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
-    // Use driver ID = 1 for testing (since profile.driverId is a string like "AMB789")
-    // In a real app, you'd need to map the string ID to the database integer ID
-    await Future.wait([
-      tripProvider.loadCompletedTrips(1),
-      earningsProvider.loadDriverEarnings(1, _selectedPeriod),
-    ]);
+    if (authProvider.currentUser != null) {
+      final driverId = int.parse(authProvider.currentUser!.driverId);
+      await Future.wait([
+        tripProvider.loadCompletedTrips(driverId),
+        earningsProvider.loadDriverEarnings(driverId, _selectedPeriod),
+      ]);
+    }
   }
 
   @override

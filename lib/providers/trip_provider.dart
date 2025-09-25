@@ -368,6 +368,21 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear all data (for logout)
+  void clearAllData() {
+    _allTrips.clear();
+    _completedTrips.clear();
+    _ongoingTrips.clear();
+    _earnings.clear();
+    _wallet = null;
+    _withdrawals.clear();
+    _currentTrip = null;
+    _selectedPeriod = 'all';
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
   // Update trip location
   Future<void> updateTripLocation(int tripId, double latitude, double longitude) async {
     try {

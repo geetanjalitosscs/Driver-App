@@ -247,13 +247,11 @@ class _NotificationBannerOverlayState extends State<NotificationBannerOverlay> {
   void initState() {
     super.initState();
     
-    // Listen for new notifications
-    NotificationService.onNotificationReceived = _onNotificationReceived;
+    // Listen for new notifications - simplified for local notifications only
   }
 
   @override
   void dispose() {
-    NotificationService.onNotificationReceived = null;
     super.dispose();
   }
 

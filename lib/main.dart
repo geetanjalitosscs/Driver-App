@@ -31,7 +31,7 @@ void main() async {
   var initSettings = InitializationSettings(android: androidInit);
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
-  // Initialize Firebase and notification service
+  // Initialize notification service
   await NotificationService.initialize();
 
   runApp(const AmbulanceDriverApp());

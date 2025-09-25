@@ -4,6 +4,9 @@ import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/auth_provider.dart';
+import '../providers/trip_provider.dart';
+import '../providers/earnings_provider.dart';
+import '../providers/wallet_provider.dart';
 import 'help_screen.dart';
 import 'login_screen.dart';
 
@@ -231,6 +234,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildVehicleInfoCard(profile),
                 const SizedBox(height: 16),
                 
+                // Driver Photos Card
+                _buildDriverPhotosCard(profile),
+                const SizedBox(height: 16),
+                
                 // Performance Card
                 _buildPerformanceCard(profile),
                 const SizedBox(height: 32),
@@ -438,6 +445,145 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildDriverPhotosCard(profile) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Driver Documents',
+            style: AppTheme.heading3,
+          ),
+          const SizedBox(height: 16),
+          
+          // Aadhar Card Photo
+          _buildPhotoRow(
+            title: 'Aadhar Card',
+            photoPath: profile.aadharPhoto,
+            driverId: profile.driverId,
+            type: 'aadhar',
+            icon: Icons.credit_card,
+          ),
+          const SizedBox(height: 12),
+          
+          // Driving Licence Photo
+          _buildPhotoRow(
+            title: 'Driving Licence',
+            photoPath: profile.licencePhoto,
+            driverId: profile.driverId,
+            type: 'licence',
+            icon: Icons.card_membership,
+          ),
+          const SizedBox(height: 12),
+          
+          // RC Photo
+          _buildPhotoRow(
+            title: 'RC (Registration Certificate)',
+            photoPath: profile.rcPhoto,
+            driverId: profile.driverId,
+            type: 'rc',
+            icon: Icons.description,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotoRow({
+    required String title,
+    required String photoPath,
+    required String driverId,
+    required String type,
+    required IconData icon,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: AppTheme.primaryBlue,
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTheme.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                photoPath,
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.neutralGreyLight,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          onPressed: () => _viewPhoto(driverId, type, title),
+          icon: Icon(
+            Icons.visibility,
+            color: AppTheme.primaryBlue,
+            size: 20,
+          ),
+          tooltip: 'View Photo',
+        ),
+      ],
+    );
+  }
+
+  void _viewPhoto(String driverId, String type, String title) {
+    // For now, show a dialog with photo info
+    // In a real app, you would open the photo in a viewer
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.image,
+              size: 64,
+              color: AppTheme.primaryBlue,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Photo: $type',
+              style: AppTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Driver ID: $driverId',
+              style: AppTheme.bodySmall.copyWith(
+                color: AppTheme.neutralGreyLight,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Close',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.primaryBlue,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPerformanceCard(profile) {
     return AppCard(
       child: Column(
@@ -562,7 +708,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context).pop();
                 // Handle logout logic here
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                final tripProvider = Provider.of<TripProvider>(context, listen: false);
+                final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+                final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+                
+                // Clear all provider data
+                tripProvider.clearAllData();
+                earningsProvider.clearAllData();
+                walletProvider.clearAllData();
+                
+                // Logout user
                 authProvider.logout();
+                
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
