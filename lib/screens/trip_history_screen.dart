@@ -311,6 +311,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                         ),
                       ),
                       Text(
+                        trip.clientName,
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
                         'Completed',
                         style: GoogleFonts.roboto(
                           fontSize: 12,
