@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
-import '../providers/profile_provider.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/earnings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
-import '../widgets/common/loading_widget.dart';
 
 class TripHistoryScreen extends StatefulWidget {
   const TripHistoryScreen({super.key});
@@ -16,23 +15,37 @@ class TripHistoryScreen extends StatefulWidget {
 }
 
 class _TripHistoryScreenState extends State<TripHistoryScreen> {
+  String _selectedPeriod = 'all';
+  
+  final List<Map<String, String>> _periods = [
+    {'value': 'all', 'label': 'All'},
+    {'value': 'today', 'label': 'Today'},
+    {'value': 'week', 'label': 'This Week'},
+    {'value': 'month', 'label': 'This Month'},
+    {'value': 'year', 'label': 'This Year'},
+  ];
+
   @override
   void initState() {
     super.initState();
     // Load data after the build is complete to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _loadCompletedTrips();
+        _loadTrips();
       }
     });
   }
 
-  Future<void> _loadCompletedTrips() async {
+  Future<void> _loadTrips() async {
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
     // Use driver ID = 1 for testing (since profile.driverId is a string like "AMB789")
     // In a real app, you'd need to map the string ID to the database integer ID
-    await tripProvider.loadCompletedTrips(1);
+    await Future.wait([
+      tripProvider.loadCompletedTrips(1),
+      earningsProvider.loadDriverEarnings(1, _selectedPeriod),
+    ]);
   }
 
   @override
@@ -62,14 +75,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: _loadCompletedTrips,
+            onPressed: _loadTrips,
             icon: const Icon(Icons.refresh, color: Colors.white),
             tooltip: 'Refresh',
           ),
         ],
       ),
-      body: Consumer<TripProvider>(
-        builder: (context, tripProvider, child) {
+      body: Consumer2<TripProvider, EarningsProvider>(
+        builder: (context, tripProvider, earningsProvider, child) {
           if (tripProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -104,7 +117,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: _loadCompletedTrips,
+                    onPressed: _loadTrips,
                     child: const Text('Retry'),
                   ),
                 ],
@@ -112,7 +125,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             );
           }
 
-          final completedTrips = tripProvider.completedTrips;
+          final completedTrips = tripProvider.filteredCompletedTrips;
 
           if (completedTrips.isEmpty) {
             return Center(
@@ -152,12 +165,16 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Trip Summary Card
-                _buildTripSummaryCard(tripProvider),
+                _buildTripSummaryCard(tripProvider, earningsProvider),
+                const SizedBox(height: 16),
+                
+                // Filter Section
+                _buildFilterSection(),
                 const SizedBox(height: 16),
                 
                 // Completed Trips List
                 Text(
-                  'Completed Trips',
+                  'Trip History',
                   style: GoogleFonts.roboto(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -175,7 +192,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     );
   }
 
-  Widget _buildTripSummaryCard(TripProvider tripProvider) {
+  Widget _buildTripSummaryCard(TripProvider tripProvider, EarningsProvider earningsProvider) {
     return AppCard(
       margin: EdgeInsets.zero,
       padding: const EdgeInsets.all(20),
@@ -197,7 +214,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               Expanded(
                 child: _buildSummaryItem(
                   'Total Trips',
-                  '${tripProvider.completedTrips.length}',
+                  '${tripProvider.filteredCompletedTrips.length}',
                   Icons.local_taxi,
                   AppTheme.primaryBlue,
                 ),
@@ -205,7 +222,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               Expanded(
                 child: _buildSummaryItem(
                   'Total Earnings',
-                  '₹${tripProvider.totalEarnings.toStringAsFixed(0)}',
+                  '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
                   Icons.account_balance_wallet,
                   AppTheme.accentGreen,
                 ),
@@ -219,7 +236,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               Expanded(
                 child: _buildSummaryItem(
                   'Today',
-                  '₹${tripProvider.todayEarnings.toStringAsFixed(0)}',
+                  '₹${earningsProvider.todayEarnings.toStringAsFixed(0)}',
                   Icons.today,
                   AppTheme.accentOrange,
                 ),
@@ -227,7 +244,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               Expanded(
                 child: _buildSummaryItem(
                   'This Week',
-                  '₹${tripProvider.weekEarnings.toStringAsFixed(0)}',
+                  '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
                   Icons.date_range,
                   AppTheme.accentPurple,
                 ),
@@ -431,5 +448,67 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
 
   String _formatDate(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  Widget _buildFilterSection() {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Filters',
+            style: GoogleFonts.roboto(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryBlue,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Period Filter
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Period',
+                style: GoogleFonts.roboto(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedPeriod,
+                    isExpanded: true,
+                    items: _periods.map((period) {
+                      return DropdownMenuItem<String>(
+                        value: period['value'],
+                        child: Text(period['label']!),
+                      );
+                    }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedPeriod = newValue!;
+                            });
+                            final tripProvider = Provider.of<TripProvider>(context, listen: false);
+                            tripProvider.setPeriod(_selectedPeriod);
+                          },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

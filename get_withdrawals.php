@@ -1,30 +1,18 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once 'db_config.php';
 
-// Handle preflight request
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    exit(0);
-}
-
-// Database configuration
-$host = 'localhost';
-$dbname = 'edueyeco_apatkal';
-$username = 'root';
-$password = '';
+setApiHeaders();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDatabaseConnection();
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
-    exit;
+    sendErrorResponse('Database connection failed: ' . $e->getMessage());
 }
 
-// Get driver ID from query parameters
+// Get driver ID and filters from query parameters
 $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
+$period = isset($_GET['period']) ? $_GET['period'] : 'all';
+$status = isset($_GET['status']) ? $_GET['status'] : 'all';
 
 if ($driver_id <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid driver ID']);
@@ -32,6 +20,34 @@ if ($driver_id <= 0) {
 }
 
 try {
+    // Build date condition based on period
+    $dateCondition = '';
+    switch ($period) {
+        case 'all':
+            $dateCondition = "1=1"; // Show all records
+            break;
+        case 'today':
+            $dateCondition = "DATE(requested_at) = CURDATE()";
+            break;
+        case 'week':
+            $dateCondition = "requested_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)";
+            break;
+        case 'month':
+            $dateCondition = "MONTH(requested_at) = MONTH(CURDATE()) AND YEAR(requested_at) = YEAR(CURDATE())";
+            break;
+        case 'year':
+            $dateCondition = "YEAR(requested_at) = YEAR(CURDATE())";
+            break;
+        default:
+            $dateCondition = "1=1"; // Default to all records
+    }
+
+    // Build status condition
+    $statusCondition = '';
+    if ($status !== 'all') {
+        $statusCondition = " AND status = '" . $status . "'";
+    }
+
     // Get withdrawals for the driver, ordered by most recent first
     $stmt = $pdo->prepare("
         SELECT 
@@ -45,9 +61,9 @@ try {
             status,
             requested_at,
             processed_at,
-            created_at
+            notes
         FROM withdrawals 
-        WHERE driver_id = ? 
+        WHERE driver_id = ? AND $dateCondition $statusCondition
         ORDER BY requested_at DESC
     ");
     $stmt->execute([$driver_id]);
@@ -67,7 +83,7 @@ try {
             'status' => $withdrawal['status'],
             'requested_at' => $withdrawal['requested_at'],
             'processed_at' => $withdrawal['processed_at'],
-            'created_at' => $withdrawal['created_at']
+            'notes' => $withdrawal['notes']
         ];
     }
 

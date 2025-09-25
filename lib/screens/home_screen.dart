@@ -963,7 +963,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final todayTrips = _getTodayTripsCount(tripProvider.completedTrips);
           
           // Get today's earnings
-          final todayEarnings = earningsProvider.totalEarnings ?? 0.0;
+          final todayEarnings = earningsProvider.todayEarnings;
           
           return Column(
             children: [

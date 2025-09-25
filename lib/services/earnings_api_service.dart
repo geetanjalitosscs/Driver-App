@@ -12,17 +12,27 @@ class EarningsApiService {
     required String period, // 'today', 'week', 'month', 'year'
   }) async {
     try {
+      final url = '$_baseUrl/get_driver_earnings.php?driver_id=$driverId&period=$period';
+      print('Fetching earnings from: $url');
+      
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_driver_earnings.php?driver_id=$driverId&period=$period'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
       );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true && data['earnings'] != null) {
-          return (data['earnings'] as List)
+          final earnings = (data['earnings'] as List)
               .map((json) => Earning.fromJson(json))
               .toList();
+          print('Parsed ${earnings.length} earnings');
+          return earnings;
+        } else {
+          print('API returned success=false or no earnings data');
         }
       }
       return [];

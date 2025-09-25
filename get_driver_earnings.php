@@ -1,30 +1,17 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once 'db_config.php';
 
-// Handle preflight OPTIONS request
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    exit(0);
-}
-
-// Database configuration
-$host = '127.0.0.1';
-$dbname = 'edueyeco_apatkal';
-$username = 'root';
-$password = '';
+setApiHeaders();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDatabaseConnection();
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $e->getMessage()]);
-    exit;
+    sendErrorResponse('Database connection failed: ' . $e->getMessage());
 }
 
 $driverId = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
-$period = isset($_GET['period']) ? $_GET['period'] : 'today';
+$period = isset($_GET['period']) ? $_GET['period'] : 'all';
+$tripId = isset($_GET['trip_id']) ? $_GET['trip_id'] : 'all';
 
 if ($driverId <= 0) {
     echo json_encode(['success' => false, 'error' => 'Invalid driver ID']);
@@ -35,6 +22,9 @@ try {
     // Build date condition based on period
     $dateCondition = '';
     switch ($period) {
+        case 'all':
+            $dateCondition = "1=1"; // Show all records
+            break;
         case 'today':
             $dateCondition = "DATE(earning_date) = CURDATE()";
             break;
@@ -48,20 +38,26 @@ try {
             $dateCondition = "YEAR(earning_date) = YEAR(CURDATE())";
             break;
         default:
-            $dateCondition = "DATE(earning_date) = CURDATE()";
+            $dateCondition = "1=1"; // Default to all records
+    }
+
+    // Build trip condition
+    $tripCondition = '';
+    if ($tripId !== 'all') {
+        $tripCondition = " AND trip_id = " . (int)$tripId;
     }
 
     $stmt = $pdo->prepare("
         SELECT 
-            earning_id,
+            id,
             driver_id,
             trip_id,
             amount,
             earning_date,
-            created_at
+            created_time
         FROM earnings 
-        WHERE driver_id = ? AND $dateCondition
-        ORDER BY earning_date DESC, created_at DESC
+        WHERE driver_id = ? AND $dateCondition $tripCondition
+        ORDER BY earning_date DESC, created_time DESC
     ");
     
     $stmt->execute([$driverId]);
@@ -70,12 +66,12 @@ try {
     // Format the response
     $formattedEarnings = array_map(function($earning) {
         return [
-            'earning_id' => (int)$earning['earning_id'],
+            'id' => (int)$earning['id'],
             'driver_id' => (int)$earning['driver_id'],
             'trip_id' => (int)$earning['trip_id'],
             'amount' => (float)$earning['amount'],
             'earning_date' => $earning['earning_date'],
-            'created_at' => $earning['created_at'],
+            'created_time' => $earning['created_time'],
         ];
     }, $earnings);
 

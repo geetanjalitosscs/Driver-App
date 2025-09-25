@@ -1,21 +1,12 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once 'db_config.php';
 
-// Database configuration
-$host = '127.0.0.1';
-$dbname = 'edueyeco_apatkal';
-$username = 'root';
-$password = '';
+setApiHeaders();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDatabaseConnection();
 } catch(PDOException $e) {
-    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
-    exit;
+    sendErrorResponse('Database connection failed: ' . $e->getMessage());
 }
 
 // Get driver ID from query parameter

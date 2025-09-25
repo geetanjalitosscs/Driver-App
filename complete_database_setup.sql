@@ -235,3 +235,29 @@ UPDATE wallet SET
     balance = total_earned - total_withdrawn;
 
 COMMIT;
+
+
+
+// trip insertion
+
+INSERT INTO trips (
+    driver_id,
+    client_name,
+    location,
+    timing,
+    amount,
+    duration,
+    start_time,
+    end_time,
+    created_at
+) VALUES (
+    1,  -- driver_id (assuming driver ID 1)
+    'Sarah Johnson',
+    'Apollo Hospital, Bengaluru',
+    '2025-09-25 09:00:00',  -- timing
+    1800,  -- amount
+    50,    -- duration in minutes
+    '2025-09-25 09:05:00',  -- start_time
+    '2025-09-25 09:55:00',  -- end_time (completed trip)
+    '2025-09-25 10:00:00'   -- created_at (today)
+);

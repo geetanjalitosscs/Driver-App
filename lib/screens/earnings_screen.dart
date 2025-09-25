@@ -15,12 +15,23 @@ class EarningsScreen extends StatefulWidget {
 }
 
 class _EarningsScreenState extends State<EarningsScreen> {
-  String _selectedPeriod = 'today';
+  String _selectedPeriod = 'all';
+  String _selectedTrip = 'all';
   final List<Map<String, String>> _periods = [
+    {'value': 'all', 'label': 'All'},
     {'value': 'today', 'label': 'Today'},
     {'value': 'week', 'label': 'This Week'},
     {'value': 'month', 'label': 'This Month'},
     {'value': 'year', 'label': 'This Year'},
+  ];
+  
+  final List<Map<String, String>> _tripFilters = [
+    {'value': 'all', 'label': 'All Trips'},
+    {'value': '5', 'label': 'Trip #5'},
+    {'value': '6', 'label': 'Trip #6'},
+    {'value': '7', 'label': 'Trip #7'},
+    {'value': '8', 'label': 'Trip #8'},
+    {'value': '9', 'label': 'Trip #9'},
   ];
 
   @override

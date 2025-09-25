@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import '../models/earning.dart';
 import '../services/earnings_api_service.dart';
+import '../config/database_config.dart';
 
 class EarningsProvider extends ChangeNotifier {
   List<Earning> _earnings = [];
@@ -10,7 +13,7 @@ class EarningsProvider extends ChangeNotifier {
   
   bool _isLoading = false;
   String? _errorMessage;
-  String _selectedPeriod = 'today';
+  String _selectedPeriod = 'all';
 
   // Getters
   List<Earning> get earnings => _earnings;
@@ -23,6 +26,7 @@ class EarningsProvider extends ChangeNotifier {
 
   // Load earnings for a specific driver and period
   Future<void> loadDriverEarnings(int driverId, String period) async {
+    print('Loading earnings for driver $driverId, period: $period');
     _setLoading(true);
     _clearError();
     _selectedPeriod = period;
@@ -34,33 +38,86 @@ class EarningsProvider extends ChangeNotifier {
         period: period,
       );
 
-      // Load summary data
-      _summary = await EarningsApiService.fetchEarningsSummary(
-        driverId: driverId,
-        period: period,
-      );
+      print('Loaded ${_earnings.length} earnings');
 
-      // Load recent earnings (always show last 10)
-      _recentEarnings = await EarningsApiService.fetchRecentEarnings(
-        driverId: driverId,
-        limit: 10,
-      );
+      // Calculate summary from earnings data
+      await _calculateSummaryWithTrips(driverId);
 
-      // Load weekly data for chart (if period is week or longer)
-      if (period == 'week' || period == 'month' || period == 'year') {
-        _weeklyData = await EarningsApiService.fetchWeeklyEarnings(
-          driverId: driverId,
-        );
-      } else {
-        _weeklyData = [];
-      }
+      // Use earnings as recent earnings for now
+      _recentEarnings = _earnings.take(10).toList();
 
+      // Clear weekly data for now
+      _weeklyData = [];
+
+      print('Summary: $_summary');
       notifyListeners();
     } catch (e) {
+      print('Error in loadDriverEarnings: $e');
       _setError('Failed to load earnings: $e');
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Calculate summary from earnings data with trip information
+  Future<void> _calculateSummaryWithTrips(int driverId) async {
+    if (_earnings.isEmpty) {
+      _summary = {
+        'total_earnings': 0.0,
+        'total_trips': 0,
+        'average_per_trip': 0.0,
+        'total_hours': 0.0,
+      };
+      return;
+    }
+
+    double totalEarnings = _earnings.fold(0.0, (sum, earning) => sum + earning.amount);
+    int totalTrips = _earnings.length;
+    double averagePerTrip = totalTrips > 0 ? totalEarnings / totalTrips : 0.0;
+
+    // Calculate total hours from trip data
+    double totalHours = await _calculateTotalHoursFromTrips(driverId);
+
+    _summary = {
+      'total_earnings': totalEarnings,
+      'total_trips': totalTrips,
+      'average_per_trip': averagePerTrip,
+      'total_hours': totalHours,
+    };
+  }
+
+  // Calculate total hours from trip data
+  Future<double> _calculateTotalHoursFromTrips(int driverId) async {
+    try {
+      // Fetch completed trips to calculate total hours
+      final response = await http.get(
+        Uri.parse('${DatabaseConfig.baseUrl}/get_completed_trips.php?driver_id=$driverId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> tripsData = json.decode(response.body);
+        double totalHours = 0.0;
+
+        for (var tripData in tripsData) {
+          // Calculate hours from trip duration or start/end times
+          if (tripData['duration'] != null) {
+            totalHours += (tripData['duration'] as num).toDouble() / 60.0; // Convert minutes to hours
+          } else if (tripData['start_time'] != null && tripData['end_time'] != null) {
+            final startTime = DateTime.parse(tripData['start_time']);
+            final endTime = DateTime.parse(tripData['end_time']);
+            final duration = endTime.difference(startTime).inMinutes;
+            totalHours += duration / 60.0; // Convert minutes to hours
+          }
+        }
+
+        return totalHours;
+      }
+    } catch (e) {
+      print('Error calculating total hours: $e');
+    }
+    
+    return 0.0;
   }
 
   // Refresh earnings data
@@ -78,6 +135,8 @@ class EarningsProvider extends ChangeNotifier {
   // Get formatted period name
   String getPeriodDisplayName() {
     switch (_selectedPeriod) {
+      case 'all':
+        return 'All';
       case 'today':
         return 'Today';
       case 'week':
@@ -87,12 +146,22 @@ class EarningsProvider extends ChangeNotifier {
       case 'year':
         return 'This Year';
       default:
-        return 'Today';
+        return 'All';
     }
   }
 
   // Get total earnings for current period
   double get totalEarnings => _summary['total_earnings']?.toDouble() ?? 0.0;
+
+  // Get today's earnings specifically
+  double get todayEarnings {
+    final today = DateTime.now();
+    return _earnings.where((earning) {
+      return earning.earningDate.year == today.year &&
+             earning.earningDate.month == today.month &&
+             earning.earningDate.day == today.day;
+    }).fold(0.0, (sum, earning) => sum + earning.amount);
+  }
 
   // Get total trips for current period
   int get totalTrips => _summary['total_trips'] ?? 0;

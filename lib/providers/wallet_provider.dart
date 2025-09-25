@@ -7,7 +7,7 @@ class WalletProvider extends ChangeNotifier {
   Wallet? _wallet;
   List<Withdrawal> _withdrawals = [];
   List<Map<String, dynamic>> _transactions = [];
-  String _currentPeriod = 'today';
+  String _currentPeriod = 'all';
   
   bool _isLoading = false;
   String? _errorMessage;
@@ -22,6 +22,11 @@ class WalletProvider extends ChangeNotifier {
 
   // Get filtered withdrawals based on current period
   List<Withdrawal> get filteredWithdrawals {
+    // For 'all' period, return all withdrawals
+    if (_currentPeriod.toLowerCase() == 'all') {
+      return _withdrawals;
+    }
+
     final now = DateTime.now();
     DateTime startDate;
 
@@ -39,7 +44,7 @@ class WalletProvider extends ChangeNotifier {
         startDate = DateTime(now.year, 1, 1);
         break;
       default:
-        startDate = DateTime(now.year, now.month, now.day);
+        return _withdrawals; // Return all for unknown periods
     }
 
     return _withdrawals.where((withdrawal) {
@@ -63,17 +68,18 @@ class WalletProvider extends ChangeNotifier {
   }
 
   // Load wallet data for a driver
-  Future<void> loadWalletData(int driverId) async {
+  Future<void> loadWalletData(int driverId, {String period = 'all', String status = 'all'}) async {
     _setLoading(true);
     _clearError();
+    _currentPeriod = period;
 
     try {
       // Load wallet balance
       final wallet = await WalletApiService.getWallet(driverId);
       _wallet = wallet;
 
-      // Load withdrawals
-      final withdrawals = await WalletApiService.getWithdrawals(driverId);
+      // Load withdrawals with filters
+      final withdrawals = await WalletApiService.getWithdrawals(driverId, period: period, status: status);
       _withdrawals = withdrawals;
 
       // Load transactions (earnings, payments, etc.)
@@ -85,6 +91,16 @@ class WalletProvider extends ChangeNotifier {
       _setError('Failed to load wallet data: $e');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  // Add earnings to wallet
+  Future<void> addEarnings(int driverId, double amount) async {
+    try {
+      // Reload wallet data to get updated balance
+      await loadWalletData(driverId);
+    } catch (e) {
+      print('Error updating wallet after adding earnings: $e');
     }
   }
 

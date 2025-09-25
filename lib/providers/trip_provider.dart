@@ -19,6 +19,7 @@ class TripProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   Trip? _currentTrip;
+  String _selectedPeriod = 'all';
 
   // Getters
   List<Trip> get allTrips => _allTrips;
@@ -30,6 +31,38 @@ class TripProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   Trip? get currentTrip => _currentTrip;
+  String get selectedPeriod => _selectedPeriod;
+
+  // Get filtered completed trips based on selected period
+  List<Trip> get filteredCompletedTrips {
+    if (_selectedPeriod == 'all') {
+      return _completedTrips;
+    }
+
+    final now = DateTime.now();
+    DateTime startDate;
+
+    switch (_selectedPeriod) {
+      case 'today':
+        startDate = DateTime(now.year, now.month, now.day);
+        break;
+      case 'week':
+        startDate = now.subtract(const Duration(days: 7));
+        break;
+      case 'month':
+        startDate = DateTime(now.year, now.month, 1);
+        break;
+      case 'year':
+        startDate = DateTime(now.year, 1, 1);
+        break;
+      default:
+        return _completedTrips;
+    }
+
+    return _completedTrips.where((trip) {
+      return trip.endTime != null && trip.endTime!.isAfter(startDate);
+    }).toList();
+  }
 
   // Get current ongoing trip (should be only one)
   Trip? get currentOngoingTrip {
@@ -111,6 +144,12 @@ class TripProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Set period for filtering trips
+  void setPeriod(String period) {
+    _selectedPeriod = period;
+    notifyListeners();
   }
 
   // Load ongoing trips only

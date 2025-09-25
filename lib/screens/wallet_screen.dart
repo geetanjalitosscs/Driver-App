@@ -16,12 +16,22 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  String _selectedPeriod = 'today';
+  String _selectedPeriod = 'all';
+  String _selectedStatus = 'all';
   final List<Map<String, String>> _periods = [
+    {'value': 'all', 'label': 'All'},
     {'value': 'today', 'label': 'Today'},
     {'value': 'week', 'label': 'This Week'},
     {'value': 'month', 'label': 'This Month'},
     {'value': 'year', 'label': 'This Year'},
+  ];
+  
+  final List<Map<String, String>> _statusFilters = [
+    {'value': 'all', 'label': 'All Status'},
+    {'value': 'pending', 'label': 'Pending'},
+    {'value': 'completed', 'label': 'Completed'},
+    {'value': 'approved', 'label': 'Approved'},
+    {'value': 'rejected', 'label': 'Rejected'},
   ];
 
   @override
@@ -40,7 +50,11 @@ class _WalletScreenState extends State<WalletScreen> {
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
     
     if (profileProvider.profile.driverId.isNotEmpty) {
-      await walletProvider.loadWalletData(1); // Using driver ID = 1 for testing
+      await walletProvider.loadWalletData(
+        1, // Using driver ID = 1 for testing
+        period: _selectedPeriod,
+        status: _selectedStatus,
+      );
     }
   }
 

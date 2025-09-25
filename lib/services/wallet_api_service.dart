@@ -28,11 +28,11 @@ class WalletApiService {
     }
   }
 
-  // Get withdrawals for a driver
-  static Future<List<Withdrawal>> getWithdrawals(int driverId) async {
+  // Get withdrawals for a driver with optional filters
+  static Future<List<Withdrawal>> getWithdrawals(int driverId, {String period = 'all', String status = 'all'}) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_withdrawals.php?driver_id=$driverId'),
+        Uri.parse('$_baseUrl/get_withdrawals.php?driver_id=$driverId&period=$period&status=$status'),
         headers: {'Content-Type': 'application/json'},
       );
 
