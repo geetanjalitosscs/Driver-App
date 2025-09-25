@@ -1,15 +1,10 @@
 <?php
-header("Content-Type: application/json");
+require_once '../db_config.php';
 
-// Database connection
-$host = "localhost";
-$dbname = "edueyeco_apatkal";
-$username = "root";
-$password = "";
+setApiHeaders();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDatabaseConnection();
     
     // Fetch accidents
     $stmt = $pdo->prepare("SELECT * FROM accidents WHERE status = 'pending' ORDER BY created_at DESC");

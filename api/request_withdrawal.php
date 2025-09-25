@@ -1,26 +1,12 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once '../db_config.php';
 
-// Handle preflight request
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    exit(0);
-}
-
-// Database configuration
-$host = 'localhost';
-$dbname = 'edueyeco_apatkal';
-$username = 'root';
-$password = '';
+setApiHeaders();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDatabaseConnection();
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
-    exit;
+    sendErrorResponse('Database connection failed: ' . $e->getMessage());
 }
 
 // Get JSON input
