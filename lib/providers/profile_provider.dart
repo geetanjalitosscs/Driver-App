@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/profile_data.dart';
-import '../services/profile_service.dart';
+import '../services/api_service.dart';
 
 class ProfileProvider with ChangeNotifier {
   ProfileData _profile = ProfileData.getDefault();
@@ -19,7 +19,7 @@ class ProfileProvider with ChangeNotifier {
 
     try {
       // Try to load from backend first
-      _profile = await ProfileService.getProfile();
+      _profile = await CentralizedApiService.getProfile();
     } catch (e) {
       _error = 'Failed to load profile: ${e.toString()}';
       // Keep default profile if loading fails
@@ -37,12 +37,23 @@ class ProfileProvider with ChangeNotifier {
 
     try {
       // Update backend
-      bool success = await ProfileService.updateProfile(newProfile);
+      final result = await CentralizedApiService.updateProfile(
+        driverId: int.parse(_profile.driverId),
+        name: newProfile.driverName,
+        email: newProfile.email,
+        phone: newProfile.phone,
+        vehicleNumber: newProfile.vehicleNumber,
+        vehicleType: newProfile.vehicleType,
+        licenseNumber: newProfile.licencePhoto,
+        aadharNumber: newProfile.aadharPhoto,
+      );
+      
+      bool success = result['success'] == true;
       
       if (success) {
         _profile = newProfile;
         // Also save to local storage as backup
-        await ProfileService.saveToLocal(newProfile);
+        await CentralizedApiService.saveProfileToLocal(newProfile);
         _isLoading = false;
         notifyListeners();
         return true;

@@ -1,41 +1,38 @@
-/// Database Configuration
+/// Centralized Configuration for Driver App
 /// 
-/// Update these values with your actual MySQL database credentials
+/// All API endpoints and app settings are centralized here
 class DatabaseConfig {
-  // Database connection settings
-  static const String host = '127.0.0.1';           // e.g., '127.0.0.1' or 'localhost'
-  static const int port = 3306;                    // Alternative MySQL port
-  static const String user = 'root';          // XAMPP default user
-  static const String password = '';  // XAMPP default (no password)
-  static const String database = 'edueyeco_apatkal';        // Driver app database name
+  // ============================================================================
+  // API CONFIGURATION
+  // ============================================================================
   
-  // API Base URL for trip operations
-  static const String baseUrl = 'http://localhost/Driver-App/api';
+  // Main Driver App API Base URL
+  static const String baseUrl = 'https://tossconsultancyservices.com/apatkal/api/';
   
-  /// Get connection settings as a map
-  static Map<String, dynamic> get connectionSettings => {
-    'host': host,
-    'port': port,
-    'user': user,
-    'password': password,
-    'database': database,
-  };
+  // Accident API Base URL (separate service)
+  static const String accidentBaseUrl = 'https://tossconsultancyservices.com/apatkal/api/';
   
-  /// Test if configuration is properly set
-  static bool get isConfigured => 
-      host != 'localhost' && 
-      user != 'root' && 
-      password != '';
+  // Google Maps API Configuration
+  static const String googleMapsApiKey = 'AIzaSyBvOkBwJcJkK8jL9mN2pQ3rS4tU5vW6xY7z';
+  
+  // ============================================================================
+  // LOCATION TRACKING CONFIGURATION
+  // ============================================================================
+  
+  static const int locationUpdateInterval = 30; // seconds
+  static const double minimumMovementDistance = 10.0; // meters
+  
+  // ============================================================================
+  // UTILITY METHODS
+  // ============================================================================
+  
+  /// Get full API URL for a specific endpoint
+  static String getApiUrl(String endpoint) {
+    return '$baseUrl/$endpoint';
+  }
+  
+  /// Get full accident API URL for a specific endpoint
+  static String getAccidentApiUrl(String endpoint) {
+    return '$accidentBaseUrl$endpoint';
+  }
 }
-
-/// Example configuration for local development:
-/// 
-/// static const String host = '127.0.0.1';
-/// static const String user = 'root';
-/// static const String password = 'your_password';
-/// 
-/// Example configuration for remote server:
-/// 
-/// static const String host = 'your-server.com';
-/// static const String user = 'your_username';
-/// static const String password = 'your_password';

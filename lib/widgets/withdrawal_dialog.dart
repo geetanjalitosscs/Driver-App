@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
-import '../services/bank_account_service.dart';
+import '../services/api_service.dart';
 
 class WithdrawalDialog extends StatefulWidget {
   final double walletBalance;
@@ -50,7 +50,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
 
   Future<void> _loadBankAccounts() async {
     try {
-      final accounts = await BankAccountService.getDriverBankAccounts(1); // Using driver ID = 1 for testing
+      final accounts = await CentralizedApiService.getDriverBankAccounts(1); // Using driver ID = 1 for testing
       setState(() {
         _savedAccounts = accounts;
         _hasSavedAccounts = accounts.isNotEmpty;

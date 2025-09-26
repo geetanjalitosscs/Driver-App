@@ -9,8 +9,7 @@ import '../providers/trip_provider.dart';
 import '../providers/accident_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
-import '../services/directions_service.dart';
-import '../services/location_tracking_service.dart';
+import '../services/api_service.dart';
 import '../config/maps_config.dart';
 
 class TripNavigationScreen extends StatefulWidget {
@@ -57,7 +56,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   void dispose() {
     _locationUpdateTimer?.cancel();
     _tripTimer?.cancel();
-    LocationTrackingService.stopTracking();
+    CentralizedApiService.stopTracking();
     super.dispose();
   }
 
@@ -69,7 +68,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       });
 
       // Get current location
-      final currentPos = await LocationTrackingService.getCurrentLocation();
+      final currentPos = await CentralizedApiService.getCurrentLocation();
       if (currentPos != null) {
         _currentLocation = LatLng(currentPos.latitude, currentPos.longitude);
         _startLocation = _currentLocation;
@@ -123,7 +122,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       }
       
       // Fallback: use geocoding service
-      return await DirectionsService.geocodeAddress(locationString);
+      return await CentralizedApiService.geocodeAddress(locationString);
     } catch (e) {
       print('Error parsing location: $e');
       return null;
@@ -134,7 +133,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
     if (_startLocation == null || _endLocation == null) return;
 
     try {
-      final route = await DirectionsService.getRoute(
+      final route = await CentralizedApiService.getRoute(
         _startLocation!,
         _endLocation!,
       );
@@ -162,7 +161,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   Future<void> _startLocationTracking() async {
-    await LocationTrackingService.startTracking(
+    await CentralizedApiService.startTracking(
       onLocationUpdate: _onLocationUpdate,
       onError: _onLocationError,
     );

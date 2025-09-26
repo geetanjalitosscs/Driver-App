@@ -7,7 +7,7 @@ class AccidentDetailPage extends StatelessWidget {
   const AccidentDetailPage({required this.accident});
 
   void updateStatus(BuildContext context, String status) async {
-    bool success = await ApiService.updateAccidentStatus(accident.id, status);
+    bool success = await CentralizedApiService.updateAccidentStatus(accident.id, status);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Status updated: $status")),

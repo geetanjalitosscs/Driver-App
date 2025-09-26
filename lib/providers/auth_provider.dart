@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import '../config/database_config.dart';
 import '../models/profile_data.dart';
+import '../services/api_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   ProfileData? _currentUser;
@@ -34,34 +32,14 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final response = await http.post(
-        Uri.parse('${DatabaseConfig.baseUrl}/login.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['success'] == true) {
-          _currentUser = ProfileData.fromJson(data['driver']);
-          _setLoading(false);
-          return true;
-        } else {
-          _setError(data['message'] ?? 'Login failed');
-          _setLoading(false);
-          return false;
-        }
+      final data = await CentralizedApiService.login(email, password);
+      
+      if (data['success'] == true) {
+        _currentUser = ProfileData.fromJson(data['driver']);
+        _setLoading(false);
+        return true;
       } else {
-        // Handle specific error codes
-        if (response.statusCode == 400 || response.statusCode == 401) {
-          _setError('Invalid credentials');
-        } else {
-          _setError('Server error: ${response.statusCode}');
-        }
+        _setError(data['message'] ?? 'Login failed');
         _setLoading(false);
         return false;
       }
@@ -89,42 +67,23 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final response = await http.post(
-        Uri.parse('${DatabaseConfig.baseUrl}/signup.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'driver_name': name,
-          'email': email,
-          'password': password,
-          'number': phone,
-          'address': address,
-          'vehicle_type': vehicleType,
-          'vehicle_number': vehicleNumber,
-          'aadhar_photo': aadharPhoto,
-          'licence_photo': licencePhoto,
-          'rc_photo': rcPhoto,
-        }),
+      final data = await CentralizedApiService.signup(
+        name: name,
+        email: email,
+        phone: phone,
+        password: password,
+        vehicleNumber: vehicleNumber,
+        vehicleType: vehicleType,
+        licenseNumber: licencePhoto, // Using photo as license number for now
+        aadharNumber: aadharPhoto, // Using photo as aadhar number for now
       );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['success'] == true) {
-          _currentUser = ProfileData.fromJson(data['driver']);
-          _setLoading(false);
-          return true;
-        } else {
-          _setError(data['message'] ?? 'Signup failed');
-          _setLoading(false);
-          return false;
-        }
+      
+      if (data['success'] == true) {
+        _currentUser = ProfileData.fromJson(data['driver']);
+        _setLoading(false);
+        return true;
       } else {
-        // Handle specific error codes
-        if (response.statusCode == 400 || response.statusCode == 409) {
-          _setError('Invalid information provided');
-        } else {
-          _setError('Server error: ${response.statusCode}');
-        }
+        _setError(data['message'] ?? 'Signup failed');
         _setLoading(false);
         return false;
       }
@@ -157,35 +116,24 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final response = await http.post(
-        Uri.parse('${DatabaseConfig.baseUrl}/update_profile.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'driver_id': _currentUser!.driverId,
-          'driver_name': name,
-          'email': email,
-          'number': phone,
-          'address': address,
-          'vehicle_type': vehicleType,
-          'vehicle_number': vehicleNumber,
-        }),
+      final data = await CentralizedApiService.updateProfile(
+        driverId: int.parse(_currentUser!.driverId),
+        name: name,
+        email: email,
+        phone: phone,
+        vehicleNumber: vehicleNumber,
+        vehicleType: vehicleType,
+        licenseNumber: _currentUser!.licencePhoto,
+        aadharNumber: _currentUser!.aadharPhoto,
       );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['success'] == true) {
-          // Update current user data
-          _currentUser = ProfileData.fromJson(data['driver']);
-          _setLoading(false);
-          return true;
-        } else {
-          _setError(data['message'] ?? 'Profile update failed');
-          _setLoading(false);
-          return false;
-        }
+      
+      if (data['success'] == true) {
+        // Update current user data
+        _currentUser = ProfileData.fromJson(data['driver']);
+        _setLoading(false);
+        return true;
       } else {
-        _setError('Server error: ${response.statusCode}');
+        _setError(data['message'] ?? 'Profile update failed');
         _setLoading(false);
         return false;
       }
@@ -210,36 +158,17 @@ class AuthProvider extends ChangeNotifier {
     _setError(null);
 
     try {
-      final response = await http.post(
-        Uri.parse('${DatabaseConfig.baseUrl}/change_password.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'driver_id': int.parse(_currentUser!.driverId),
-          'current_password': currentPassword,
-          'new_password': newPassword,
-        }),
+      final data = await CentralizedApiService.changePassword(
+        driverId: int.parse(_currentUser!.driverId),
+        currentPassword: currentPassword,
+        newPassword: newPassword,
       );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['success'] == true) {
-          _setLoading(false);
-          return true;
-        } else {
-          _setError(data['error'] ?? 'Password change failed');
-          _setLoading(false);
-          return false;
-        }
+      
+      if (data['success'] == true) {
+        _setLoading(false);
+        return true;
       } else {
-        // Handle specific error codes
-        if (response.statusCode == 401) {
-          _setError('Current password is incorrect');
-        } else if (response.statusCode == 400) {
-          _setError('Invalid password format');
-        } else {
-          _setError('Server error: ${response.statusCode}');
-        }
+        _setError(data['error'] ?? 'Password change failed');
         _setLoading(false);
         return false;
       }

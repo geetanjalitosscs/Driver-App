@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/earning.dart';
-import '../services/earnings_api_service.dart';
+import '../services/api_service.dart';
 import '../config/database_config.dart';
 
 class EarningsProvider extends ChangeNotifier {
@@ -33,7 +33,7 @@ class EarningsProvider extends ChangeNotifier {
 
     try {
       // Load earnings for the selected period
-      _earnings = await EarningsApiService.fetchDriverEarnings(
+      _earnings = await CentralizedApiService.getDriverEarnings(
         driverId: driverId,
         period: period,
       );
