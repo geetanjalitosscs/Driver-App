@@ -96,40 +96,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      setState(() {
-        _isLoadingLocation = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingLocation = true;
+        });
+      }
 
       final locationData = await LocationPickerService.getCurrentLocation();
       
       if (locationData != null) {
-        setState(() {
-          _currentLatitude = locationData['latitude'];
-          _currentLongitude = locationData['longitude'];
-          _currentAddress = locationData['address'] ?? 'Unknown Location';
-          
-          // Store detailed address information
-          _currentStreet = locationData['street'] ?? '';
-          _currentCity = locationData['city'] ?? '';
-          _currentState = locationData['state'] ?? '';
-          _currentCountry = locationData['country'] ?? '';
-          _currentPostalCode = locationData['postalCode'] ?? '';
-          _currentFormattedAddress = locationData['formattedAddress'] ?? _currentAddress;
-          
-          _isLoadingLocation = false;
-        });
+        if (mounted) {
+          setState(() {
+            _currentLatitude = locationData['latitude'];
+            _currentLongitude = locationData['longitude'];
+            _currentAddress = locationData['address'] ?? 'Unknown Location';
+            
+            // Store detailed address information
+            _currentStreet = locationData['street'] ?? '';
+            _currentCity = locationData['city'] ?? '';
+            _currentState = locationData['state'] ?? '';
+            _currentCountry = locationData['country'] ?? '';
+            _currentPostalCode = locationData['postalCode'] ?? '';
+            _currentFormattedAddress = locationData['formattedAddress'] ?? _currentAddress;
+            
+            _isLoadingLocation = false;
+          });
+        }
       } else {
+        if (mounted) {
+          setState(() {
+            _currentAddress = 'Location unavailable';
+            _isLoadingLocation = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error getting location: $e');
+      if (mounted) {
         setState(() {
           _currentAddress = 'Location unavailable';
           _isLoadingLocation = false;
         });
       }
-    } catch (e) {
-      print('Error getting location: $e');
-      setState(() {
-        _currentAddress = 'Location unavailable';
-        _isLoadingLocation = false;
-      });
     }
   }
 
@@ -177,6 +185,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refreshData() async {
     await _loadStatisticsData();
     await _loadOngoingTrips();
+  }
+
+  // Refresh all data including reports
+  Future<void> _refreshAllData() async {
+    await _loadStatisticsData();
+    await _loadOngoingTrips();
+    // Refresh accident reports
+    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+    await accidentProvider.refreshPendingCount();
+    // Refresh location
+    await _refreshLocation();
   }
 
   Future<void> _navigateToTrip(trip) async {
@@ -493,37 +512,84 @@ class _HomeScreenState extends State<HomeScreen> {
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  text: 'Go Online',
-                  icon: Icons.play_circle_fill,
-                  variant: _isOnDuty ? AppButtonVariant.secondary : AppButtonVariant.outline,
-                  onPressed: () {
-                    setState(() {
-                      _isOnDuty = true;
-                    });
-                    // Refresh accident count when going online
-                    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-                    accidentProvider.refreshPendingCount();
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: AppButton(
-                  text: 'Go Offline',
-                  icon: Icons.pause_circle_filled,
-                  variant: !_isOnDuty ? AppButtonVariant.danger : AppButtonVariant.outline,
-                  onPressed: () {
-                    setState(() {
-                      _isOnDuty = false;
-                    });
-                  },
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 300) {
+                // Only for extremely small screens, stack buttons vertically
+                return Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButton(
+                        text: 'Go Online',
+                        icon: Icons.play_circle_fill,
+                        variant: _isOnDuty ? AppButtonVariant.secondary : AppButtonVariant.outline,
+                        size: AppButtonSize.small,
+                        onPressed: () {
+                          setState(() {
+                            _isOnDuty = true;
+                          });
+                          // Refresh accident count when going online
+                          final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+                          accidentProvider.refreshPendingCount();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButton(
+                        text: 'Go Offline',
+                        icon: Icons.pause_circle_filled,
+                        variant: !_isOnDuty ? AppButtonVariant.danger : AppButtonVariant.outline,
+                        size: AppButtonSize.small,
+                        onPressed: () {
+                          setState(() {
+                            _isOnDuty = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // For screens 300px and above, use horizontal layout with smaller buttons
+                return Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        text: 'Go Online',
+                        icon: Icons.play_circle_fill,
+                        variant: _isOnDuty ? AppButtonVariant.secondary : AppButtonVariant.outline,
+                        size: constraints.maxWidth < 360 ? AppButtonSize.small : AppButtonSize.medium,
+                        onPressed: () {
+                          setState(() {
+                            _isOnDuty = true;
+                          });
+                          // Refresh accident count when going online
+                          final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+                          accidentProvider.refreshPendingCount();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: AppButton(
+                        text: 'Go Offline',
+                        icon: Icons.pause_circle_filled,
+                        variant: !_isOnDuty ? AppButtonVariant.danger : AppButtonVariant.outline,
+                        size: constraints.maxWidth < 360 ? AppButtonSize.small : AppButtonSize.medium,
+                        onPressed: () {
+                          setState(() {
+                            _isOnDuty = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
           const SizedBox(height: 20),
           Container(
@@ -706,6 +772,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
+          ),
+          const SizedBox(height: 12),
+          // Refresh Data button
+          AppButton(
+            text: 'Refresh Data',
+            icon: Icons.refresh,
+            variant: AppButtonVariant.secondary,
+            size: AppButtonSize.medium,
+            isFullWidth: true,
+            onPressed: _refreshAllData,
           ),
         ],
       ),
@@ -1001,64 +1077,31 @@ class _HomeScreenState extends State<HomeScreen> {
           
           return Column(
             children: [
-              // Refresh Button
-              _buildRefreshButton(),
-              const SizedBox(height: 16),
-              
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth < 400) {
-                    // Stack vertically for small screens
-                    return Column(
-                      children: [
-                        _buildStatCard(
-                          'Today\'s Trips',
-                          '$todayTrips',
-                          Icons.directions_car,
-                          AppTheme.primaryBlue,
-                          _getTripsSubtitle(todayTrips),
-                          onTap: () => _navigateToTrips(),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildStatCard(
-                          'Earnings',
-                          '₹${todayEarnings.toStringAsFixed(2)}',
-                          Icons.currency_rupee,
-                          AppTheme.accentGreen,
-                          _getEarningsSubtitle(todayEarnings),
-                          onTap: () => _navigateToEarnings(),
-                        ),
-                      ],
-                    );
-                  } else {
-                    // Use horizontal layout for larger screens
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            'Today\'s Trips',
-                            '$todayTrips',
-                            Icons.directions_car,
-                            AppTheme.primaryBlue,
-                            _getTripsSubtitle(todayTrips),
-                            onTap: () => _navigateToTrips(),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            'Earnings',
-                            '₹${todayEarnings.toStringAsFixed(2)}',
-                            Icons.currency_rupee,
-                            AppTheme.accentGreen,
-                            _getEarningsSubtitle(todayEarnings),
-                            onTap: () => _navigateToEarnings(),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                },
+              // Statistics Cards - Always 2 per row
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Today\'s Trips',
+                      '$todayTrips',
+                      Icons.directions_car,
+                      AppTheme.primaryBlue,
+                      _getTripsSubtitle(todayTrips),
+                      onTap: () => _navigateToTrips(),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Earnings',
+                      '₹${todayEarnings.toStringAsFixed(2)}',
+                      Icons.currency_rupee,
+                      AppTheme.accentGreen,
+                      _getEarningsSubtitle(todayEarnings),
+                      onTap: () => _navigateToEarnings(),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               InfoCard(
@@ -1324,22 +1367,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRefreshButton() {
-    return Consumer2<TripProvider, EarningsProvider>(
-      builder: (context, tripProvider, earningsProvider, child) {
-        final isLoading = tripProvider.isLoading || earningsProvider.isLoading;
-        
-        return AppButton(
-          text: 'Refresh Data',
-          icon: Icons.refresh,
-          variant: AppButtonVariant.secondary,
-          isLoading: isLoading,
-          onPressed: isLoading ? null : _refreshData,
-          isFullWidth: true,
-        );
-      },
-    );
-  }
 
   Widget _buildAcceptedAccidentCard(AccidentReport accident) {
     return AppCard(
@@ -1408,15 +1435,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   text: 'Continue',
                   icon: Icons.navigation,
                   variant: AppButtonVariant.primary,
+                  size: AppButtonSize.small,
                   onPressed: () => _continueWithAccident(accident),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: AppButton(
                   text: 'Cancel',
                   icon: Icons.cancel,
                   variant: AppButtonVariant.secondary,
+                  size: AppButtonSize.small,
                   onPressed: () => _cancelAccident(),
                 ),
               ),
@@ -1458,25 +1487,55 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _continueWithAccident(AccidentReport accident) async {
     try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
       // Create a trip from the accepted accident report
       final trip = await _createTripFromAccident(accident);
       
-      if (trip != null) {
-        // Navigate to trip navigation screen
-        // Don't clear the accepted accident yet - let it persist until trip is completed
+      // Close loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+      
+      if (trip != null && mounted) {
+        // Navigate to trip navigation screen (this will show trip details, not open map)
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => TripNavigationScreen(trip: trip),
           ),
         );
+      } else {
+        // Show error if trip creation failed
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to create trip from accident report'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Close loading dialog if still open
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

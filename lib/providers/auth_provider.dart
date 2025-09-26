@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/profile_data.dart';
 import '../services/api_service.dart';
 
@@ -11,6 +13,45 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentUser != null;
+
+  // Initialize authentication state from storage
+  Future<void> initializeAuth() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userData = prefs.getString('user_data');
+      
+      if (userData != null) {
+        final userJson = json.decode(userData);
+        _currentUser = ProfileData.fromJson(userJson);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error loading saved user data: $e');
+    }
+  }
+
+  // Save user data to storage
+  Future<void> _saveUserData() async {
+    if (_currentUser != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final userJson = json.encode(_currentUser!.toJson());
+        await prefs.setString('user_data', userJson);
+      } catch (e) {
+        print('Error saving user data: $e');
+      }
+    }
+  }
+
+  // Clear user data from storage
+  Future<void> _clearUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('user_data');
+    } catch (e) {
+      print('Error clearing user data: $e');
+    }
+  }
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -36,6 +77,7 @@ class AuthProvider extends ChangeNotifier {
       
       if (data['success'] == true) {
         _currentUser = ProfileData.fromJson(data['driver']);
+        await _saveUserData(); // Save user data to storage
         _setLoading(false);
         return true;
       } else {
@@ -44,7 +86,12 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Network error: $e');
+      // Check if it's a login error (400 status) and show appropriate message
+      if (e.toString().contains('400') || e.toString().contains('login failed')) {
+        _setError('Invalid credentials');
+      } else {
+        _setError('Network error: $e');
+      }
       _setLoading(false);
       return false;
     }
@@ -95,9 +142,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // Logout method
-  void logout() {
+  Future<void> logout() async {
     _currentUser = null;
     _errorMessage = null;
+    await _clearUserData(); // Clear stored user data
     notifyListeners();
   }
 

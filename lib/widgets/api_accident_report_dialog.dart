@@ -5,11 +5,9 @@ import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/profile_provider.dart';
 import '../models/accident_report.dart';
-import '../models/accident_filter.dart';
 import '../models/trip.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
-import '../widgets/accident_filter_widget.dart';
 import '../screens/trip_navigation_screen.dart';
 import '../theme/app_theme.dart';
 
@@ -181,20 +179,9 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                           style: AppTheme.bodyLarge.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          overflow: TextOverflow.visible,
                         ),
-                      ),
-                      // Filter button
-                      IconButton(
-                        onPressed: _showFilterDialog,
-                        icon: Icon(
-                          Icons.filter_list,
-                          color: provider.currentFilter.hasActiveFilters 
-                              ? AppTheme.primaryBlue 
-                              : Colors.grey,
-                        ),
-                        tooltip: 'Filter Reports',
-                        iconSize: 20,
                       ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
@@ -302,31 +289,59 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                   // Action Buttons
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      final isSmallScreen = constraints.maxWidth < 300;
-                      final buttonSpacing = isSmallScreen ? 8.0 : 12.0;
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: AppButton(
-                              text: 'Reject',
-                              onPressed: _isProcessing ? null : () => _handleReject(provider),
-                              variant: AppButtonVariant.danger,
-                              icon: Icons.close,
-                              size: isSmallScreen ? AppButtonSize.small : AppButtonSize.medium,
+                      if (constraints.maxWidth < 360) {
+                        // For very small screens, stack buttons vertically
+                        return Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: AppButton(
+                                text: 'Reject',
+                                onPressed: _isProcessing ? null : () => _handleReject(provider),
+                                variant: AppButtonVariant.danger,
+                                icon: Icons.close,
+                                size: AppButtonSize.medium,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: buttonSpacing),
-                          Expanded(
-                            child: AppButton(
-                              text: 'Accept',
-                              onPressed: _isProcessing ? null : () => _handleAccept(provider),
-                              variant: AppButtonVariant.secondary,
-                              icon: Icons.check,
-                              size: isSmallScreen ? AppButtonSize.small : AppButtonSize.medium,
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: AppButton(
+                                text: 'Accept',
+                                onPressed: _isProcessing ? null : () => _handleAccept(provider),
+                                variant: AppButtonVariant.secondary,
+                                icon: Icons.check,
+                                size: AppButtonSize.medium,
+                              ),
                             ),
-                          ),
-                        ],
-                      );
+                          ],
+                        );
+                      } else {
+                        // For larger screens, use horizontal layout
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: AppButton(
+                                text: 'Reject',
+                                onPressed: _isProcessing ? null : () => _handleReject(provider),
+                                variant: AppButtonVariant.danger,
+                                icon: Icons.close,
+                                size: AppButtonSize.medium,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: AppButton(
+                                text: 'Accept',
+                                onPressed: _isProcessing ? null : () => _handleAccept(provider),
+                                variant: AppButtonVariant.secondary,
+                                icon: Icons.check,
+                                size: AppButtonSize.medium,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                     },
                   ),
                 ],
@@ -486,28 +501,4 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
     );
   }
 
-  Future<void> _showFilterDialog() async {
-    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-    final newFilter = await FilterBottomSheet.show(
-      context,
-      accidentProvider.currentFilter,
-    );
-    
-    if (newFilter != null) {
-      accidentProvider.applyFilter(newFilter);
-      
-      // Show feedback
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            newFilter.hasActiveFilters 
-                ? 'Filters applied: ${newFilter.filterSummary}'
-                : 'All filters cleared',
-          ),
-          backgroundColor: AppTheme.primaryBlue,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
 }

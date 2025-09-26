@@ -237,109 +237,56 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 },
               ];
 
-              if (constraints.maxWidth < 350) {
-                // Very small screens: Single column, centered
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+              // Always use 2 cards per row for better layout
+              return Column(
+                children: [
+                  // First row
+                  Row(
                     children: [
-                      for (int i = 0; i < cards.length; i++) ...[
-                        SizedBox(
-                          width: constraints.maxWidth * 0.8, // 80% of screen width
-                          child: _buildSummaryCard(
-                            cards[i]['title'] as String,
-                            cards[i]['value'] as String,
-                            cards[i]['icon'] as IconData,
-                            cards[i]['color'] as Color,
-                          ),
+                      Expanded(
+                        child: _buildSummaryCard(
+                          cards[0]['title'] as String,
+                          cards[0]['value'] as String,
+                          cards[0]['icon'] as IconData,
+                          cards[0]['color'] as Color,
                         ),
-                        if (i < cards.length - 1) const SizedBox(height: 8),
-                      ],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildSummaryCard(
+                          cards[1]['title'] as String,
+                          cards[1]['value'] as String,
+                          cards[1]['icon'] as IconData,
+                          cards[1]['color'] as Color,
+                        ),
+                      ),
                     ],
                   ),
-                );
-              } else if (constraints.maxWidth < 600) {
-                // Medium screens: 2x2 grid, centered
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  const SizedBox(height: 12),
+                  // Second row
+                  Row(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
-                            child: _buildSummaryCard(
-                              cards[0]['title'] as String,
-                              cards[0]['value'] as String,
-                              cards[0]['icon'] as IconData,
-                              cards[0]['color'] as Color,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          SizedBox(
-                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
-                            child: _buildSummaryCard(
-                              cards[1]['title'] as String,
-                              cards[1]['value'] as String,
-                              cards[1]['icon'] as IconData,
-                              cards[1]['color'] as Color,
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: _buildSummaryCard(
+                          cards[2]['title'] as String,
+                          cards[2]['value'] as String,
+                          cards[2]['icon'] as IconData,
+                          cards[2]['color'] as Color,
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
-                            child: _buildSummaryCard(
-                              cards[2]['title'] as String,
-                              cards[2]['value'] as String,
-                              cards[2]['icon'] as IconData,
-                              cards[2]['color'] as Color,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          SizedBox(
-                            width: (constraints.maxWidth - 24) / 2, // Half width minus spacing
-                            child: _buildSummaryCard(
-                              cards[3]['title'] as String,
-                              cards[3]['value'] as String,
-                              cards[3]['icon'] as IconData,
-                              cards[3]['color'] as Color,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildSummaryCard(
+                          cards[3]['title'] as String,
+                          cards[3]['value'] as String,
+                          cards[3]['icon'] as IconData,
+                          cards[3]['color'] as Color,
+                        ),
                       ),
                     ],
                   ),
-                );
-              } else {
-                // Large screens: Horizontal row, centered with max width
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 800), // Max width for very large screens
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (int i = 0; i < cards.length; i++) ...[
-                          Expanded(
-                            child: _buildSummaryCard(
-                              cards[i]['title'] as String,
-                              cards[i]['value'] as String,
-                              cards[i]['icon'] as IconData,
-                              cards[i]['color'] as Color,
-                            ),
-                          ),
-                          if (i < cards.length - 1) const SizedBox(width: 12),
-                        ],
-                      ],
-                    ),
-                  ),
-                );
-              }
+                ],
+              );
             },
           ),
         ],

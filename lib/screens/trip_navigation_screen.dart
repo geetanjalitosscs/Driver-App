@@ -90,6 +90,9 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       // Start trip timer
       _startTripTimer();
 
+      // Automatically start navigation since we don't have a separate button
+      await _startNavigation();
+
       setState(() {
         _isLoading = false;
       });
@@ -371,30 +374,11 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   Widget _buildMapWidget() {
-    // Check if running on Windows desktop
-    if (kIsWeb || defaultTargetPlatform == TargetPlatform.windows) {
-      // Fallback for Windows/Web - show trip details without map
-      return _buildWindowsFallback();
-    }
-    
-    // Use Google Maps for mobile platforms
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: _currentLocation!,
-        zoom: MapsConfig.defaultZoom,
-      ),
-      onMapCreated: (GoogleMapController controller) {
-        _mapController = controller;
-      },
-      markers: _markers,
-      polylines: _polylines,
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
-    );
+    // Always show trip details instead of map for better UX
+    return _buildTripDetailsView();
   }
 
-  Widget _buildWindowsFallback() {
+  Widget _buildTripDetailsView() {
     return Container(
       color: Colors.grey[100],
       child: Center(
@@ -402,25 +386,25 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.map,
+              Icons.directions_car,
               size: 64,
-              color: Colors.grey[400],
+              color: AppTheme.primaryBlue,
             ),
             const SizedBox(height: 16),
             Text(
-              'Trip Navigation',
+              'Trip Details',
               style: GoogleFonts.roboto(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+                color: AppTheme.primaryBlue,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Maps not supported on Windows',
+              'Trip #${widget.trip.historyId}',
               style: GoogleFonts.roboto(
                 fontSize: 16,
-                color: Colors.grey[500],
+                color: Colors.grey[600],
               ),
             ),
             const SizedBox(height: 24),
@@ -443,7 +427,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Trip Details',
+                    'Trip Information',
                     style: GoogleFonts.roboto(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -451,7 +435,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildTripDetailRow('Client', widget.trip.clientName),
+                  _buildTripDetailRow('Client', widget.trip.clientName ?? 'N/A'),
                   _buildTripDetailRow('Location', widget.trip.location.split(',')[0]), // Show only address part
                   _buildTripDetailRow('Fare', '₹${widget.trip.amount}'),
                   _buildTripDetailRow('Duration', _formatDuration(_tripDuration)),
@@ -460,16 +444,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _completeTrip,
-              icon: const Icon(Icons.check_circle),
-              label: const Text('Complete Trip'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accentGreen,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-            ),
           ],
         ),
       ),
@@ -648,54 +622,27 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               ),
               child: Column(
                 children: [
-                  if (!_isNavigating) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _startNavigation,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _completeTrip,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.accentGreen,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          'Start Navigation',
-                          style: GoogleFonts.roboto(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                      ),
+                      child: Text(
+                        'Complete Trip',
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                  ] else ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _completeTrip,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.accentGreen,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'Complete Trip',
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                   if (_nextStep.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Container(
