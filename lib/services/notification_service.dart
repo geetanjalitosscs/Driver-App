@@ -24,13 +24,20 @@ class NotificationService {
       // Initialize local notifications only
       await _initializeLocalNotifications();
       
-      // Request permissions
-      await _requestPermissions();
+      // Request permissions (with error handling)
+      try {
+        await _requestPermissions();
+      } catch (e) {
+        print('⚠️ Permission request failed: $e');
+        // Continue without permissions
+      }
       
       _isInitialized = true;
       print('✅ NotificationService initialized successfully');
     } catch (e) {
       print('❌ Error initializing NotificationService: $e');
+      // Set as initialized even if failed to prevent retry loops
+      _isInitialized = true;
     }
   }
 

@@ -689,7 +689,7 @@ class CentralizedApiService {
         }),
       );
 
-      return response.statusCode == 200;
+    return response.statusCode == 200;
     } catch (e) {
       print('Error updating trip location: $e');
       return false;
