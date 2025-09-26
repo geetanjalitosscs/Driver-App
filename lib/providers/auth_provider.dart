@@ -22,7 +22,9 @@ class AuthProvider extends ChangeNotifier {
       
       if (userData != null) {
         final userJson = json.decode(userData);
+        print('Loaded user data from storage: $userJson'); // Debug log
         _currentUser = ProfileData.fromJson(userJson);
+        print('Restored user name: ${_currentUser?.driverName}'); // Debug log
         notifyListeners();
       }
     } catch (e) {
@@ -76,7 +78,9 @@ class AuthProvider extends ChangeNotifier {
       final data = await CentralizedApiService.login(email, password);
       
       if (data['success'] == true) {
+        print('Login response data: $data'); // Debug log
         _currentUser = ProfileData.fromJson(data['driver']);
+        print('Parsed user data: ${_currentUser?.driverName}'); // Debug log
         await _saveUserData(); // Save user data to storage
         _setLoading(false);
         return true;

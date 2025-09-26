@@ -101,18 +101,18 @@ class ProfileData {
   // Create from JSON from backend
   factory ProfileData.fromJson(Map<String, dynamic> json) {
     return ProfileData(
-      driverName: json['driver_name'] ?? '',
-      driverId: json['driver_id']?.toString() ?? '',
+      driverName: json['driver_name'] ?? json['name'] ?? json['driverName'] ?? '',
+      driverId: json['driver_id']?.toString() ?? json['id']?.toString() ?? '',
       email: json['email'] ?? '',
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
-      vehicleType: json['vehicle_type'] ?? '',
-      vehicleNumber: json['vehicle_number'] ?? '',
+      vehicleType: json['vehicle_type'] ?? json['vehicleType'] ?? '',
+      vehicleNumber: json['vehicle_number'] ?? json['vehicleNumber'] ?? '',
       rating: (json['rating'] ?? 0.0).toDouble(),
-      aadharPhoto: json['aadhar_photo'] ?? '',
-      licencePhoto: json['licence_photo'] ?? '',
-      rcPhoto: json['rc_photo'] ?? '',
-      createdAt: json['created_at'] ?? '',
+      aadharPhoto: json['aadhar_photo'] ?? json['aadharPhoto'] ?? '',
+      licencePhoto: json['licence_photo'] ?? json['licencePhoto'] ?? '',
+      rcPhoto: json['rc_photo'] ?? json['rcPhoto'] ?? '',
+      createdAt: json['created_at'] ?? json['createdAt'] ?? '',
     );
   }
 }
