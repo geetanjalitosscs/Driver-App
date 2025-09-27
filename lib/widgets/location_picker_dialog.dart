@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
 
 class LocationPickerDialog extends StatefulWidget {
   final String? initialLocation;
@@ -53,14 +53,14 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Location found: ${location['address']}'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.accentGreen,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Unable to get current location'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.accentRed,
           ),
         );
       }
@@ -68,7 +68,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.accentRed,
         ),
       );
     } finally {
@@ -96,7 +96,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Search error: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.accentRed,
         ),
       );
     } finally {
@@ -131,7 +131,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please select or enter a location'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppTheme.accentOrange,
         ),
       );
     }
@@ -144,7 +144,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
+        width: MediaQuery.of(context).size.width * 0.95,
         height: MediaQuery.of(context).size.height * 0.8,
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -153,15 +153,11 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
             // Header
             Row(
               children: [
-                Icon(Icons.location_on, color: Colors.red, size: 24),
+                Icon(AppIconStyles.locationIcon, color: AppIconStyles.locationIconColor, size: AppIconStyles.locationIconSize),
                 const SizedBox(width: 8),
                 Text(
                   'Select Location',
-                  style: GoogleFonts.roboto(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                  style: AppTextStyles.dialogTitle,
                 ),
                 const Spacer(),
                 IconButton(
@@ -186,16 +182,9 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     : const Icon(Icons.my_location),
                 label: Text(
                   _isGettingCurrentLocation ? 'Getting Location...' : 'Use Current Location',
-                  style: GoogleFonts.roboto(fontSize: 16),
+                  style: AppTextStyles.dialogBody,
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: AppButtonStyles.primaryButton,
               ),
             ),
             const SizedBox(height: 20),
@@ -203,11 +192,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
             // Search Section
             Text(
               'Search Location',
-              style: GoogleFonts.roboto(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: AppTextStyles.dialogSubtitle,
             ),
             const SizedBox(height: 8),
             Row(
@@ -244,11 +229,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
             if (_searchResults.isNotEmpty) ...[
               Text(
                 'Search Results',
-                style: GoogleFonts.roboto(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
-                ),
+                style: AppTextStyles.dialogSmall,
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -259,14 +240,14 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
-                        leading: const Icon(Icons.location_on, color: Colors.red),
+                        leading: const Icon(Icons.location_on, color: AppTheme.accentRed),
                         title: Text(
                           result['address'],
-                          style: GoogleFonts.roboto(fontSize: 14),
+                          style: AppTextStyles.locationText,
                         ),
                         subtitle: Text(
                           'Lat: ${result['latitude'].toStringAsFixed(4)}, Lng: ${result['longitude'].toStringAsFixed(4)}',
-                          style: GoogleFonts.roboto(fontSize: 12, color: Colors.grey[600]),
+                          style: AppTextStyles.locationSmallText,
                         ),
                         onTap: () => _selectLocation(result),
                       ),
@@ -278,11 +259,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
               // Manual Input
               Text(
                 'Selected Location',
-                style: GoogleFonts.roboto(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
+                style: AppTextStyles.dialogSubtitle,
               ),
               const SizedBox(height: 8),
               TextField(
@@ -308,25 +285,18 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.roboto(fontSize: 16),
+                      style: AppTextStyles.dialogBody,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _confirmLocation,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                    style: AppButtonStyles.successButton,
                     child: Text(
                       'Confirm',
-                      style: GoogleFonts.roboto(fontSize: 16),
+                      style: AppTextStyles.dialogBody,
                     ),
                   ),
                 ),

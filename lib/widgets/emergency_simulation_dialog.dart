@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/emergency_request.dart';
 import '../providers/emergency_provider.dart';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'location_picker_dialog.dart';
 
@@ -82,7 +82,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Current location set: ${location['address']}'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.accentGreen,
             duration: Duration(seconds: 3),
           ),
         );
@@ -94,7 +94,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Unable to get current location. Check console for details.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.accentRed,
             duration: Duration(seconds: 5),
           ),
         );
@@ -108,7 +108,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error getting location: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.accentRed,
           duration: Duration(seconds: 5),
         ),
       );
@@ -135,7 +135,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Location selected: $location'),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.accentGreen,
               ),
             );
           } else {
@@ -198,7 +198,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Emergency request created successfully!'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppTheme.accentGreen,
             ),
           );
         }
@@ -211,7 +211,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to create emergency: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.accentRed,
             ),
           );
         }
@@ -227,25 +227,29 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
       ),
       child: Container(
         padding: const EdgeInsets.all(24),
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.95,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // Header
               Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: AppTheme.accentRed.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       Icons.emergency,
-                      color: Colors.red,
+                      color: AppTheme.accentRed,
                       size: 24,
                     ),
                   ),
@@ -253,11 +257,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
                   Expanded(
                     child: Text(
                       'Create Emergency Simulation',
-                      style: GoogleFonts.roboto(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      style: AppTextStyles.dialogTitle,
                     ),
                   ),
                   IconButton(
@@ -348,7 +348,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
                           onLongPress: _openLocationPicker,
                           child: Container(
                             padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.my_location, color: Colors.blue),
+                            child: const Icon(Icons.my_location, color: AppTheme.primaryBlue),
                           ),
                         ),
                   errorText: _locationError,
@@ -400,20 +400,16 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
                       ),
                       child: Text(
                         'Cancel',
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                        ),
+                        style: AppTextStyles.dialogBody,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitForm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppTheme.accentRed,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -429,18 +425,15 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
                               ),
                             )
                           : Text(
-                              'Create Emergency',
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
+                              'Create',
+                              style: AppTextStyles.buttonText,
                             ),
                     ),
                   ),
                 ],
               ),
             ],
+            ),
           ),
         ),
       ),

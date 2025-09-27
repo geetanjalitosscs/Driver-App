@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
 import '../models/trip.dart';
@@ -86,7 +85,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.accentGreen,
           ),
         );
       } else {
@@ -111,10 +110,15 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.95,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Header
             Row(
               children: [
@@ -127,17 +131,13 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                 Expanded(
                   child: Text(
                     'Complete Trip',
-                    style: GoogleFonts.roboto(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryBlue,
-                    ),
+                    style: AppTextStyles.dialogTitle,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close),
-                  color: Colors.grey,
+                  color: AppTheme.neutralGreyLight,
                 ),
               ],
             ),
@@ -147,20 +147,16 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: AppTheme.neutralGrey50,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
+                border: Border.all(color: AppTheme.neutralGrey300),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Trip Details',
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
-                    ),
+                    style: AppTextStyles.dialogSubtitle,
                   ),
                   const SizedBox(height: 8),
                   _buildDetailRow('Location:', widget.trip.location),
@@ -177,10 +173,10 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: _endLocation != null ? Colors.green[50] : Colors.orange[50],
+                color: _endLocation != null ? AppTheme.accentGreen50 : AppTheme.accentOrange50,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _endLocation != null ? Colors.green[300]! : Colors.orange[300]!,
+                  color: _endLocation != null ? AppTheme.accentGreen300 : AppTheme.accentOrange300,
                 ),
               ),
               child: Column(
@@ -190,17 +186,13 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                     children: [
                       Icon(
                         _endLocation != null ? Icons.location_on : Icons.location_searching,
-                        color: _endLocation != null ? Colors.green : Colors.orange,
+                        color: _endLocation != null ? AppTheme.accentGreen : AppTheme.accentOrange,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'End Location',
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: _endLocation != null ? Colors.green[700] : Colors.orange[700],
-                        ),
+                        style: AppTextStyles.dialogSubtitle,
                       ),
                     ],
                   ),
@@ -208,18 +200,12 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                   if (_endLocation != null)
                     Text(
                       _endLocation!,
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.green[700],
-                      ),
+                      style: AppTextStyles.dialogSmall,
                     )
                   else
                     Text(
                       'Capturing location...',
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.orange[700],
-                      ),
+                      style: AppTextStyles.dialogSmall,
                     ),
                 ],
               ),
@@ -231,21 +217,18 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
+                  color: AppTheme.accentRed50,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red[300]!),
+                  border: Border.all(color: AppTheme.accentRed300),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red[600], size: 20),
+                    Icon(Icons.error_outline, color: AppTheme.accentRed600, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          color: Colors.red[600],
-                        ),
+                        style: AppTextStyles.errorText,
                       ),
                     ),
                   ],
@@ -263,22 +246,18 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                     onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey[400]!),
+                      side: BorderSide(color: AppTheme.neutralGrey400),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.roboto(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
+                      style: AppTextStyles.dialogBody,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _isLoading || _endLocation == null ? null : _completeTrip,
@@ -299,18 +278,15 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                             ),
                           )
                         : Text(
-                            'Complete Trip',
-                            style: GoogleFonts.roboto(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
+                            'Complete',
+                            style: AppTextStyles.buttonText,
                           ),
                   ),
                 ),
               ],
             ),
           ],
+          ),
         ),
       ),
     );
@@ -326,20 +302,13 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
             width: 60,
             child: Text(
               label,
-              style: GoogleFonts.roboto(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: AppTextStyles.dialogCaption,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.roboto(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[800],
-              ),
+              style: AppTextStyles.dialogBody,
             ),
           ),
         ],

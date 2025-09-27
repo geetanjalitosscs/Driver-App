@@ -74,10 +74,10 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.6, // 60% of screen height for very small screens
-          maxWidth: MediaQuery.of(context).size.width * 0.9,   // 90% of screen width
+          maxHeight: MediaQuery.of(context).size.height * 0.7, // 70% of screen height
+          maxWidth: MediaQuery.of(context).size.width * 0.95,  // 95% of screen width for better button space
         ),
         child: Form(
           key: _formKey,
@@ -160,7 +160,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Bank Account Selection
               if (_isLoadingAccounts)
@@ -170,7 +170,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
               else
                 _buildNewAccountForm(),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // Action Buttons
               Row(
@@ -189,7 +189,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                       child: const Text('Cancel'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleWithdrawal,
@@ -201,7 +201,7 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(_isLoading ? 'Processing...' : 'Withdraw'),
+                      child: Text(_isLoading ? 'Processing...' : 'Withdraw', style: const TextStyle(fontSize: 14)),
                     ),
                   ),
                 ],
@@ -292,7 +292,8 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Bank Account Details',
@@ -301,8 +302,8 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                 color: AppTheme.neutralGreyDark,
               ),
             ),
-            const Spacer(),
-            if (_hasSavedAccounts)
+            if (_hasSavedAccounts) ...[
+              const SizedBox(height: 8),
               TextButton(
                 onPressed: () {
                   setState(() {
@@ -311,9 +312,10 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
                 },
                 child: const Text('Use Saved Account'),
               ),
+            ],
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         
         // Bank Name
         TextFormField(
@@ -336,9 +338,9 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
             return null;
           },
         ),
-        const SizedBox(height: 12),
-        
-        // Account Number
+              const SizedBox(height: 8),
+              
+              // Account Number
         TextFormField(
           controller: _accountNumberController,
           keyboardType: TextInputType.number,
@@ -367,9 +369,9 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
             return null;
           },
         ),
-        const SizedBox(height: 12),
-        
-        // IFSC Code
+              const SizedBox(height: 8),
+              
+              // IFSC Code
         TextFormField(
           controller: _ifscCodeController,
           textCapitalization: TextCapitalization.characters,
@@ -398,9 +400,9 @@ class _WithdrawalDialogState extends State<WithdrawalDialog> {
             return null;
           },
         ),
-        const SizedBox(height: 12),
-        
-        // Account Holder Name
+              const SizedBox(height: 8),
+              
+              // Account Holder Name
         TextFormField(
           controller: _accountHolderController,
           textCapitalization: TextCapitalization.words,
