@@ -158,6 +158,7 @@ class AuthProvider extends ChangeNotifier {
         vehicleType: vehicleType,
         licenseNumber: licencePhoto, // Using photo as license number for now
         aadharNumber: aadharPhoto, // Using photo as aadhar number for now
+        address: address,
       );
       
       if (data['success'] == true) {
@@ -170,7 +171,12 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Network error: $e');
+      // Check if it's a signup error (400 status) and show appropriate message
+      if (e.toString().contains('400') || e.toString().contains('signup failed')) {
+        _setError('Invalid credentials');
+      } else {
+        _setError('Network error: $e');
+      }
       _setLoading(false);
       return false;
     }

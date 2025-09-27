@@ -118,9 +118,19 @@ class TripProvider extends ChangeNotifier {
       _completedTrips = _allTrips.where((trip) => trip.isCompleted).toList();
       _ongoingTrips = _allTrips.where((trip) => trip.isOngoing).toList();
       
-      // Sort trips by creation date (newest first)
-      _completedTrips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      _ongoingTrips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      // Sort trips by completion/start date (newest first)
+      _completedTrips.sort((a, b) {
+        if (a.endTime == null && b.endTime == null) return 0;
+        if (a.endTime == null) return 1;
+        if (b.endTime == null) return -1;
+        return b.endTime!.compareTo(a.endTime!);
+      });
+      _ongoingTrips.sort((a, b) {
+        if (a.startTime == null && b.startTime == null) return 0;
+        if (a.startTime == null) return 1;
+        if (b.startTime == null) return -1;
+        return b.startTime!.compareTo(a.startTime!);
+      });
       
       notifyListeners();
     } catch (e) {
@@ -137,7 +147,12 @@ class TripProvider extends ChangeNotifier {
     
     try {
       _completedTrips = await CentralizedApiService.getCompletedTrips(driverId);
-      _completedTrips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      _completedTrips.sort((a, b) {
+        if (a.endTime == null && b.endTime == null) return 0;
+        if (a.endTime == null) return 1;
+        if (b.endTime == null) return -1;
+        return b.endTime!.compareTo(a.endTime!);
+      });
       notifyListeners();
     } catch (e) {
       _setError('Failed to load completed trips: $e');

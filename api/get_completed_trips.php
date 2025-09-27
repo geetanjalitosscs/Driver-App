@@ -33,7 +33,12 @@ try {
             created_at
         FROM trips 
         WHERE driver_id = ? AND end_time IS NOT NULL
-        ORDER BY created_at DESC
+        ORDER BY 
+            CASE 
+                WHEN end_time IS NOT NULL THEN end_time
+                WHEN timing IS NOT NULL THEN timing
+                ELSE created_at
+            END DESC
     ");
     
     $stmt->execute([$driver_id]);

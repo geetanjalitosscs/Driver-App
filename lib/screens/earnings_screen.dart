@@ -123,11 +123,6 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 _buildSummaryCards(earningsProvider),
                 const SizedBox(height: 16),
 
-                // Weekly Chart (if applicable)
-                if (_selectedPeriod == 'week' || _selectedPeriod == 'month' || _selectedPeriod == 'year')
-                  _buildWeeklyChart(earningsProvider),
-                if (_selectedPeriod == 'week' || _selectedPeriod == 'month' || _selectedPeriod == 'year')
-                  const SizedBox(height: 16),
 
                 // Period Selector (moved between cards and recent earnings)
                 _buildPeriodSelector(),

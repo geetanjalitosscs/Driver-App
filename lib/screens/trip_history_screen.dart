@@ -44,10 +44,10 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     
     if (authProvider.currentUser != null) {
       final driverId = authProvider.currentUser!.driverIdAsInt;
-      await Future.wait([
-        tripProvider.loadCompletedTrips(driverId),
-        earningsProvider.loadDriverEarnings(driverId, _selectedPeriod),
-      ]);
+        await Future.wait([
+          tripProvider.loadCompletedTrips(driverId),
+          earningsProvider.loadDriverEarnings(driverId, 'all'), // Always load ALL earnings for summary
+        ]);
     }
   }
 
@@ -130,38 +130,6 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
 
           final completedTrips = tripProvider.filteredCompletedTrips;
 
-          if (completedTrips.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No completed trips yet',
-                    style: GoogleFonts.roboto(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your completed trips will appear here',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -186,7 +154,11 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 ),
                 const SizedBox(height: 12),
                 
-                ...completedTrips.map((trip) => _buildTripCard(trip)).toList(),
+                // Show trips or empty state
+                if (completedTrips.isEmpty)
+                  _buildEmptyTripsState()
+                else
+                  ...completedTrips.map((trip) => _buildTripCard(trip)).toList(),
               ],
             ),
           );
@@ -209,11 +181,11 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              // Define card data
+              // Define card data - ALWAYS show ALL trips data (not filtered)
               final cards = [
                 {
                   'title': 'Total Trips',
-                  'value': '${tripProvider.filteredCompletedTrips.length}',
+                  'value': '${tripProvider.completedTrips.length}', // Use all trips, not filtered
                   'icon': Icons.local_taxi,
                   'color': AppTheme.primaryBlue,
                 },
@@ -231,7 +203,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 },
                 {
                   'title': 'This Week',
-                  'value': '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
+                  'value': '₹${earningsProvider.weeklyTotal.toStringAsFixed(0)}',
                   'icon': Icons.date_range,
                   'color': AppTheme.accentPurple,
                 },
@@ -487,62 +459,94 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
+  Widget _buildEmptyTripsState() {
+    return AppCard(
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.history,
+              size: 48,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No trips found for ${_getPeriodLabel(_selectedPeriod)}',
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your completed trips will appear here',
+              style: GoogleFonts.roboto(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getPeriodLabel(String period) {
+    switch (period) {
+      case 'today':
+        return 'today';
+      case 'week':
+        return 'this week';
+      case 'month':
+        return 'this month';
+      case 'year':
+        return 'this year';
+      default:
+        return 'the selected period';
+    }
+  }
+
   Widget _buildFilterSection() {
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Filters',
-            style: GoogleFonts.roboto(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.primaryBlue,
-            ),
+            'Select Period',
+            style: AppTheme.heading3,
           ),
-          const SizedBox(height: 16),
-          
-          // Period Filter
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Period',
-                style: GoogleFonts.roboto(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
-                ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedPeriod,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedPeriod,
-                    isExpanded: true,
-                    items: _periods.map((period) {
-                      return DropdownMenuItem<String>(
-                        value: period['value'],
-                        child: Text(period['label']!),
-                      );
-                    }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedPeriod = newValue!;
-                            });
-                            final tripProvider = Provider.of<TripProvider>(context, listen: false);
-                            tripProvider.setPeriod(_selectedPeriod);
-                          },
-                  ),
-                ),
-              ),
-            ],
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            items: _periods.map((period) {
+              return DropdownMenuItem<String>(
+                value: period['value'],
+                child: Text(period['label']!),
+              );
+            }).toList(),
+            onChanged: (String? newValue) async {
+              if (newValue != null && newValue != _selectedPeriod) {
+                setState(() {
+                  _selectedPeriod = newValue;
+                });
+                
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                final tripProvider = Provider.of<TripProvider>(context, listen: false);
+                
+                if (authProvider.currentUser != null) {
+                  // Reload trips data for the new period
+                  await tripProvider.loadCompletedTrips(authProvider.currentUser!.driverIdAsInt);
+                  tripProvider.setPeriod(_selectedPeriod);
+                }
+              }
+            },
           ),
         ],
       ),

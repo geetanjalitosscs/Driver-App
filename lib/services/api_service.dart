@@ -56,20 +56,24 @@ class CentralizedApiService {
     required String vehicleType,
     required String licenseNumber,
     required String aadharNumber,
+    String address = 'Default Address',
+    String rcPhoto = 'default_rc.jpg',
   }) async {
     try {
       final response = await http.post(
         Uri.parse('$_accidentBaseUrl/signup.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'name': name,
+          'driver_name': name,
           'email': email,
-          'phone': phone,
+          'number': phone,
           'password': password,
           'vehicle_number': vehicleNumber,
           'vehicle_type': vehicleType,
-          'license_number': licenseNumber,
-          'aadhar_number': aadharNumber,
+          'licence_photo': licenseNumber,
+          'aadhar_photo': aadharNumber,
+          'address': address,
+          'rc_photo': rcPhoto,
         }),
       );
 
@@ -483,6 +487,131 @@ class CentralizedApiService {
     }
   }
 
+
+  // ============================================================================
+  // LOCATION-BASED ACCIDENT APIs
+  // ============================================================================
+
+  /// Get Nearby Accidents API (with driver location)
+  static Future<List<AccidentReport>> getNearbyAccidents({
+    required int driverId,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_accidentBaseUrl/get_nearby_accidents.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'driver_id': driverId,
+          'latitude': latitude,
+          'longitude': longitude,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null && data['data']['accidents'] != null) {
+          return (data['data']['accidents'] as List)
+              .map((json) => AccidentReport.fromJson(json))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching nearby accidents: $e');
+      return [];
+    }
+  }
+
+  /// Get Accidents by Location API
+  static Future<List<AccidentReport>> getAccidentsByLocation({
+    required double latitude,
+    required double longitude,
+    String status = 'pending',
+  }) async {
+    try {
+      final uri = Uri.parse('$_accidentBaseUrl/get_accidents_by_location.php').replace(
+        queryParameters: {
+          'latitude': latitude.toString(),
+          'longitude': longitude.toString(),
+          'status': status,
+        },
+      );
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null && data['data']['accidents'] != null) {
+          return (data['data']['accidents'] as List)
+              .map((json) => AccidentReport.fromJson(json))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching accidents by location: $e');
+      return [];
+    }
+  }
+
+  /// Update Driver Location API
+  static Future<Map<String, dynamic>> updateDriverLocation({
+    required int driverId,
+    required double latitude,
+    required double longitude,
+    String? address,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_accidentBaseUrl/update_driver_location.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'driver_id': driverId,
+          'latitude': latitude,
+          'longitude': longitude,
+          'address': address,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to update driver location: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating driver location: $e');
+    }
+  }
+
+  /// Get Driver Nearby Accidents API (using stored location)
+  static Future<List<AccidentReport>> getDriverNearbyAccidents({
+    required int driverId,
+  }) async {
+    try {
+      final uri = Uri.parse('$_accidentBaseUrl/get_driver_nearby_accidents.php').replace(
+        queryParameters: {
+          'driver_id': driverId.toString(),
+        },
+      );
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null && data['data']['accidents'] != null) {
+          return (data['data']['accidents'] as List)
+              .map((json) => AccidentReport.fromJson(json))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching driver nearby accidents: $e');
+      return [];
+    }
+  }
 
   // ============================================================================
   // ACCIDENT APIs

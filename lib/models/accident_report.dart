@@ -169,6 +169,24 @@ class AccidentReport {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'fullname': fullname,
+      'phone': phone,
+      'vehicle': vehicle,
+      'accidentDate': accidentDate,
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'description': description,
+      'photo': photo,
+      'photos': photos,
+      'createdAt': createdAt,
+      'status': status,
+    };
+  }
+
   @override
   String toString() {
     return 'AccidentReport(id: $id, fullname: $fullname, phone: $phone, vehicle: $vehicle, accidentDate: $accidentDate, location: $location, latitude: $latitude, longitude: $longitude, description: $description, photo: $photo, createdAt: $createdAt, status: $status)';
