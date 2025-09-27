@@ -14,7 +14,7 @@ import '../providers/trip_provider.dart';
 import '../providers/earnings_provider.dart';
 import '../providers/navigation_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../services/location_picker_service.dart';
+import '../services/api_service.dart';
 import '../widgets/api_accident_report_dialog.dart';
 import '../widgets/trip_completion_dialog.dart';
 import '../models/trip.dart';
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
 
-      final locationData = await LocationPickerService.getCurrentLocation();
+      final locationData = await CentralizedApiService.getCurrentLocationDetailed();
       
       if (locationData != null) {
         if (mounted) {
@@ -150,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
     
     if (authProvider.currentUser != null) {
-      await tripProvider.loadOngoingTrips(int.parse(authProvider.currentUser!.driverId));
+      final driverId = authProvider.currentUser!.driverIdAsInt;
+      await tripProvider.loadOngoingTrips(driverId);
     }
   }
 
@@ -160,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
     if (authProvider.currentUser != null) {
-      final driverId = int.parse(authProvider.currentUser!.driverId);
+      final driverId = authProvider.currentUser!.driverIdAsInt;
       
       // Load completed trips for today
       await tripProvider.loadCompletedTrips(driverId);
@@ -1549,7 +1550,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       
       if (authProvider.currentUser != null) {
-        final driverId = int.parse(authProvider.currentUser!.driverId);
+        final driverId = authProvider.currentUser!.driverIdAsInt;
         
         // Create a Trip object with the accident details
         // Format location string to include coordinates for trip navigation

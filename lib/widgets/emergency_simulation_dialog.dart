@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/emergency_request.dart';
 import '../providers/emergency_provider.dart';
-import '../services/location_picker_service.dart';
+import '../services/api_service.dart';
 import 'package:provider/provider.dart';
 import 'location_picker_dialog.dart';
 
@@ -71,7 +71,7 @@ class _EmergencySimulationDialogState extends State<EmergencySimulationDialog> {
 
     try {
       print('Emergency simulation: Getting current location...');
-      final location = await LocationPickerService.getCurrentLocation();
+      final location = await CentralizedApiService.getCurrentLocationDetailed();
       
       if (location != null) {
         setState(() {

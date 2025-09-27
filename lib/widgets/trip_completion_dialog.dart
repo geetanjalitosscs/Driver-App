@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
-import '../services/location_picker_service.dart';
+import '../services/api_service.dart';
 
 class TripCompletionDialog extends StatefulWidget {
   final Trip trip;
@@ -38,7 +38,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
     });
 
     try {
-      final location = await LocationPickerService.getCurrentLocation();
+      final location = await CentralizedApiService.getCurrentLocationDetailed();
       if (location != null) {
         _endLatitude = location['latitude'];
         _endLongitude = location['longitude'];

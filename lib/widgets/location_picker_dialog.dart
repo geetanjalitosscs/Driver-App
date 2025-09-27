@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/location_picker_service.dart';
+import '../services/api_service.dart';
 
 class LocationPickerDialog extends StatefulWidget {
   final String? initialLocation;
@@ -43,7 +43,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     });
 
     try {
-      final location = await LocationPickerService.getCurrentLocation();
+      final location = await CentralizedApiService.getCurrentLocationDetailed();
       if (location != null) {
         setState(() {
           _selectedLocation = location;
@@ -88,7 +88,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     });
 
     try {
-      final results = await LocationPickerService.searchLocation(query);
+      final results = await CentralizedApiService.searchLocation(query);
       setState(() {
         _searchResults = results;
       });

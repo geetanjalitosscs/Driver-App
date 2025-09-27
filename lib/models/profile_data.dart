@@ -27,6 +27,16 @@ class ProfileData {
     required this.createdAt,
   });
 
+  // Helper method to safely get driver ID as integer
+  int get driverIdAsInt {
+    try {
+      return int.parse(driverId);
+    } catch (e) {
+      print('Error parsing driver ID "$driverId": $e');
+      return 1; // Default fallback
+    }
+  }
+
   // Getter for compatibility
   String get contact => phone;
   double get averageRating => rating;
@@ -100,15 +110,18 @@ class ProfileData {
 
   // Create from JSON from backend
   factory ProfileData.fromJson(Map<String, dynamic> json) {
+    print('ProfileData.fromJson input: $json'); // Debug log
+    final driverId = json['driverId']?.toString() ?? json['driver_id']?.toString() ?? json['id']?.toString() ?? '';
+    print('Parsed driverId: "$driverId"'); // Debug log
     return ProfileData(
       driverName: json['driver_name'] ?? json['name'] ?? json['driverName'] ?? '',
-      driverId: json['driver_id']?.toString() ?? json['id']?.toString() ?? '',
+      driverId: driverId,
       email: json['email'] ?? '',
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
       vehicleType: json['vehicle_type'] ?? json['vehicleType'] ?? '',
       vehicleNumber: json['vehicle_number'] ?? json['vehicleNumber'] ?? '',
-      rating: (json['rating'] ?? 0.0).toDouble(),
+      rating: (json['rating'] ?? json['model_rating'] ?? 0.0).toDouble(),
       aadharPhoto: json['aadhar_photo'] ?? json['aadharPhoto'] ?? '',
       licencePhoto: json['licence_photo'] ?? json['licencePhoto'] ?? '',
       rcPhoto: json['rc_photo'] ?? json['rcPhoto'] ?? '',

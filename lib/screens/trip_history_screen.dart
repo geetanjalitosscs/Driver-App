@@ -43,7 +43,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
     
     if (authProvider.currentUser != null) {
-      final driverId = int.parse(authProvider.currentUser!.driverId);
+      final driverId = authProvider.currentUser!.driverIdAsInt;
       await Future.wait([
         tripProvider.loadCompletedTrips(driverId),
         earningsProvider.loadDriverEarnings(driverId, _selectedPeriod),

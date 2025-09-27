@@ -51,7 +51,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     
     if (authProvider.currentUser != null) {
       await earningsProvider.loadDriverEarnings(
-        int.parse(authProvider.currentUser!.driverId),
+        authProvider.currentUser!.driverIdAsInt,
         _selectedPeriod,
       );
     }
@@ -178,7 +178,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 
                 if (authProvider.currentUser != null) {
                   await earningsProvider.changePeriod(
-                    int.parse(authProvider.currentUser!.driverId),
+                    authProvider.currentUser!.driverIdAsInt,
                     newValue,
                   );
                 }

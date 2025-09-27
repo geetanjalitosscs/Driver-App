@@ -23,12 +23,24 @@ class AuthProvider extends ChangeNotifier {
       if (userData != null) {
         final userJson = json.decode(userData);
         print('Loaded user data from storage: $userJson'); // Debug log
+        print('Driver ID from storage: ${userJson['driverId']} (type: ${userJson['driverId'].runtimeType})'); // Debug log
+        
+        // Check if driverId is empty or invalid
+        if (userJson['driverId'] == null || userJson['driverId'].toString().isEmpty) {
+          print('Invalid driver ID in stored data, clearing storage');
+          await _clearUserData();
+          return;
+        }
+        
         _currentUser = ProfileData.fromJson(userJson);
         print('Restored user name: ${_currentUser?.driverName}'); // Debug log
+        print('Restored driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
         notifyListeners();
       }
     } catch (e) {
       print('Error loading saved user data: $e');
+      // Clear corrupted data
+      await _clearUserData();
     }
   }
 
@@ -50,8 +62,24 @@ class AuthProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('user_data');
+      print('Cleared stored user data');
     } catch (e) {
       print('Error clearing user data: $e');
+    }
+  }
+
+  // Debug method to check stored data
+  Future<void> debugStoredData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userData = prefs.getString('user_data');
+      print('Stored user data: $userData');
+      if (userData != null) {
+        final userJson = json.decode(userData);
+        print('Parsed driver ID: ${userJson['driverId']} (type: ${userJson['driverId'].runtimeType})');
+      }
+    } catch (e) {
+      print('Error checking stored data: $e');
     }
   }
 
@@ -79,8 +107,11 @@ class AuthProvider extends ChangeNotifier {
       
       if (data['success'] == true) {
         print('Login response data: $data'); // Debug log
+        print('Driver data from API: ${data['driver']}'); // Debug log
+        print('Driver ID from API: ${data['driver']['driver_id']} (type: ${data['driver']['driver_id'].runtimeType})'); // Debug log
         _currentUser = ProfileData.fromJson(data['driver']);
         print('Parsed user data: ${_currentUser?.driverName}'); // Debug log
+        print('Parsed driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
         await _saveUserData(); // Save user data to storage
         _setLoading(false);
         return true;
@@ -153,6 +184,12 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Force clear stored data (for debugging)
+  Future<void> clearStoredData() async {
+    await _clearUserData();
+    print('Cleared all stored user data');
+  }
+
   // Update profile method
   Future<bool> updateProfile({
     required String name,
@@ -169,7 +206,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final data = await CentralizedApiService.updateProfile(
-        driverId: int.parse(_currentUser!.driverId),
+        driverId: _currentUser!.driverIdAsInt,
         name: name,
         email: email,
         phone: phone,
@@ -211,7 +248,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final data = await CentralizedApiService.changePassword(
-        driverId: int.parse(_currentUser!.driverId),
+        driverId: _currentUser!.driverIdAsInt,
         currentPassword: currentPassword,
         newPassword: newPassword,
       );

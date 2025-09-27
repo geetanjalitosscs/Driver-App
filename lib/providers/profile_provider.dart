@@ -38,7 +38,7 @@ class ProfileProvider with ChangeNotifier {
     try {
       // Update backend
       final result = await CentralizedApiService.updateProfile(
-        driverId: int.parse(_profile.driverId),
+        driverId: _profile.driverIdAsInt,
         name: newProfile.driverName,
         email: newProfile.email,
         phone: newProfile.phone,

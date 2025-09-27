@@ -51,7 +51,7 @@ class _WalletScreenState extends State<WalletScreen> {
     
     if (authProvider.currentUser != null) {
       await walletProvider.loadWalletData(
-        int.parse(authProvider.currentUser!.driverId),
+        authProvider.currentUser!.driverIdAsInt,
         period: _selectedPeriod,
         status: _selectedStatus,
       );

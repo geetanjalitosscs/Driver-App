@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/accident_report.dart';
@@ -26,7 +28,7 @@ class CentralizedApiService {
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/login.php'),
+        Uri.parse('$_accidentBaseUrl/login.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
@@ -57,7 +59,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/signup.php'),
+        Uri.parse('$_accidentBaseUrl/signup.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'name': name,
@@ -94,7 +96,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/update_profile.php'),
+        Uri.parse('$_accidentBaseUrl/update_profile.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
@@ -126,7 +128,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/change_password.php'),
+        Uri.parse('$_accidentBaseUrl/change_password.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
@@ -155,7 +157,7 @@ class CentralizedApiService {
     required String period, // 'today', 'week', 'month', 'year', 'all'
   }) async {
     try {
-      final url = '$_baseUrl/get_driver_earnings.php?driver_id=$driverId&period=$period';
+      final url = '$_accidentBaseUrl/get_driver_earnings.php?driver_id=$driverId&period=$period';
       print('Fetching earnings from: $url');
       
       final response = await http.get(
@@ -192,7 +194,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_recent_earnings.php?driver_id=$driverId&limit=$limit'),
+        Uri.parse('$_accidentBaseUrl/get_recent_earnings.php?driver_id=$driverId&limit=$limit'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -218,7 +220,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_weekly_earnings.php?driver_id=$driverId&week=$week'),
+        Uri.parse('$_accidentBaseUrl/get_weekly_earnings.php?driver_id=$driverId&week=$week'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -244,7 +246,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_earnings_summary.php?driver_id=$driverId&period=$period'),
+        Uri.parse('$_accidentBaseUrl/get_earnings_summary.php?driver_id=$driverId&period=$period'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -269,7 +271,7 @@ class CentralizedApiService {
   static Future<List<Trip>> getDriverTrips(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_driver_trips.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_driver_trips.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -288,7 +290,7 @@ class CentralizedApiService {
   static Future<List<Trip>> getCompletedTrips(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_completed_trips.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_completed_trips.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -310,7 +312,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/accept_trip.php'),
+        Uri.parse('$_accidentBaseUrl/accept_trip.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'trip_id': tripId,
@@ -337,7 +339,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/complete_trip.php'),
+        Uri.parse('$_accidentBaseUrl/complete_trip.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'trip_id': tripId,
@@ -365,7 +367,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/create_trip_from_accident.php'),
+        Uri.parse('$_accidentBaseUrl/create_trip_from_accident.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'accident_id': accidentId,
@@ -391,7 +393,7 @@ class CentralizedApiService {
   static Future<Wallet?> getWallet(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_wallet.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_wallet.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -412,7 +414,7 @@ class CentralizedApiService {
   static Future<List<Payment>> getWalletTransactions(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_wallet_transactions.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_wallet_transactions.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -435,7 +437,7 @@ class CentralizedApiService {
   static Future<List<Withdrawal>> getWithdrawals(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_withdrawals.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_withdrawals.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -462,7 +464,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/request_withdrawal.php'),
+        Uri.parse('$_accidentBaseUrl/request_withdrawal.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
@@ -574,7 +576,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_driver_photo.php?driver_id=$driverId&type=$type'),
+        Uri.parse('$_accidentBaseUrl/get_driver_photo.php?driver_id=$driverId&type=$type'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -604,7 +606,7 @@ class CentralizedApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/send_notification.php'),
+        Uri.parse('$_accidentBaseUrl/send_notification.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
@@ -632,7 +634,7 @@ class CentralizedApiService {
   static Future<List<BankAccount>> getDriverBankAccounts(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/get_driver_bank_accounts.php?driver_id=$driverId'),
+        Uri.parse('$_accidentBaseUrl/get_driver_bank_accounts.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -676,7 +678,7 @@ class CentralizedApiService {
   }) async {
     try {
     final response = await http.post(
-        Uri.parse('$_baseUrl/update_trip_location.php'),
+        Uri.parse('$_accidentBaseUrl/update_trip_location.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'trip_id': tripId,
@@ -752,6 +754,323 @@ class CentralizedApiService {
   static void stopTracking() {
     // This would stop any ongoing location tracking
     // For now, it's a placeholder for compatibility
+  }
+
+  /// Get current location with detailed address information
+  static Future<Map<String, dynamic>?> getCurrentLocationDetailed() async {
+    try {
+      print('=== LOCATION DEBUG START ===');
+      
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      print('Location services enabled: $serviceEnabled');
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled. Please enable location services in your device settings.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      print('Initial permission: $permission');
+      
+      if (permission == LocationPermission.denied) {
+        print('Requesting location permission...');
+        permission = await Geolocator.requestPermission();
+        print('Permission after request: $permission');
+        
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied. Please allow location access in app settings.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied. Please enable location access in device settings.');
+      }
+
+      print('Getting current position...');
+      
+      Position position;
+      if (Platform.isWindows) {
+        print('Windows platform detected - using lenient location settings');
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 20),
+        );
+      } else {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        );
+      }
+      
+      print('Position obtained: ${position.latitude}, ${position.longitude}');
+      print('Accuracy: ${position.accuracy}m');
+
+      print('Reverse geocoding...');
+      String address = 'Unknown Location';
+      Map<String, String>? addressDetails;
+      
+      try {
+        addressDetails = await getLocationFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+        
+        if (addressDetails != null) {
+          address = addressDetails['shortAddress'] ?? addressDetails['formattedAddress'] ?? 'Unknown Location';
+          print('Address found: $address');
+        } else {
+          print('No address found, using mock address');
+          address = _getMockAddressFromCoordinates(position.latitude, position.longitude);
+        }
+      } catch (geocodingError) {
+        print('Geocoding error: $geocodingError');
+        address = _getMockAddressFromCoordinates(position.latitude, position.longitude);
+        print('Using mock address: $address');
+      }
+
+      print('=== LOCATION DEBUG END ===');
+      return {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'address': address,
+        'accuracy': position.accuracy,
+        'timestamp': position.timestamp,
+        'street': addressDetails?['street'] ?? '',
+        'city': addressDetails?['city'] ?? '',
+        'state': addressDetails?['state'] ?? '',
+        'country': addressDetails?['country'] ?? '',
+        'postalCode': addressDetails?['postalCode'] ?? '',
+        'formattedAddress': addressDetails?['formattedAddress'] ?? address,
+        'shortAddress': addressDetails?['shortAddress'] ?? address,
+        'fullAddress': addressDetails?['fullAddress'] ?? address,
+      };
+    } catch (e) {
+      print('=== LOCATION ERROR ===');
+      print('Error type: ${e.runtimeType}');
+      print('Error message: $e');
+      print('=== LOCATION ERROR END ===');
+      return null;
+    }
+  }
+
+  /// Get location information using reverse geocoding
+  static Future<Map<String, String>?> getLocationFromCoordinates(double latitude, double longitude) async {
+    try {
+      print('=== GOOGLE MAPS URL API DEBUG START ===');
+      print('Getting location for: $latitude, $longitude');
+      
+      final locationData = await _getLocationDataFromCoordinates(latitude, longitude);
+      
+      if (locationData != null) {
+        print('Location data retrieved successfully');
+        print('Street: ${locationData['street']}');
+        print('City: ${locationData['city']}');
+        print('State: ${locationData['state']}');
+        print('Country: ${locationData['country']}');
+        print('=== GOOGLE MAPS URL API DEBUG END ===');
+        return locationData;
+      }
+      
+      print('No location data found, using fallback');
+      print('=== GOOGLE MAPS URL API DEBUG END (FALLBACK) ===');
+      return null;
+      
+    } catch (e) {
+      print('Google Maps URL API error: $e');
+      print('=== GOOGLE MAPS URL API DEBUG END (ERROR) ===');
+      return null;
+    }
+  }
+  
+  /// Get location data from coordinates using reverse geocoding
+  static Future<Map<String, String>?> _getLocationDataFromCoordinates(double latitude, double longitude) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      
+      if (placemarks.isNotEmpty) {
+        final place = placemarks[0];
+        
+        try {
+          String street = _formatStreet(place);
+          String city = place?.locality ?? place?.subLocality ?? '';
+          String state = place?.administrativeArea ?? '';
+          String country = place?.country ?? '';
+          String postalCode = place?.postalCode ?? '';
+          
+          String shortAddress = _createShortAddress(street, city, state);
+          String fullAddress = _createFullAddress(street, city, state, country, postalCode);
+          
+          return {
+            'street': street,
+            'city': city,
+            'state': state,
+            'country': country,
+            'postalCode': postalCode,
+            'shortAddress': shortAddress,
+            'fullAddress': fullAddress,
+            'formattedAddress': fullAddress,
+          };
+        } catch (e) {
+          print('Error processing placemark: $e');
+          return null;
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      print('Reverse geocoding error: $e');
+      return null;
+    }
+  }
+  
+  /// Format street address from placemark
+  static String _formatStreet(dynamic place) {
+    List<String> streetParts = [];
+    
+    try {
+      if (place?.streetNumber != null && place.streetNumber.isNotEmpty) {
+        streetParts.add(place.streetNumber);
+      }
+      if (place?.street != null && place.street.isNotEmpty) {
+        streetParts.add(place.street);
+      }
+      if (place?.thoroughfare != null && place.thoroughfare.isNotEmpty) {
+        streetParts.add(place.thoroughfare);
+      }
+    } catch (e) {
+      print('Error formatting street: $e');
+    }
+    
+    return streetParts.join(' ').trim();
+  }
+  
+  /// Create a short address format (Street, City, State)
+  static String _createShortAddress(String street, String city, String state) {
+    List<String> parts = [];
+    
+    if (street.isNotEmpty) parts.add(street);
+    if (city.isNotEmpty) parts.add(city);
+    if (state.isNotEmpty) parts.add(state);
+    
+    return parts.join(', ');
+  }
+  
+  /// Create a full address format (Street, City, State, Country, Postal Code)
+  static String _createFullAddress(String street, String city, String state, String country, String postalCode) {
+    List<String> parts = [];
+    
+    if (street.isNotEmpty) parts.add(street);
+    if (city.isNotEmpty) parts.add(city);
+    if (state.isNotEmpty) parts.add(state);
+    if (country.isNotEmpty) parts.add(country);
+    if (postalCode.isNotEmpty) parts.add(postalCode);
+    
+    return parts.join(', ');
+  }
+
+  /// Get mock address from coordinates when geocoding fails
+  static String _getMockAddressFromCoordinates(double latitude, double longitude) {
+    if ((latitude >= 22.6 && latitude <= 22.8) && (longitude >= 75.8 && longitude <= 76.0)) {
+      return 'Indore, Madhya Pradesh, India';
+    } else if ((latitude >= 23.1 && latitude <= 23.3) && (longitude >= 79.9 && longitude <= 80.1)) {
+      return 'Jabalpur, Madhya Pradesh, India';
+    } else if ((latitude >= 23.0 && latitude <= 23.1) && (longitude >= 81.3 && longitude <= 81.4)) {
+      return 'Beohari, Madhya Pradesh, India';
+    } else if ((latitude >= 28.5 && latitude <= 28.8) && (longitude >= 77.0 && longitude <= 77.3)) {
+      return 'New Delhi, Delhi, India';
+    } else if ((latitude >= 19.0 && latitude <= 19.2) && (longitude >= 72.8 && longitude <= 73.0)) {
+      return 'Mumbai, Maharashtra, India';
+    } else if ((latitude >= 12.9 && latitude <= 13.0) && (longitude >= 77.5 && longitude <= 77.7)) {
+      return 'Bangalore, Karnataka, India';
+    } else if ((latitude >= 23.2 && latitude <= 23.3) && (longitude >= 77.3 && longitude <= 77.5)) {
+      return 'Bhopal, Madhya Pradesh, India';
+    } else if ((latitude >= 26.1 && latitude <= 26.3) && (longitude >= 78.0 && longitude <= 78.3)) {
+      return 'Gwalior, Madhya Pradesh, India';
+    } else {
+      return 'Current Location (${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)})';
+    }
+  }
+
+  /// Get Google Maps navigation URL for a destination
+  static String getNavigationUrl(double destinationLat, double destinationLng, {double? currentLat, double? currentLng}) {
+    String url = 'https://www.google.com/maps/dir/?api=1&destination=$destinationLat,$destinationLng&travelmode=driving';
+    
+    if (currentLat != null && currentLng != null) {
+      url += '&origin=$currentLat,$currentLng';
+    }
+    
+    return url;
+  }
+  
+  /// Get Google Maps search URL for an address
+  static String getSearchUrl(String address) {
+    return 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}';
+  }
+  
+  /// Get Google Maps place URL for coordinates
+  static String getPlaceUrl(double latitude, double longitude) {
+    return 'https://www.google.com/maps/place/?api=1&query=$latitude,$longitude';
+  }
+
+  /// Search for location by address
+  static Future<List<Map<String, dynamic>>> searchLocation(String query) async {
+    try {
+      List<Location> locations = await locationFromAddress(query);
+      
+      List<Map<String, dynamic>> results = [];
+      for (Location location in locations) {
+        // Get address for each location
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          location.latitude,
+          location.longitude,
+        );
+        
+        String address = 'Unknown Location';
+        if (placemarks.isNotEmpty) {
+          address = _formatAddress(placemarks[0]);
+        }
+        
+        results.add({
+          'latitude': location.latitude,
+          'longitude': location.longitude,
+          'address': address,
+        });
+      }
+      
+      return results;
+    } catch (e) {
+      print('Error searching location: $e');
+      return [];
+    }
+  }
+
+  /// Format address from placemark
+  static String _formatAddress(Placemark place) {
+    List<String> addressParts = [];
+    
+    try {
+      String? street = place.street;
+      String? locality = place.locality;
+      String? administrativeArea = place.administrativeArea;
+      String? country = place.country;
+      
+      if (street != null && street.isNotEmpty) {
+        addressParts.add(street);
+      }
+      if (locality != null && locality.isNotEmpty) {
+        addressParts.add(locality);
+      }
+      if (administrativeArea != null && administrativeArea.isNotEmpty) {
+        addressParts.add(administrativeArea);
+      }
+      if (country != null && country.isNotEmpty) {
+        addressParts.add(country);
+      }
+      
+      String formattedAddress = addressParts.join(', ');
+      return formattedAddress.isEmpty ? 'Unknown Location' : formattedAddress;
+    } catch (e) {
+      print('Error formatting address: $e');
+      return 'Unknown Location';
+    }
   }
 
   // ============================================================================
