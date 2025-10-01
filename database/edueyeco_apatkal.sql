@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Sep 25, 2025 at 12:34 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: Oct 01, 2025 at 01:39 PM
+-- Server version: 10.6.23-MariaDB-cll-lve
+-- PHP Version: 8.4.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -47,23 +47,37 @@ CREATE TABLE `accidents` (
 --
 
 INSERT INTO `accidents` (`id`, `fullname`, `phone`, `vehicle`, `accident_date`, `location`, `latitude`, `longitude`, `description`, `photo`, `created_at`, `status`) VALUES
-(1, 'fffs', '7893524122', 'mp20ze3605', '2000-02-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'rydhfujt ', '', '2025-09-09 00:17:44', 'pending'),
-(2, 'dddd', '8523697410', 'mp20ze3609', '2005-02-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'dghfjh', '', '2025-09-09 00:22:37', 'pending'),
+(1, 'fffs', '7893524122', 'mp20ze3605', '2000-02-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'rydhfujt ', '', '2025-09-09 00:17:44', 'resolved'),
+(2, 'dddd', '8523697410', 'mp20ze3609', '2005-02-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'dghfjh', '', '2025-09-09 00:22:37', 'resolved'),
 (3, 'fffs', '8523697410', 'mp20ze3608', '2022-02-20', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'gfugjihkuyo', '', '2025-09-09 00:32:56', 'pending'),
-(4, 'sdfgh', '8523697416', 'mp20ze3602', '2001-10-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'gfhjbkgcjy', NULL, '2025-09-09 00:43:41', 'pending'),
-(5, 'fgdh', '8523697410', 'mp20ze3605', '2004-02-20', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'iiuihmvgllofsfdg', NULL, '2025-09-09 00:49:37', 'pending'),
-(6, 'dddd', '8523697410', 'mp20ze3605', '2322-03-22', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'ifjkhgafjk', NULL, '2025-09-09 00:53:15', 'pending'),
-(7, 'dddd', '7695432875', 'mp20ze3602', '2124-02-22', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'ghgfh', NULL, '2025-09-09 00:58:59', 'pending'),
-(8, 'dddd', '8523697410', 'mp20ze3605', '0000-00-00', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'gjh', NULL, '2025-09-09 01:17:40', 'pending'),
-(11, 'Siddharth Singh Rajput', '8523697469', 'mp20ze6974', '2005-10-10', '79, Tirupati Colony, Neelbad, Bhopal, Madhya Pradesh 462044, India (Lat: 23.189914, Lng: 77.342310)', 23.18991360, 77.34231040, 'Mental Patient', NULL, '2025-09-10 01:17:12', 'pending'),
-(12, 'Kritika', '7946325186', 'mp20ze3602', '2005-10-10', 'Shastri bridge jabalpur madhya pradesh', 0.00000000, 0.00000000, 'Car accident', NULL, '2025-09-10 04:14:04', 'pending'),
-(13, 'sdfgh', '8523697469', 'mp20ze3605', '2005-10-10', '      adhartal jabalpur ', 0.00000000, 0.00000000, 'hjhjhg u y ouoh', NULL, '2025-09-10 06:24:46', 'pending'),
+(4, 'sdfgh', '8523697416', 'mp20ze3602', '2001-10-21', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'gfhjbkgcjy', NULL, '2025-09-09 00:43:41', 'resolved'),
+(5, 'fgdh', '8523697410', 'mp20ze3605', '2004-02-20', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'iiuihmvgllofsfdg', NULL, '2025-09-09 00:49:37', 'resolved'),
+(6, 'dddd', '8523697410', 'mp20ze3605', '2322-03-22', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'ifjkhgafjk', NULL, '2025-09-09 00:53:15', 'resolved'),
+(7, 'dddd', '7695432875', 'mp20ze3602', '2124-02-22', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'ghgfh', NULL, '2025-09-09 00:58:59', 'resolved'),
+(8, 'dddd', '8523697410', 'mp20ze3605', '0000-00-00', '126, Indra Nagar, Loknayak Nagar, Indore, Madhya Pradesh 452002, India', 22.71700000, 75.83370000, 'gjh', NULL, '2025-09-09 01:17:40', 'resolved'),
+(11, 'Siddharth Singh Rajput', '8523697469', 'mp20ze6974', '2005-10-10', '79, Tirupati Colony, Neelbad, Bhopal, Madhya Pradesh 462044, India (Lat: 23.189914, Lng: 77.342310)', 23.18991360, 77.34231040, 'Mental Patient', NULL, '2025-09-10 01:17:12', 'resolved'),
+(12, 'Kritika', '7946325186', 'mp20ze3602', '2005-10-10', 'Shastri bridge jabalpur madhya pradesh', 0.00000000, 0.00000000, 'Car accident', NULL, '2025-09-10 04:14:04', 'resolved'),
+(13, 'sdfgh', '8523697469', 'mp20ze3605', '2005-10-10', '      adhartal jabalpur ', 0.00000000, 0.00000000, 'hjhjhg u y ouoh', NULL, '2025-09-10 06:24:46', 'resolved'),
 (16, 'Mehika                                                                                              ', '8523697454', 'mp20ze3602', '2025-09-12', '1320, near Telephone Exchange, Wright Town, Jabalpur, Madhya Pradesh 482002, India (Lat: 23.166976, Lng: 79.930982)', 23.16697600, 79.93098240, 's testing', NULL, '2025-09-12 00:05:33', 'pending'),
-(18, 'Siddharth Singh Rajput', '7694975579', 'mp20ze3605', '2025-10-20', '15 Malipura, Hathipala Main Rd, Gadi Adda, Indore, Madhya Pradesh 452007, India (Lat: 22.712453, Lng: 75.864277)', 22.71245300, 75.86427730, 'accident', NULL, '2025-09-12 07:21:25', 'pending'),
-(20, 'Janki das', '8770658824', 'Mp20ja6567', '2025-09-13', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187849, Lng: 79.944728)', 23.18784940, 79.94472760, 'Fattal accident ', '', '2025-09-13 18:31:32', 'pending'),
+(18, 'Siddharth Singh Rajput', '7694975579', 'mp20ze3605', '2025-10-20', '15 Malipura, Hathipala Main Rd, Gadi Adda, Indore, Madhya Pradesh 452007, India (Lat: 22.712453, Lng: 75.864277)', 22.71245300, 75.86427730, 'accident', NULL, '2025-09-12 07:21:25', 'resolved'),
+(20, 'Janki das', '8770658824', 'Mp20ja6567', '2025-09-13', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187849, Lng: 79.944728)', 23.18784940, 79.94472760, 'Fattal accident ', '', '2025-09-13 18:31:32', 'resolved'),
 (21, 'Yadav', '', 'Mp20ja6567', '2025-09-13', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187850, Lng: 79.944727)', 23.18785010, 79.94472690, '', '', '2025-09-13 18:59:01', 'pending'),
-(22, 'dgs', '7654891234', 'mp20ac3898', '2025-09-17', '1, Devguradia, Indore, Deoguradia, Madhya Pradesh 452016, India (Lat: 22.686500, Lng: 75.931300)', 22.68650000, 75.93130000, 'efedtgr', '', '2025-09-17 10:09:54', 'pending'),
-(23, 'Raj', '7654891234', 'mp20ac3898', '2025-09-17', '1, Devguradia, Indore, Deoguradia, Madhya Pradesh 452016, India (Lat: 22.686500, Lng: 75.931300)', 22.68650000, 75.93130000, 'Mental', '', '2025-09-17 10:37:30', 'pending');
+(23, 'swayam ', '7723065844', 'mp20ze3602', '2025-09-23', '37F, Surya Dev Nagar, Indore, Madhya Pradesh 452009, India (Lat: 22.682600, Lng: 75.824500)', 22.68260000, 75.82450000, 'dfsdfdfdfs', '', '2025-09-23 11:13:39', 'pending'),
+(26, '', '', 'mp20kj9999', '2025-09-25', '1190, Vishwasnagar, Residency Area, Indore, Madhya Pradesh 452001, India (Lat: 22.708195, Lng: 75.882442)', 22.70819550, 75.88244220, '', '', '2025-09-25 19:08:05', 'pending'),
+(27, 'krisha', '7723065844', 'mp20ze3602', '2025-09-26', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155016, Lng: 79.926033)', 23.15501560, 79.92603250, 'ww1', '', '2025-09-26 13:45:15', 'pending'),
+(28, 'rupesh sahu', '8959176446', 'MP20KJ0078', '2025-09-27', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154993, Lng: 79.926051)', 23.15499260, 79.92605080, 'qwe', '', '2025-09-27 06:18:15', 'pending'),
+(29, 'rupesh sahu', '8959176446', 'MP20KJ0078', '2025-09-27', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154993, Lng: 79.926051)', 23.15499260, 79.92605080, 'ee', '', '2025-09-27 06:19:00', 'pending'),
+(30, 'geetanjali', '7694975579', 'MP20PH2265', '2025-09-27', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155004, Lng: 79.926001)', 23.15500400, 79.92600140, 'sdfa', '', '2025-09-27 08:50:34', 'pending'),
+(31, 'geetanjali', '7694975579', 'MP20PH2265', '2025-09-27', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155029, Lng: 79.926034)', 23.15502870, 79.92603380, 'sddf', '', '2025-09-27 09:08:17', 'pending'),
+(32, 'jai', '9999999990', 'mp20sa6567', '2025-09-27', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)', 23.15499060, 79.92600720, 'wqdsqd', '', '2025-09-27 09:24:51', 'pending'),
+(33, 'geetanjali', '7694975579', 'MP20PH2265', '2025-09-27', 'N/A', 23.15505050, 79.92600370, 'ahhs', '', '2025-09-27 11:18:50', 'pending'),
+(34, 'jai', '9999999990', 'mp20sa6567', '2025-09-27', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155034, Lng: 79.926032)', 23.15503390, 79.92603200, 'asfdsa', '', '2025-09-27 11:53:27', 'pending'),
+(35, 'geetanjali', '7694975579', 'MP20PH2265', '2025-09-27', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154998, Lng: 79.926003)', 23.15499820, 79.92600270, 'fsdfa', '', '2025-09-27 12:01:09', 'pending'),
+(0, '', '', 'Mp20zy8885', '2025-09-27', '30, Siddha Baba Rd, Near Shiv temple, Lalmati, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482001, India (Lat: 23.189189, Lng: 79.955095)', 23.18918919, 79.95509535, 'Fattal accident ', '', '2025-09-27 20:38:54', 'pending'),
+(0, '', '', 'Mp20pa5590', '2025-09-28', '3, Siloundi, Katni, Jabalpur, Madhya Pradesh 483334, India (Lat: 23.173197, Lng: 79.947445)', 23.17319680, 79.94744460, 'Accident ', '', '2025-09-28 10:51:58', 'pending'),
+(0, '', '', 'mp20ab2010', '2025-09-29', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155042, Lng: 79.926022)', 23.15504230, 79.92602160, '', '', '2025-09-29 06:19:15', 'pending'),
+(0, 'Raju', '', 'Mp20nm2713', '2025-09-29', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187873, Lng: 79.944689)', 23.18787260, 79.94468880, 'Accident', '', '2025-09-29 20:08:58', 'pending'),
+(0, 'Raju', '', 'Mp20nm2713', '2025-09-29', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187869, Lng: 79.944685)', 23.18786870, 79.94468470, 'Accident ', '', '2025-09-29 20:13:24', 'pending');
 
 -- --------------------------------------------------------
 
@@ -92,8 +106,42 @@ INSERT INTO `accident_photos` (`id`, `accident_id`, `photo`) VALUES
 (10, 13, '1757505286_screencapture-localhost-8080-apatkal-adminn-admin-dashboard-php-2025-09-08-17_24_22.png'),
 (13, 16, '1757655333_screencapture-localhost-8080-apatkal-adminn-accidents-php-2025-09-08-17_26_14.png'),
 (15, 18, '1757681485_screencapture-localhost-8080-apatkal-adminn-accidents-php-2025-09-08-17_26_14.png'),
-(16, 22, '1758103794_Blue Flower.jpg'),
-(17, 23, '1758105450_Blue Flower.jpg');
+(17, 23, '1758626019_Generated Image September 23, 2025 - 11_49AM.png'),
+(20, 31, '1758964097_main-banner1 (1).jpg'),
+(21, 32, '1758965091_image3.png'),
+(22, 33, '1758971930_About US - The TOSS Journey.png'),
+(23, 34, '1758974007_image5.png'),
+(24, 35, '1758974469_image4.png'),
+(0, 0, '1759005534_17590055123647811666092973636848.jpg'),
+(0, 0, '1759056718_17590567012542399286746731959602.jpg'),
+(0, 0, '1759176538_17591765164406493994352732885042.jpg'),
+(0, 0, '1759176804_17591767774808470940553918188441.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `accident_remarks`
+--
+
+CREATE TABLE `accident_remarks` (
+  `id` int(11) NOT NULL,
+  `accident_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `user_role` varchar(50) NOT NULL,
+  `remark` text NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `accident_remarks`
+--
+
+INSERT INTO `accident_remarks` (`id`, `accident_id`, `user_id`, `user_name`, `user_role`, `remark`, `created_at`, `updated_at`) VALUES
+(1, 33, 1, 'Admin ', 'admin', 'ggfgf', '2025-09-27 16:53:10', '2025-09-27 16:53:10'),
+(2, 33, 1, 'Admin ', 'admin', 'done', '2025-09-27 16:56:10', '2025-09-27 16:56:10'),
+(3, 35, 1, 'Admin ', 'admin', 'done', '2025-09-27 17:50:55', '2025-09-27 17:50:55');
 
 -- --------------------------------------------------------
 
@@ -117,43 +165,69 @@ CREATE TABLE `accident_reports` (
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `active_emergencies`
--- (See below for the actual view)
+-- Table structure for table `active_emergencies`
 --
+
 CREATE TABLE `active_emergencies` (
-`incident_id` int(11)
-,`user_id` int(11)
-,`first_name` varchar(100)
-,`last_name` varchar(100)
-,`phone` varchar(20)
-,`incident_type` enum('accident','breakdown','medical','other')
-,`location` varchar(255)
-,`status` enum('reported','dispatched','in_progress','resolved','cancelled')
-,`priority` enum('low','medium','high','critical')
-,`reported_at` datetime
-);
+  `incident_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `incident_type` enum('accident','breakdown','medical','other') DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `status` enum('reported','dispatched','in_progress','resolved','cancelled') DEFAULT NULL,
+  `priority` enum('low','medium','high','critical') DEFAULT NULL,
+  `reported_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `active_pages_content`
--- (See below for the actual view)
+-- Table structure for table `active_pages_content`
 --
+
 CREATE TABLE `active_pages_content` (
-`page_id` int(11)
-,`page_name` varchar(100)
-,`slug` varchar(100)
-,`meta_title` varchar(200)
-,`meta_description` text
-,`section_id` int(11)
-,`section_name` varchar(100)
-,`section_order` int(11)
-,`component_id` int(11)
-,`component_type` enum('text','image','video','button','form','link','html_block','icon','card','list')
-,`content` longtext
-,`extra_settings` longtext
-,`component_order` int(11)
-);
+  `page_id` int(11) DEFAULT NULL,
+  `page_name` varchar(100) DEFAULT NULL,
+  `slug` varchar(100) DEFAULT NULL,
+  `meta_title` varchar(200) DEFAULT NULL,
+  `meta_description` text DEFAULT NULL,
+  `section_id` int(11) DEFAULT NULL,
+  `section_name` varchar(100) DEFAULT NULL,
+  `section_order` int(11) DEFAULT NULL,
+  `component_id` int(11) DEFAULT NULL,
+  `component_type` enum('text','image','video','button','form','link','html_block','icon','card','list') DEFAULT NULL,
+  `content` longtext DEFAULT NULL,
+  `extra_settings` longtext DEFAULT NULL,
+  `component_order` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_profiles`
+--
+
+CREATE TABLE `admin_profiles` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `profile_image` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `admin_profiles`
+--
+
+INSERT INTO `admin_profiles` (`id`, `user_id`, `first_name`, `last_name`, `email`, `phone`, `bio`, `profile_image`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Admin', 'User', 'admin@apatkal.com', '', 'Administrator', 'admin_profile_1_1758795302.jpeg', '2025-09-25 14:38:18', '2025-09-25 15:45:40');
 
 -- --------------------------------------------------------
 
@@ -167,6 +241,7 @@ CREATE TABLE `clients` (
   `mobile_no` varchar(20) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `vehicle_no` varchar(50) DEFAULT NULL,
+  `vehicle_type` enum('two-wheeler','three-wheeler','four-wheeler') DEFAULT 'four-wheeler',
   `created_date` date DEFAULT curdate(),
   `house_no` varchar(100) DEFAULT NULL,
   `address` text DEFAULT NULL,
@@ -178,7 +253,7 @@ CREATE TABLE `clients` (
   `added_by` int(11) NOT NULL,
   `assigned_staff` int(11) DEFAULT NULL,
   `photo` varchar(255) DEFAULT NULL,
-  `status` enum('active','inactive','pending') DEFAULT 'active',
+  `status` enum('paid','unpaid') DEFAULT 'unpaid',
   `notes` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -188,13 +263,17 @@ CREATE TABLE `clients` (
 -- Dumping data for table `clients`
 --
 
-INSERT INTO `clients` (`id`, `full_name`, `mobile_no`, `email`, `vehicle_no`, `created_date`, `house_no`, `address`, `landmark`, `state`, `district`, `city`, `pincode`, `added_by`, `assigned_staff`, `photo`, `status`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 'Test Client', '9876543210', 'test@example.com', 'MH12AB1234', '2025-01-15', '123 Test House', 'Test Address', 'Test Landmark', 'Maharashtra', 'Mumbai', 'Mumbai', '400001', 1, 1, NULL, 'active', 'Test client for verification', '2025-09-13 17:12:01', '2025-09-13 17:12:01'),
-(2, 'Test', '9999999999', 'test@test.com', 'MP20KJ0001', '2025-09-13', '', '', '', '', '', '', '', 1, 4, NULL, 'active', NULL, '2025-09-13 17:16:46', '2025-09-13 17:16:46'),
-(3, 'mehak', '7771076100', 'kalmaliindia@gmail.com', 'mp20sa3333', '2025-09-14', '430 taigore WARD JABALPUR', 'jabalpur', '', 'Madhya Pradesh', 'jabalpur', 'Jabalpur', '482004', 1, 3, NULL, 'active', NULL, '2025-09-14 00:25:38', '2025-09-14 00:25:38'),
-(5, 'jai', '9999999990', 'kalmaliindia@gmail.com', 'mp20sa6567', '2025-09-14', 'jabalpur', 'jabalpur', 'ground', 'Madhya Pradesh', 'jabalpur', 'Jabalpur', '482004', 1, 3, NULL, 'active', NULL, '2025-09-14 00:37:17', '2025-09-14 00:37:17'),
-(7, 'rupesh sahu1', '8959176446', 's@s.com', 'MP20KJ0078', '2025-09-14', '', 'Ranjhi', '', '', '', '', '', 1, NULL, NULL, 'active', NULL, '2025-09-14 15:52:42', '2025-09-14 18:00:13'),
-(10, 'Geetanjali', '7694975579', 'geetanjali.tosscs@gmail.com', 'mp20ch8767', '2025-09-17', NULL, 'Jabalpur', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'active', NULL, '2025-09-17 15:43:50', '2025-09-17 15:43:50');
+INSERT INTO `clients` (`id`, `full_name`, `mobile_no`, `email`, `vehicle_no`, `vehicle_type`, `created_date`, `house_no`, `address`, `landmark`, `state`, `district`, `city`, `pincode`, `added_by`, `assigned_staff`, `photo`, `status`, `notes`, `created_at`, `updated_at`) VALUES
+(1, 'Test Client', '9876543210', 'test@example.com', 'MH12AB1234', 'four-wheeler', '2025-01-15', '123 Test House', 'Test Address', 'Test Landmark', 'Maharashtra', 'Mumbai', 'Mumbai', '400001', 1, 1, NULL, '', 'Test client for verification', '2025-09-13 17:12:01', '2025-09-25 11:54:09'),
+(2, 'Test', '9999999999', 'test@test.com', 'MP20KJ0001', 'four-wheeler', '2025-09-13', '', '', '', '', '', '', '', 1, 4, NULL, '', NULL, '2025-09-13 17:16:46', '2025-09-25 11:54:09'),
+(3, 'mehak', '7771076100', 'kalmaliindia@gmail.com', 'mp20sa3333', 'four-wheeler', '2025-09-14', '430 taigore WARD JABALPUR', 'jabalpur', '', 'Madhya Pradesh', 'jabalpur', 'Jabalpur', '482004', 1, 3, NULL, '', NULL, '2025-09-14 00:25:38', '2025-09-25 11:54:09'),
+(5, 'jai', '9999999990', 'kalmaliindia@gmail.com', 'mp20sa6567', 'four-wheeler', '2025-09-14', 'jabalpur', 'jabalpur', 'ground', 'Madhya Pradesh', 'jabalpur', 'Jabalpur', '482004', 1, 3, NULL, '', NULL, '2025-09-14 00:37:17', '2025-09-25 11:54:09'),
+(10, 'geetanjali', '7694975579', 'siddharth.toss.cs@gmail.com', 'MP20PH2265', 'four-wheeler', '2025-09-17', NULL, 'rdthgfjdg', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '', NULL, '2025-09-17 12:43:04', '2025-09-25 11:54:09'),
+(11, 'siddharth', '9508570649', 'siddharth.toss.cs@gmail.com', 'MP20KJ0005', 'four-wheeler', '2025-09-17', NULL, 'hhgdrt', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'unpaid', NULL, '2025-09-17 15:25:38', '2025-09-27 11:59:58'),
+(26, 'Krishna Vishwakarma', '8959176446', 'Krishna.vishwakarma@tosssolution.in', 'mp20ab2010', 'four-wheeler', '2025-09-27', NULL, 'Toss solution Jabalpur', NULL, '', '', '', '482001', 1, NULL, NULL, 'unpaid', NULL, '2025-09-27 13:37:09', '2025-09-27 13:37:09'),
+(0, 'testing 1', '8827944207', 'Toss125traingin@gmail.com', 'mp20ab2011', 'two-wheeler', '2025-09-28', NULL, 'Behind new post office\r\nबिहाइंड न्यू पोस्ट ऑफिस', NULL, 'Madhya Pradesh', 'Katni', 'Sihora', '483225', 1, NULL, NULL, 'unpaid', NULL, '2025-09-28 12:00:26', '2025-09-28 12:00:26'),
+(0, 'siddharth', '7898140799', 'siddharthsingh@gmail.com', 'Mp20ZB6308', 'two-wheeler', '2025-09-28', NULL, 'adhartal', NULL, 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482004', 1, NULL, NULL, 'unpaid', NULL, '2025-09-28 14:54:17', '2025-09-28 14:54:17'),
+(0, 'Hussain', '7898684888', 'admin@apatkal.com', 'Mp20nm2713', 'two-wheeler', '2025-09-30', NULL, '140 gohalpur ramnahar chitranjan ward jabalpur\r\nGohalpur\r\nJabalpur', NULL, 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482002', 1, NULL, NULL, 'unpaid', NULL, '2025-09-30 01:34:57', '2025-09-30 01:34:57');
 
 -- --------------------------------------------------------
 
@@ -226,7 +305,10 @@ INSERT INTO `client_family_members` (`id`, `client_id`, `full_name`, `mobile_no`
 (1, 5, 'test', '8959176446', 's@s.com', 'other', '2025-09-14', 'Ranjhi', NULL, 0, NULL, '2025-09-14 13:14:31', '2025-09-14 13:14:31'),
 (2, 5, 'test2', '8989898989', 's@s.com', 'spouse', '2025-09-14', NULL, NULL, 0, NULL, '2025-09-14 13:14:58', '2025-09-14 13:14:58'),
 (3, 2, 'test2', '9999999999', 's@s.com', 'other', '2025-09-14', 'address', NULL, 0, NULL, '2025-09-14 14:42:13', '2025-09-14 14:42:13'),
-(4, 7, 'rupesh sahu', '8959176446', NULL, 'other', NULL, 'Ranjhi', NULL, 0, NULL, '2025-09-14 17:56:56', '2025-09-14 17:56:56');
+(15, 10, 'shivam kumar', '9508570649', 'siddharth.toss.cs@gmail.com', 'brother', '2025-09-12', 'wefst', NULL, 1, NULL, '2025-09-25 18:15:54', '2025-09-25 18:15:54'),
+(16, 11, 'Test', '7898140799', 'admintest@apatkal.com', 'daughter', '2025-09-25', NULL, NULL, 0, NULL, '2025-09-25 19:04:30', '2025-09-25 19:04:30'),
+(20, 26, 'Krishna Vishwakarma', '7869722272', 'toss125training@gmail.com', 'son', '2025-10-01', 'Toss solution Jabalpur', NULL, 1, NULL, '2025-09-27 13:59:40', '2025-09-27 13:59:40'),
+(0, 0, 'Gaus', '8770658824', 'kalmaliindia@gmail.com', 'other', NULL, '140 gohalpur ramnahar chitranjan ward jabalpur\r\nGohalpur\r\nJabalpur', NULL, 1, NULL, '2025-09-30 01:36:42', '2025-09-30 01:36:42');
 
 -- --------------------------------------------------------
 
@@ -250,8 +332,13 @@ CREATE TABLE `client_logins` (
 --
 
 INSERT INTO `client_logins` (`id`, `client_id`, `mobile_no`, `password`, `status`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 7, '8959176446', '$2y$10$NWQM8qmwRzKLhsyWO0qC2uXIo4amUu0/Mwtv40b6g3RZFI/rDd4fm', 'active', NULL, '2025-09-14 16:07:51', '2025-09-14 16:07:51'),
-(2, 10, '7694975579', '$2y$10$UpOM5JHhWgHXTZloy2hxmOqwOP/iOaLuQDF5R1ltk/gnbPzQoQNmG', 'active', NULL, '2025-09-17 15:43:50', '2025-09-17 15:43:50');
+(2, 10, '7694975579', '$2y$10$w9xJZuLM1exthm.mu/uKruxqKBy2jFEwNAxwPMxpCe5gSF7Fyg8xi', 'active', NULL, '2025-09-17 12:43:04', '2025-09-17 12:43:04'),
+(3, 11, '9508570649', '$2y$10$7js7HmTTivXLz4erd1bwx.Zb6U.EI.3lpivJnErHZAKadoSL9wtU2', 'active', NULL, '2025-09-17 15:25:38', '2025-09-22 15:46:08'),
+(16, 26, '8959176446', '$2y$10$w/J.IYdmt.IKe/0CDWrsTOpe5l.OhICXUNQ548yrpDdjCkedVAg66', 'active', NULL, '2025-09-27 13:37:09', '2025-09-27 13:37:09'),
+(20, 30, '7898140799', '$2y$10$YIO3Em0jcUaz76Bmh5H0zu5N8KJ.HNkqrC3RJ2.LyqPpa08cFmFZW', 'active', NULL, '2025-09-27 18:05:00', '2025-09-27 18:05:00'),
+(0, 0, '8827944207', '$2y$10$R/GC00v6JaZaYajBm7jUM.qKQzDcBvdoc9RxSZ5LoF52XWsgAdd6C', 'active', NULL, '2025-09-28 12:00:26', '2025-09-28 12:00:26'),
+(0, 0, '7898140799', '$2y$10$DZGIQcQUc/9SqTH6txk6VuBFyKxreRpRoYlvlNzIHWstOIJy2u9qq', 'active', NULL, '2025-09-28 14:54:17', '2025-09-28 14:54:17'),
+(0, 0, '7898684888', '$2y$10$r9oV.Aouce1lpJTTFXbgfexw41Vl5L2TVE.aRfNkgpItq4BjVmYFS', 'active', NULL, '2025-09-30 01:34:58', '2025-09-30 01:34:58');
 
 -- --------------------------------------------------------
 
@@ -305,15 +392,15 @@ INSERT INTO `components` (`id`, `section_id`, `type`, `content`, `extra_settings
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `component_stats`
--- (See below for the actual view)
+-- Table structure for table `component_stats`
 --
+
 CREATE TABLE `component_stats` (
-`type` enum('text','image','video','button','form','link','html_block','icon','card','list')
-,`total_components` bigint(21)
-,`active_components` bigint(21)
-,`inactive_components` bigint(21)
-);
+  `type` enum('text','image','video','button','form','link','html_block','icon','card','list') DEFAULT NULL,
+  `total_components` bigint(21) DEFAULT NULL,
+  `active_components` bigint(21) DEFAULT NULL,
+  `inactive_components` bigint(21) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -336,7 +423,10 @@ CREATE TABLE `contact_messages` (
 --
 
 INSERT INTO `contact_messages` (`id`, `name`, `mobile`, `email`, `message`, `status`, `created_at`) VALUES
-(1, 'test', '8959176446', 'test@test.com', 'test', 'new', '2025-09-13 18:40:52');
+(1, 'test', '8959176446', 'test@test.com', 'test', 'new', '2025-09-13 18:40:52'),
+(3, 'siddharth', '7888886523', 'siddharth.toss.cs@gmail.com', 'dffffffffffffff', 'new', '2025-09-17 08:07:31'),
+(4, 'siddharth', '7888886523', 'sidhusingh7898thakur@gmail.com', 'q', 'new', '2025-09-24 09:51:53'),
+(0, 'new', '9876543210', 'Toss125training@gmail.com', 'testing pr\r\n\r\n', 'new', '2025-09-29 06:14:40');
 
 -- --------------------------------------------------------
 
@@ -377,15 +467,16 @@ CREATE TABLE `drivers` (
   `rc_photo` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `drivers`
 --
 
 INSERT INTO `drivers` (`id`, `driver_name`, `email`, `password`, `number`, `address`, `vehicle_type`, `vehicle_number`, `model_rating`, `aadhar_photo`, `licence_photo`, `rc_photo`, `created_at`, `updated_at`) VALUES
-(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', 4.8, 'aadhar_rajash.jpg', 'licence_rajash.jpg', 'rc_rajash.jpg', '2025-09-24 11:22:18', '2025-09-25 09:12:54'),
-(2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'beohari mp', 'Ambulance', 'mp20mz4528', NULL, 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-tossconsultancyservices-atlassian-net-jira-software-projects-AWA-boards-101-2025-09-23-11_43_19.png', '2025-09-25 09:50:15', '2025-09-25 09:50:15');
+(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', 4.8, 'aadhar_rajash.jpg', 'licence_rajash.jpg', 'rc_rajash.jpg', '2025-09-24 05:52:18', '2025-09-25 03:42:54'),
+(2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'beohari mp', 'Ambulance', 'mp20mz4528', NULL, 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-103-14-120-163-8083-organization-2025-09-22-16_26_14.png', 'screencapture-tossconsultancyservices-atlassian-net-jira-software-projects-AWA-boards-101-2025-09-23-11_43_19.png', '2025-09-25 04:20:15', '2025-09-25 04:20:15'),
+(0, 'amit', 'kalmaliindia@gmail.com', '$2y$10$5umnfnk.EgxwjelKFomLLekkdsYdHe6FKGVNkGWILLhim6j1lgvna', '8770658824', 'jabalpur', 'ambulance', 'mp20ja6365', NULL, 'JPEG_20250927_235821_3502812970878090506.jpg', 'JPEG_20250927_235827_7286715491207715510.jpg', 'default_rc.jpg', '2025-09-27 18:28:45', '2025-09-27 18:28:45');
 
 -- --------------------------------------------------------
 
@@ -407,9 +498,9 @@ CREATE TABLE `earnings` (
 --
 
 INSERT INTO `earnings` (`id`, `driver_id`, `trip_id`, `amount`, `earning_date`, `created_time`) VALUES
-(1, 1, 5, 1500.00, '2025-09-20', '2025-09-20 03:50:00'),
-(2, 1, 7, 1800.00, '2025-09-23', '2025-09-22 11:00:00'),
-(3, 1, 9, 1800.00, '2025-09-25', '2025-09-25 04:25:00');
+(1, 1, 1, 1800.00, '2025-09-20', '2025-09-20 09:50:00'),
+(2, 1, 2, 2200.00, '2025-09-27', '2025-09-27 04:50:00'),
+(3, 1, 3, 1950.00, '2025-10-01', '2025-10-01 12:10:00');
 
 -- --------------------------------------------------------
 
@@ -502,6 +593,32 @@ INSERT INTO `emergency_team` (`id`, `name`, `phone`, `email`, `specialization`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `family_members`
+--
+
+CREATE TABLE `family_members` (
+  `id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `relationship` varchar(100) NOT NULL,
+  `mobile_no` varchar(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `family_members`
+--
+
+INSERT INTO `family_members` (`id`, `client_id`, `full_name`, `relationship`, `mobile_no`, `email`, `date_of_birth`, `address`, `created_at`, `updated_at`) VALUES
+(2, 10, 'shivam kumar', 'brother', '7723065844', 'siddharth.toss.cs@gmail.com', '2025-09-24', 'efwat', '2025-09-25 18:02:10', '2025-09-25 18:02:10');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `media`
 --
 
@@ -573,6 +690,36 @@ INSERT INTO `pages` (`id`, `name`, `slug`, `meta_title`, `meta_description`, `is
 (4, 'Plans', 'plan', 'Emergency Service Plans - Apatkal', 'Choose the perfect emergency service plan for your needs. Flexible options for individuals and families.', 1, '2025-09-13 08:01:19', '2025-09-13 08:01:19'),
 (5, 'FAQ', 'faq', 'Frequently Asked Questions - Apatkal', 'Find answers to common questions about Apatkal emergency services and how our system works.', 1, '2025-09-13 08:01:19', '2025-09-13 08:01:19'),
 (6, 'Submit Accident', 'submitaccident', 'Submit Accident Information - Apatkal', 'Report accident information to Apatkal emergency services for immediate assistance.', 1, '2025-09-13 08:01:19', '2025-09-13 08:01:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_transactions`
+--
+
+CREATE TABLE `payment_transactions` (
+  `id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_method` enum('phonepe','upi','card','netbanking','wallet','cash','cheque') NOT NULL DEFAULT 'phonepe',
+  `transaction_id` varchar(255) NOT NULL,
+  `gateway_transaction_id` varchar(255) DEFAULT NULL,
+  `gateway_response` text DEFAULT NULL,
+  `status` enum('pending','completed','failed','cancelled','refunded') DEFAULT 'pending',
+  `payment_date` datetime DEFAULT NULL,
+  `refund_date` datetime DEFAULT NULL,
+  `refund_amount` decimal(10,2) DEFAULT NULL,
+  `refund_reason` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `payment_transactions`
+--
+
+INSERT INTO `payment_transactions` (`id`, `client_id`, `amount`, `payment_method`, `transaction_id`, `gateway_transaction_id`, `gateway_response`, `status`, `payment_date`, `refund_date`, `refund_amount`, `refund_reason`, `created_at`, `updated_at`) VALUES
+(6, 26, 1000.00, 'phonepe', 'TXN_1758960451_26', NULL, NULL, 'pending', NULL, NULL, NULL, NULL, '2025-09-27 13:37:32', '2025-09-27 13:37:32');
 
 -- --------------------------------------------------------
 
@@ -669,6 +816,39 @@ INSERT INTO `site_settings` (`id`, `setting_key`, `setting_value`, `setting_type
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sms_logs`
+--
+
+CREATE TABLE `sms_logs` (
+  `id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL,
+  `family_member_id` int(11) DEFAULT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `message` text NOT NULL,
+  `status` enum('sent','failed','error') NOT NULL,
+  `api_response` text DEFAULT NULL,
+  `sent_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `sms_logs`
+--
+
+INSERT INTO `sms_logs` (`id`, `client_id`, `family_member_id`, `phone_number`, `message`, `status`, `api_response`, `sent_at`) VALUES
+(1, 5, 1, '8959176446', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.313965 S.848908 S.892029  \r\n', '2025-09-27 16:28:52'),
+(2, 5, 2, '8989898989', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.639130 S.182496 S.331208  \r\n', '2025-09-27 16:28:54'),
+(3, 5, 1, '8959176446', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.653595 S.602967 S.131318  \r\n', '2025-09-27 16:36:22'),
+(4, 5, 2, '8989898989', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.612244 S.392548 S.555054  \r\n', '2025-09-27 16:36:24'),
+(5, 5, 1, '8959176446', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.943970 S.456940 S.355042 ', '2025-09-27 16:36:36'),
+(6, 5, 2, '8989898989', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.401215 S.562256 S.787629  \r\n', '2025-09-27 16:36:40'),
+(7, 5, 1, '8959176446', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.92042 S.284211 S.465027  \r\n', '2025-09-27 16:36:50'),
+(8, 5, 2, '8989898989', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154991, Lng: 79.926007)\nCoordinates: 23.1549906,79.9260072\nMap Link: https://www.google.com/maps?q=23.1549906,79.9260072\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.15107 S.663941 S.308747  \r\n', '2025-09-27 16:36:51'),
+(9, 10, 15, '9508570649', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: 1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155051, Lng: 79.926004)\nCoordinates: 23.1550505,79.9260037\nMap Link: https://www.google.com/maps?q=23.1550505,79.9260037\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.263825 S.180481 S.892914  \r\n', '2025-09-27 17:10:04'),
+(10, 10, 15, '9508570649', '🚨 APATKAL EMERGENCY 🚨\n\nAccident Location: 1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155051, Lng: 79.926004)\nCoordinates: 23.1550505,79.9260037\nMap Link: https://www.google.com/maps?q=23.1550505,79.9260037\n\nEmergency Contact: 18005709696\nWebsite: https://apatkal.com', 'failed', 'S.742310 S.725983 S.930726  \r\n', '2025-09-27 17:10:05');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `trips`
 --
 
@@ -690,61 +870,10 @@ CREATE TABLE `trips` (
 --
 
 INSERT INTO `trips` (`history_id`, `driver_id`, `client_name`, `location`, `timing`, `amount`, `duration`, `start_time`, `end_time`, `created_at`) VALUES
-(5, 1, 'Ravi Sharma', 'Apollo Hospital, Bengaluru', '2025-09-20 03:00:00', 1500.00, 45, '2025-09-20 03:05:00', '2025-09-20 03:50:00', '2025-09-24 11:23:52'),
-(6, 1, 'Meera Patel', 'Fortis Hospital, Bengaluru', '2025-09-21 06:30:00', 2200.00, 60, '2025-09-21 06:35:00', NULL, '2025-09-24 11:23:52'),
-(7, 1, 'Amit Verma', 'Manipal Hospital, Bengaluru', '2025-09-22 10:15:00', 1800.00, 40, '2025-09-22 10:20:00', '2025-09-22 11:00:00', '2025-09-24 11:23:52'),
-(8, 1, 'Priya Singh', 'Narayana Hrudayalaya, Bengaluru', '2025-09-25 04:30:00', 2500.00, 75, NULL, NULL, '2025-09-24 11:23:52'),
-(9, 1, 'Sarah Johnson', 'Apollo Hospital, Bengaluru', '2025-09-25 03:30:00', 1800.00, 50, '2025-09-25 03:35:00', '2025-09-25 04:25:00', '2025-09-25 04:30:00');
-
---
--- Triggers `trips`
---
-DELIMITER $$
-CREATE TRIGGER `after_trip_completion` AFTER UPDATE ON `trips` FOR EACH ROW BEGIN
-    
-    IF OLD.end_time IS NULL AND NEW.end_time IS NOT NULL THEN
-        
-        INSERT INTO earnings (
-            driver_id, 
-            trip_id, 
-            amount, 
-            earning_date, 
-            created_time
-        ) VALUES (
-            NEW.driver_id,
-            NEW.history_id,
-            NEW.amount,
-            DATE(NEW.end_time),
-            NEW.end_time
-        );
-        
-        
-        INSERT INTO wallet (driver_id, balance, total_earned, total_withdrawn)
-        VALUES (NEW.driver_id, 0.00, 0.00, 0.00)
-        ON DUPLICATE KEY UPDATE 
-            balance = balance + NEW.amount,
-            total_earned = total_earned + NEW.amount;
-            
-        
-        INSERT INTO wallet_transactions (
-            driver_id, 
-            amount, 
-            transaction_type, 
-            description, 
-            type, 
-            created_at
-        ) VALUES (
-            NEW.driver_id,
-            NEW.amount,
-            'earning',
-            CONCAT('Trip Earning #', NEW.history_id),
-            'credit',
-            NEW.end_time
-        );
-    END IF;
-END
-$$
-DELIMITER ;
+(1, 1, 'Priya Sharma', 'Apollo Hospital, Indore', '2025-09-20 09:00:00', 1800.00, 45, '2025-09-20 09:05:00', '2025-09-20 09:50:00', '2025-09-20 09:00:00'),
+(2, 1, 'Rajesh Kumar', 'Fortis Hospital, Bhopal', '2025-09-27 03:45:00', 2200.00, 60, '2025-09-27 03:50:00', '2025-09-27 04:50:00', '2025-09-27 03:45:00'),
+(3, 1, 'Meera Patel', 'Manipal Hospital, Jabalpur', '2025-10-01 11:15:00', 1950.00, 50, '2025-10-01 11:20:00', '2025-10-01 12:10:00', '2025-10-01 11:15:00'),
+(4, 1, 'Vikram Singh', 'AIIMS Hospital, Delhi', '2025-10-02 06:00:00', 2800.00, 75, '2025-10-02 06:05:00', NULL, '2025-10-02 06:00:00');
 
 -- --------------------------------------------------------
 
@@ -780,72 +909,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `phone`, `password`, `username`, `date_of_birth`, `gender`, `address`, `city`, `state`, `pincode`, `profile_image`, `role`, `is_verified`, `is_active`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'Admin', 'User', 'admin@apatkal.com', '', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin', 0, 1, '2025-09-14 12:54:04', '2025-09-13 08:01:19', '2025-09-14 12:54:04'),
+(1, 'Admin', 'User', 'admin@apatkal.com', '', '$2y$10$X08cLsnl4.NvQxcshoKi8u1055krtrOM9eI/MGVzIShf0Bv5R48eC', 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin', 0, 1, '2025-09-30 14:45:10', '2025-09-13 08:01:19', '2025-09-30 14:45:10'),
 (2, 'Krishna', 'Vish', 'Toss125traininag@gmai.com', '7723065844', '$2y$10$pZ8DQ4CufH1drx2OF5qMnuPXgpPuWCT.Z5.wnHc38Oy7.HR036jVq', 'sales', NULL, NULL, '', NULL, NULL, NULL, NULL, 'sales', 0, 1, NULL, '2025-09-13 15:46:08', '2025-09-13 17:02:04'),
 (3, 'Sarah', 'Johnson', 'hr@apatkal.com', '9876543210', '$2y$10$wDNv.mYbXpnet7re8If.keP.NPDOHoLOXgsqJBK1YBITQi2aWKn6u', 'hr_manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'hr', 0, 1, NULL, '2025-09-13 16:58:30', '2025-09-13 16:59:37'),
 (4, 'Mike', 'Davis', 'sales@apatkal.com', '9876543211', '$2y$10$4AYUzkUaaGtu5nnXGguB4.aPA.DgfCprSC5hnBGj4Mm7H1wkt4sti', 'sales_rep', NULL, NULL, '', NULL, NULL, NULL, NULL, 'sales', 0, 1, '2025-09-14 14:17:26', '2025-09-13 16:58:30', '2025-09-14 14:17:26'),
 (5, 'Lisa', 'Wilson', 'office@apatkal.com', '9876543212', '$2y$10$w2eAWT7oUdswd6KDvTw0muJv4zVRsU35o10vMxLj/kBkyfnbv5nPC', 'office_staff', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'office_staff', 0, 1, NULL, '2025-09-13 16:58:30', '2025-09-13 16:59:37'),
 (6, 'David', 'Brown', 'manager@apatkal.com', '9876543213', '$2y$10$jV9jn2GjPqA7XJUP1p35ieUQNDbirBOZDRPE6pYsbpBq5zsGtwXAK', 'manager1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'manager', 0, 1, NULL, '2025-09-13 16:58:30', '2025-09-13 16:59:37'),
 (7, 'Emma', 'Garcia', 'supervisor@apatkal.com', '9876543214', '$2y$10$oSF8KFXrI.lOk.puE8igeOE5yeY/jNNSYaETcEHdqEhgVXqZVR3EC', 'supervisor1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'supervisor', 0, 1, NULL, '2025-09-13 16:58:30', '2025-09-13 16:59:37'),
-(8, 'Gulam', 'Gous', 'kalmaliindia@gmail.com', '8770658824', '$2y$10$FonFNbtwhX7uKdjK2J4rD.dXZ6L3O3GKUUfYhQBJ2/Mpsuyw4BIGK', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 0, 1, '2025-09-14 00:10:22', '2025-09-14 00:07:43', '2025-09-14 00:10:22');
-
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `user_emergency_contacts`
--- (See below for the actual view)
---
-CREATE TABLE `user_emergency_contacts` (
-`contact_id` int(11)
-,`user_id` int(11)
-,`first_name` varchar(100)
-,`last_name` varchar(100)
-,`contact_name` varchar(100)
-,`relationship` varchar(50)
-,`contact_phone` varchar(20)
-,`contact_email` varchar(100)
-,`is_primary` tinyint(1)
-);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `user_subscriptions`
---
-
-CREATE TABLE `user_subscriptions` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `plan_id` int(11) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `status` enum('active','expired','cancelled','suspended') DEFAULT 'active',
-  `payment_status` enum('pending','paid','failed','refunded') DEFAULT 'pending',
-  `amount_paid` decimal(10,2) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `vehicles`
---
-
-CREATE TABLE `vehicles` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `vehicle_number` varchar(20) NOT NULL,
-  `vehicle_type` enum('car','bike','truck','bus','other') NOT NULL,
-  `make` varchar(100) DEFAULT NULL,
-  `model` varchar(100) DEFAULT NULL,
-  `year` year(4) DEFAULT NULL,
-  `color` varchar(50) DEFAULT NULL,
-  `qr_code` varchar(255) NOT NULL,
-  `is_active` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+(8, 'Gulam', 'Gous', 'kalmaliindia@gmail.com', '8770658824', '$2y$10$FonFNbtwhX7uKdjK2J4rD.dXZ6L3O3GKUUfYhQBJ2/Mpsuyw4BIGK', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 0, 1, '2025-09-14 00:10:22', '2025-09-14 00:07:43', '2025-09-14 00:10:22'),
+(9, 'shivam', 'kumar', 'siddharth.toss.cs@gmail.com', '7723065844', '$2y$10$aUm.zWoadt.sD/2z8NfTCeUGGUwfSy8seH7ofmtoQ81xauAaM.RPS', 'shivam', NULL, NULL, 'frfre', NULL, NULL, NULL, NULL, 'supervisor', 0, 1, NULL, '2025-09-17 13:15:35', '2025-09-17 13:16:06'),
+(10, 'siddharth', 'singh', 'shreyash.toss.cs@gmail.com', '7898140799', '$2y$10$WxVsjnomImnEgZyqMhz9XeI6JB9BTUL02Q2KhqgNNa3OlYa.WssyS', 'siddharth', NULL, NULL, 'jbp', NULL, NULL, NULL, NULL, 'hr', 0, 1, NULL, '2025-09-23 15:10:59', '2025-09-24 11:25:17'),
+(11, 'aavi', 'thakur', 'sidhusingh7898thakur@gmail.com', '7898140799', '$2y$10$sN9jAh2LzTWxwcfT1s0NGuRnkAmvempf2LH0keRV54rN13hMC/xHW', 'aaavi', NULL, NULL, 'dsffsd', NULL, NULL, NULL, NULL, 'sales', 0, 0, NULL, '2025-09-24 11:27:41', '2025-09-24 15:31:43'),
+(12, 'Krishna', 'Vishwakarma', 'Toss125training@gmail.com', '7723065844', '$2y$10$ImdXHAGbRAbMY8GGOP3xE.zfwXSJYusqVUZeGkIaOVljqqaNX2Aq2', 'krishnaToss', NULL, NULL, '', NULL, NULL, NULL, NULL, 'hr', 0, 1, '2025-09-26 11:40:00', '2025-09-26 11:39:03', '2025-09-26 11:40:00');
 
 -- --------------------------------------------------------
 
@@ -868,8 +943,7 @@ CREATE TABLE `wallet` (
 --
 
 INSERT INTO `wallet` (`wallet_id`, `driver_id`, `balance`, `total_earned`, `total_withdrawn`, `created_at`, `updated_at`) VALUES
-(1, 1, 2900.00, 5100.00, 2200.00, '2025-09-25 05:04:00', '2025-09-25 10:23:10'),
-(3, 2, 0.00, 0.00, 0.00, '2025-09-25 09:50:15', '2025-09-25 10:18:18');
+(0, 1, 2250.00, 5950.00, 3700.00, '2025-08-01 04:30:00', '2025-10-01 08:08:11');
 
 -- --------------------------------------------------------
 
@@ -883,7 +957,7 @@ CREATE TABLE `website_config` (
   `config_value` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -910,251 +984,25 @@ CREATE TABLE `withdrawals` (
 --
 
 INSERT INTO `withdrawals` (`withdrawal_id`, `driver_id`, `amount`, `bank_account_number`, `bank_name`, `ifsc_code`, `account_holder_name`, `status`, `requested_at`, `processed_at`, `notes`) VALUES
-(1, 1, 500.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-20 05:00:00', '2025-09-21 08:50:00', 'Monthly withdrawal - September'),
-(2, 1, 450.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-15 11:15:00', '2025-09-16 06:00:00', 'Emergency withdrawal'),
-(3, 1, 400.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-25 13:00:00', NULL, 'Current withdrawal request'),
-(4, 1, 600.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-05 08:50:00', '2025-09-06 04:45:00', 'Weekly withdrawal'),
-(5, 1, 250.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-08-30 06:15:00', '2025-08-31 04:00:00', 'Emergency withdrawal');
-
--- --------------------------------------------------------
-
---
--- Structure for view `active_emergencies`
---
-DROP TABLE IF EXISTS `active_emergencies`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`edueyeco`@`localhost` SQL SECURITY DEFINER VIEW `active_emergencies`  AS SELECT `ei`.`id` AS `incident_id`, `ei`.`user_id` AS `user_id`, `u`.`first_name` AS `first_name`, `u`.`last_name` AS `last_name`, `u`.`phone` AS `phone`, `ei`.`incident_type` AS `incident_type`, `ei`.`location` AS `location`, `ei`.`status` AS `status`, `ei`.`priority` AS `priority`, `ei`.`reported_at` AS `reported_at` FROM (`emergency_incidents` `ei` join `users` `u` on(`ei`.`user_id` = `u`.`id`)) WHERE `ei`.`status` in ('reported','dispatched','in_progress') ;
-
--- --------------------------------------------------------
-
---
--- Structure for view `active_pages_content`
---
-DROP TABLE IF EXISTS `active_pages_content`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`edueyeco`@`localhost` SQL SECURITY DEFINER VIEW `active_pages_content`  AS SELECT `p`.`id` AS `page_id`, `p`.`name` AS `page_name`, `p`.`slug` AS `slug`, `p`.`meta_title` AS `meta_title`, `p`.`meta_description` AS `meta_description`, `s`.`id` AS `section_id`, `s`.`name` AS `section_name`, `s`.`order_number` AS `section_order`, `c`.`id` AS `component_id`, `c`.`type` AS `component_type`, `c`.`content` AS `content`, `c`.`extra_settings` AS `extra_settings`, `c`.`order_number` AS `component_order` FROM ((`pages` `p` left join `sections` `s` on(`p`.`id` = `s`.`page_id` and `s`.`is_active` = 1)) left join `components` `c` on(`s`.`id` = `c`.`section_id` and `c`.`is_active` = 1)) WHERE `p`.`is_active` = 1 ORDER BY `p`.`id` ASC, `s`.`order_number` ASC, `c`.`order_number` ASC ;
-
--- --------------------------------------------------------
-
---
--- Structure for view `component_stats`
---
-DROP TABLE IF EXISTS `component_stats`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`edueyeco`@`localhost` SQL SECURITY DEFINER VIEW `component_stats`  AS SELECT `c`.`type` AS `type`, count(0) AS `total_components`, count(case when `c`.`is_active` = 1 then 1 end) AS `active_components`, count(case when `c`.`is_active` = 0 then 1 end) AS `inactive_components` FROM `components` AS `c` GROUP BY `c`.`type` ;
-
--- --------------------------------------------------------
-
---
--- Structure for view `user_emergency_contacts`
---
-DROP TABLE IF EXISTS `user_emergency_contacts`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`edueyeco`@`localhost` SQL SECURITY DEFINER VIEW `user_emergency_contacts`  AS SELECT `ec`.`id` AS `contact_id`, `ec`.`user_id` AS `user_id`, `u`.`first_name` AS `first_name`, `u`.`last_name` AS `last_name`, `ec`.`name` AS `contact_name`, `ec`.`relationship` AS `relationship`, `ec`.`phone` AS `contact_phone`, `ec`.`email` AS `contact_email`, `ec`.`is_primary` AS `is_primary` FROM (`emergency_contacts` `ec` join `users` `u` on(`ec`.`user_id` = `u`.`id`)) WHERE `ec`.`is_active` = 1 ;
+(1, 1, 1000.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-21 05:00:00', '2025-09-22 08:50:00', 'Withdrawal after Sep 20 trip'),
+(2, 1, 1500.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-28 05:45:00', '2025-09-29 11:00:00', 'Withdrawal after Sep 27 trip'),
+(3, 1, 1200.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-10-02 04:15:00', '2025-10-02 04:15:00', 'Withdrawal after Oct 1 trip');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `accidents`
---
-ALTER TABLE `accidents`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `accident_photos`
---
-ALTER TABLE `accident_photos`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `accident_reports`
---
-ALTER TABLE `accident_reports`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `clients`
---
-ALTER TABLE `clients`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_mobile_no` (`mobile_no`),
-  ADD UNIQUE KEY `unique_vehicle_no` (`vehicle_no`),
-  ADD KEY `added_by` (`added_by`),
-  ADD KEY `assigned_staff` (`assigned_staff`);
-
---
--- Indexes for table `client_family_members`
---
-ALTER TABLE `client_family_members`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_client_family_client_id` (`client_id`),
-  ADD KEY `idx_client_family_relationship` (`relationship`),
-  ADD KEY `idx_client_family_emergency` (`is_emergency_contact`);
-
---
--- Indexes for table `client_logins`
---
-ALTER TABLE `client_logins`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_mobile_login` (`mobile_no`),
-  ADD KEY `client_id` (`client_id`);
-
---
--- Indexes for table `components`
---
-ALTER TABLE `components`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_components_section` (`section_id`),
-  ADD KEY `idx_components_type` (`type`),
-  ADD KEY `idx_components_order` (`order_number`);
-
---
--- Indexes for table `contact_messages`
---
-ALTER TABLE `contact_messages`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `contact_submissions`
---
-ALTER TABLE `contact_submissions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_contact_submissions_status` (`status`),
-  ADD KEY `idx_contact_submissions_created` (`created_at`);
-
---
--- Indexes for table `drivers`
---
-ALTER TABLE `drivers`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
 -- Indexes for table `earnings`
 --
 ALTER TABLE `earnings`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `driver_id` (`driver_id`),
-  ADD KEY `idx_earnings_trip_completion` (`trip_id`,`created_time`);
-
---
--- Indexes for table `emergency_contacts`
---
-ALTER TABLE `emergency_contacts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `emergency_dispatch`
---
-ALTER TABLE `emergency_dispatch`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `incident_id` (`incident_id`),
-  ADD KEY `team_id` (`team_id`);
-
---
--- Indexes for table `emergency_incidents`
---
-ALTER TABLE `emergency_incidents`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `vehicle_id` (`vehicle_id`),
-  ADD KEY `idx_emergency_incidents_user` (`user_id`),
-  ADD KEY `idx_emergency_incidents_status` (`status`),
-  ADD KEY `idx_emergency_incidents_reported` (`reported_at`);
-
---
--- Indexes for table `emergency_team`
---
-ALTER TABLE `emergency_team`
   ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `media`
---
-ALTER TABLE `media`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_media_type` (`type`);
-
---
--- Indexes for table `navigation_menus`
---
-ALTER TABLE `navigation_menus`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `parent_id` (`parent_id`);
-
---
--- Indexes for table `pages`
---
-ALTER TABLE `pages`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `slug` (`slug`),
-  ADD KEY `idx_pages_slug` (`slug`),
-  ADD KEY `idx_pages_active` (`is_active`);
-
---
--- Indexes for table `sections`
---
-ALTER TABLE `sections`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_sections_page` (`page_id`),
-  ADD KEY `idx_sections_order` (`order_number`);
-
---
--- Indexes for table `service_plans`
---
-ALTER TABLE `service_plans`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `site_settings`
---
-ALTER TABLE `site_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `setting_key` (`setting_key`);
 
 --
 -- Indexes for table `trips`
 --
 ALTER TABLE `trips`
-  ADD PRIMARY KEY (`history_id`),
-  ADD KEY `driver_id` (`driver_id`),
-  ADD KEY `idx_trips_completion` (`end_time`,`driver_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `idx_users_email` (`email`),
-  ADD KEY `idx_users_phone` (`phone`);
-
---
--- Indexes for table `user_subscriptions`
---
-ALTER TABLE `user_subscriptions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `plan_id` (`plan_id`);
-
---
--- Indexes for table `vehicles`
---
-ALTER TABLE `vehicles`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `qr_code` (`qr_code`),
-  ADD KEY `idx_vehicles_user` (`user_id`),
-  ADD KEY `idx_vehicles_qr` (`qr_code`);
-
---
--- Indexes for table `wallet`
---
-ALTER TABLE `wallet`
-  ADD PRIMARY KEY (`wallet_id`),
-  ADD UNIQUE KEY `driver_id` (`driver_id`);
+  ADD PRIMARY KEY (`history_id`);
 
 --
 -- Indexes for table `website_config`
@@ -1167,168 +1015,23 @@ ALTER TABLE `website_config`
 -- Indexes for table `withdrawals`
 --
 ALTER TABLE `withdrawals`
-  ADD PRIMARY KEY (`withdrawal_id`),
-  ADD KEY `driver_id` (`driver_id`);
+  ADD PRIMARY KEY (`withdrawal_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `accidents`
---
-ALTER TABLE `accidents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT for table `accident_photos`
---
-ALTER TABLE `accident_photos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `accident_reports`
---
-ALTER TABLE `accident_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `clients`
---
-ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `client_family_members`
---
-ALTER TABLE `client_family_members`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `client_logins`
---
-ALTER TABLE `client_logins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `components`
---
-ALTER TABLE `components`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT for table `contact_messages`
---
-ALTER TABLE `contact_messages`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `contact_submissions`
---
-ALTER TABLE `contact_submissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `drivers`
---
-ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT for table `earnings`
 --
 ALTER TABLE `earnings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `emergency_contacts`
---
-ALTER TABLE `emergency_contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `emergency_dispatch`
---
-ALTER TABLE `emergency_dispatch`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `emergency_incidents`
---
-ALTER TABLE `emergency_incidents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `emergency_team`
---
-ALTER TABLE `emergency_team`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `media`
---
-ALTER TABLE `media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `navigation_menus`
---
-ALTER TABLE `navigation_menus`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `pages`
---
-ALTER TABLE `pages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `sections`
---
-ALTER TABLE `sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `service_plans`
---
-ALTER TABLE `service_plans`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `site_settings`
---
-ALTER TABLE `site_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `trips`
 --
 ALTER TABLE `trips`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `user_subscriptions`
---
-ALTER TABLE `user_subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `vehicles`
---
-ALTER TABLE `vehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `wallet`
---
-ALTER TABLE `wallet`
-  MODIFY `wallet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `website_config`
@@ -1340,105 +1043,7 @@ ALTER TABLE `website_config`
 -- AUTO_INCREMENT for table `withdrawals`
 --
 ALTER TABLE `withdrawals`
-  MODIFY `withdrawal_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `clients`
---
-ALTER TABLE `clients`
-  ADD CONSTRAINT `clients_ibfk_1` FOREIGN KEY (`added_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `clients_ibfk_2` FOREIGN KEY (`assigned_staff`) REFERENCES `users` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `client_family_members`
---
-ALTER TABLE `client_family_members`
-  ADD CONSTRAINT `client_family_members_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `client_logins`
---
-ALTER TABLE `client_logins`
-  ADD CONSTRAINT `client_logins_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `components`
---
-ALTER TABLE `components`
-  ADD CONSTRAINT `components_ibfk_1` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `earnings`
---
-ALTER TABLE `earnings`
-  ADD CONSTRAINT `earnings_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `emergency_contacts`
---
-ALTER TABLE `emergency_contacts`
-  ADD CONSTRAINT `emergency_contacts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `emergency_dispatch`
---
-ALTER TABLE `emergency_dispatch`
-  ADD CONSTRAINT `emergency_dispatch_ibfk_1` FOREIGN KEY (`incident_id`) REFERENCES `emergency_incidents` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `emergency_dispatch_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `emergency_team` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `emergency_incidents`
---
-ALTER TABLE `emergency_incidents`
-  ADD CONSTRAINT `emergency_incidents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `emergency_incidents_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `navigation_menus`
---
-ALTER TABLE `navigation_menus`
-  ADD CONSTRAINT `navigation_menus_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `navigation_menus` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `sections`
---
-ALTER TABLE `sections`
-  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `trips`
---
-ALTER TABLE `trips`
-  ADD CONSTRAINT `trips_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `user_subscriptions`
---
-ALTER TABLE `user_subscriptions`
-  ADD CONSTRAINT `user_subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `user_subscriptions_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `service_plans` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `vehicles`
---
-ALTER TABLE `vehicles`
-  ADD CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `wallet`
---
-ALTER TABLE `wallet`
-  ADD CONSTRAINT `wallet_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `withdrawals`
---
-ALTER TABLE `withdrawals`
-  ADD CONSTRAINT `withdrawals_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE;
+  MODIFY `withdrawal_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

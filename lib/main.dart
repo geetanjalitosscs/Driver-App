@@ -147,7 +147,7 @@ class _MainScreenState extends State<MainScreen> {
                   label: 'Trips',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications),
+                  icon: Icon(Icons.currency_rupee),
                   label: 'Earnings',
                 ),
                 BottomNavigationBarItem(
