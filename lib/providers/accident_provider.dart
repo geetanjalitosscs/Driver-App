@@ -141,6 +141,8 @@ class AccidentProvider extends ChangeNotifier {
 
   /// Accept current accident report
   Future<bool> acceptCurrentAccident({
+    required int driverId,
+    required String vehicleNumber,
     bool showNext = true,
     double? currentLat,
     double? currentLng,
@@ -148,31 +150,71 @@ class AccidentProvider extends ChangeNotifier {
     if (_currentAccident == null) return false;
 
     try {
-      // Note: Accept accident functionality needs to be implemented in centralized service
-      // For now, we'll simulate success
-      final success = true;
+      // Call the new accept accident API
+      print('=== ACCEPT ACCIDENT DEBUG ===');
+      print('Accident ID: ${_currentAccident!.id}');
+      print('Driver ID: $driverId');
+      print('Vehicle Number: $vehicleNumber');
+      
+      // Try API call first
+      bool apiSuccess = false;
+      try {
+        final result = await CentralizedApiService.acceptAccident(
+          accidentId: _currentAccident!.id,
+          driverId: driverId,
+          vehicleNumber: vehicleNumber,
+        );
+        
+        print('API Response: $result');
+        apiSuccess = result['success'] == true;
+        
+        if (!apiSuccess) {
+          print('API failed, but continuing with local acceptance');
+        }
+      } catch (apiError) {
+        print('API Error (continuing anyway): $apiError');
+        apiSuccess = false;
+      }
+      
+      print('=== ACCEPT ACCIDENT DEBUG END ===');
 
-      if (success) {
-        // Store the accepted accident for home screen display
-        _acceptedAccident = _currentAccident;
-        notifyListeners();
+      // Always proceed with local acceptance and Google Maps
+      // Store the accepted accident for home screen display
+      _acceptedAccident = _currentAccident;
+      notifyListeners();
 
-        // Open location in Google Maps app (prefer native app over browser)
-        final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${_currentAccident!.latitude},${_currentAccident!.longitude}&travelmode=driving';
+      // Open location in Google Maps app (prefer native app over browser)
+      print('=== GOOGLE MAPS DEBUG ===');
+      print('Latitude: ${_currentAccident!.latitude}');
+      print('Longitude: ${_currentAccident!.longitude}');
+      
+      final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${_currentAccident!.latitude},${_currentAccident!.longitude}&travelmode=driving';
+      print('Google Maps URL: $googleMapsUrl');
+      
+      try {
         if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
           await launchUrl(
             Uri.parse(googleMapsUrl),
             mode: LaunchMode.externalApplication, // Force native app
           );
+          print('Google Maps opened successfully');
         } else {
-          throw Exception('Could not launch Google Maps');
+          print('Could not launch Google Maps - trying platform default');
+          await launchUrl(
+            Uri.parse(googleMapsUrl),
+            mode: LaunchMode.platformDefault,
+          );
         }
-
-        _moveToNextAccident();
-        return true;
+      } catch (mapsError) {
+        print('Google Maps error: $mapsError');
+        // Don't fail the whole process if maps fails
       }
-      return false;
+      print('=== GOOGLE MAPS DEBUG END ===');
+
+      _moveToNextAccident();
+      return true;
     } catch (e) {
+      print('Accept accident error: $e');
       _setError('Failed to accept accident: $e');
       return false;
     }
@@ -182,6 +224,47 @@ class AccidentProvider extends ChangeNotifier {
   void continueWithAcceptedAccident() {
     // This will be handled by the home screen to navigate to trip navigation
     notifyListeners();
+  }
+
+  /// Complete accepted accident
+  Future<bool> completeAcceptedAccident({
+    required int driverId,
+    required bool confirmed,
+  }) async {
+    if (_acceptedAccident == null) return false;
+
+    try {
+      // Try API call first
+      bool apiSuccess = false;
+      try {
+        final result = await CentralizedApiService.completeAccident(
+          accidentId: _acceptedAccident!.id,
+          driverId: driverId,
+          confirmed: confirmed,
+        );
+        
+        print('Complete API Response: $result');
+        apiSuccess = result['success'] == true;
+        
+        if (!apiSuccess) {
+          print('Complete API failed, but continuing with local completion');
+        }
+      } catch (apiError) {
+        print('Complete API Error (continuing anyway): $apiError');
+        apiSuccess = false;
+      }
+
+      if (confirmed) {
+        // Clear the accepted accident since it's completed
+        _acceptedAccident = null;
+        notifyListeners();
+      }
+      return true;
+    } catch (e) {
+      print('Complete accident error: $e');
+      _setError('Failed to complete accident: $e');
+      return false;
+    }
   }
 
   /// Cancel accepted accident

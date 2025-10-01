@@ -1353,11 +1353,67 @@ class CentralizedApiService {
     return null;
   }
 
-}
+  // ============================================================================
+  // ACCIDENT DRIVER ACCEPTANCE APIs
+  // ============================================================================
 
-// ============================================================================
-// SUPPORTING CLASSES
-// ============================================================================
+  /// Accept an accident report
+  static Future<Map<String, dynamic>> acceptAccident({
+    required int accidentId,
+    required int driverId,
+    required String vehicleNumber,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_accidentBaseUrl/get_accidents.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'action': 'accept_accident',
+          'accident_id': accidentId,
+          'driver_id': driverId,
+          'vehicle_number': vehicleNumber,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Accept accident failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Accept accident error: $e');
+    }
+  }
+
+  /// Complete an accident report
+  static Future<Map<String, dynamic>> completeAccident({
+    required int accidentId,
+    required int driverId,
+    required bool confirmed,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_accidentBaseUrl/get_accidents.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'action': 'complete_accident',
+          'accident_id': accidentId,
+          'driver_id': driverId,
+          'confirmed': confirmed,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Complete accident failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Complete accident error: $e');
+    }
+  }
+
+}
 
 /// Bank Account Model
 class BankAccount {

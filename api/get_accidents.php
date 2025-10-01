@@ -1,12 +1,71 @@
 <?php
-require_once '../db_config.php';
+require_once './db_config.php';
 
 setApiHeaders();
 
 try {
     $pdo = getDatabaseConnection();
     
-    // Fetch accidents
+    // Handle POST requests for updating accident status
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (isset($input['action'])) {
+            if ($input['action'] === 'accept_accident') {
+                // Accept accident
+                $accident_id = intval($input['accident_id']);
+                $driver_id = intval($input['driver_id']);
+                $vehicle_number = trim($input['vehicle_number']);
+                
+                $driver_details = "Driver ID: " . $driver_id . " | Vehicle: " . $vehicle_number;
+                
+                // Update accident - driver_status starts as NULL, so we check for NULL or 'available'
+                $updateStmt = $pdo->prepare("UPDATE accidents SET 
+                    driver_details = ?, 
+                    driver_status = 'assigned',
+                    accepted_at = NOW()
+                    WHERE id = ? AND status = 'pending' AND (driver_status IS NULL OR driver_status = 'available')");
+                
+                if ($updateStmt->execute([$driver_details, $accident_id])) {
+                    $affected_rows = $updateStmt->rowCount();
+                    if ($affected_rows > 0) {
+                        echo json_encode(['success' => true, 'message' => 'Accident accepted successfully', 'affected_rows' => $affected_rows]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'No rows updated - accident may not exist or already assigned', 'affected_rows' => $affected_rows]);
+                    }
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to accept accident - SQL execution failed']);
+                }
+                exit;
+                
+            } elseif ($input['action'] === 'complete_accident') {
+                // Complete accident
+                $accident_id = intval($input['accident_id']);
+                $driver_id = intval($input['driver_id']);
+                $confirmed = $input['confirmed'] ?? false;
+                
+                if ($confirmed) {
+                    $updateStmt = $pdo->prepare("UPDATE accidents SET 
+                        driver_status = 'completed',
+                        completed_at = NOW(),
+                        completion_confirmed = TRUE,
+                        status = 'resolved'
+                        WHERE id = ?");
+                    
+                    if ($updateStmt->execute([$accident_id])) {
+                        echo json_encode(['success' => true, 'message' => 'Accident completed successfully']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Failed to complete accident']);
+                    }
+                } else {
+                    echo json_encode(['success' => true, 'message' => 'Completion cancelled']);
+                }
+                exit;
+            }
+        }
+    }
+    
+    // Default: Fetch accidents
     $stmt = $pdo->prepare("SELECT * FROM accidents WHERE status = 'pending' ORDER BY created_at DESC");
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);

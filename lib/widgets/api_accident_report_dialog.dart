@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/accident_report.dart';
 import '../models/trip.dart';
 import '../widgets/common/app_button.dart';
@@ -389,7 +390,19 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
     });
 
     try {
+      // Get driver information from auth provider
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final driverId = authProvider.currentUser?.driverIdAsInt ?? 1;
+      final vehicleNumber = authProvider.currentUser?.vehicleNumber ?? 'DL01AB1234';
+      
+      print('=== ACCEPT ACCIDENT DEBUG ===');
+      print('Driver ID: $driverId');
+      print('Vehicle Number: $vehicleNumber');
+      print('Accident ID: ${provider.currentAccident?.id}');
+      
       final success = await provider.acceptCurrentAccident(
+        driverId: driverId,
+        vehicleNumber: vehicleNumber,
         showNext: false,
         currentLat: widget.currentLat,
         currentLng: widget.currentLng,

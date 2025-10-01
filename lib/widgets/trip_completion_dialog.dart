@@ -211,8 +211,9 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
               ),
             ),
 
-            // Error Message
-            if (_errorMessage != null) ...[
+            // Error Message - HIDDEN (but keep the logic)
+            // Validation is hidden but the popup still works
+            if (false && _errorMessage != null) ...[
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),

@@ -10,8 +10,8 @@
 $db_config = [
     'host' => 'localhost',
     'dbname' => 'edueyeco_apatkal',
-    'username' => 'root',
-    'password' => '',
+    'username' => 'edueyeco_apatkal',
+    'password' => 'edueyeco_apatkal',
     'charset' => 'utf8mb4'
 ];
 

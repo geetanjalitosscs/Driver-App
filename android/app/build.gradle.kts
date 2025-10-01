@@ -19,6 +19,8 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+        // Disable incremental compilation
+        freeCompilerArgs += listOf("-Xno-incremental")
     }
 
     defaultConfig {
@@ -31,6 +33,9 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         multiDexEnabled = true
+        
+        // Set APK name
+        setProperty("archivesBaseName", "Apatkal-Driver-App")
     }
 
     buildTypes {

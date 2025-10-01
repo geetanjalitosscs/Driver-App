@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/trip_provider.dart';
 import '../providers/accident_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
@@ -284,23 +285,26 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       return;
     }
 
+    // DISABLED: Distance and time validation (as requested)
+    // The validation logic is kept but commented out to preserve the code
+    
     // Check minimum distance/time criteria
-    final distance = Geolocator.distanceBetween(
-      _currentLocation!.latitude,
-      _currentLocation!.longitude,
-      _endLocation!.latitude,
-      _endLocation!.longitude,
-    );
+    // final distance = Geolocator.distanceBetween(
+    //   _currentLocation!.latitude,
+    //   _currentLocation!.longitude,
+    //   _endLocation!.latitude,
+    //   _endLocation!.longitude,
+    // );
 
-    if (distance > MapsConfig.tripCompletionRadius) {
-      _showError('You must be within ${MapsConfig.tripCompletionRadius}m of the destination to complete the trip');
-      return;
-    }
+    // if (distance > MapsConfig.tripCompletionRadius) {
+    //   _showError('You must be within ${MapsConfig.tripCompletionRadius}m of the destination to complete the trip');
+    //   return;
+    // }
 
-    if (_tripDuration.inMinutes < MapsConfig.minimumTripDuration) {
-      _showError('Trip must be at least ${MapsConfig.minimumTripDuration} minutes long to complete');
-      return;
-    }
+    // if (_tripDuration.inMinutes < MapsConfig.minimumTripDuration) {
+    //   _showError('Trip must be at least ${MapsConfig.minimumTripDuration} minutes long to complete');
+    //   return;
+    // }
 
     // Show completion dialog
     final result = await showDialog<bool>(
@@ -348,22 +352,28 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   Future<void> _finalizeTrip() async {
+    // Show confirmation popup
+    final confirmed = await _showCompletionConfirmation();
+    
+    if (!confirmed) {
+      // User clicked "No" - just close popup, don't remove km validation
+      return;
+    }
+    
+    // User clicked "Yes" - proceed with completion
     try {
-      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      // Get driver information
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final driverId = authProvider.currentUser?.driverIdAsInt ?? 1;
       
-      final result = await tripProvider.completeTrip(
-        tripId: widget.trip.historyId,
-        driverId: widget.trip.driverId,
-        endLatitude: _currentLocation!.latitude,
-        endLongitude: _currentLocation!.longitude,
-        endLocation: widget.trip.location,
+      // Complete the accident using the new API
+      final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+      final success = await accidentProvider.completeAcceptedAccident(
+        driverId: driverId,
+        confirmed: true,
       );
 
-      if (result['success'] == true) {
-        // Clear the accepted accident since trip is completed
-        final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-        accidentProvider.cancelAcceptedAccident();
-        
+      if (success) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -372,11 +382,34 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
           ),
         );
       } else {
-        _showError(result['message'] ?? 'Failed to complete trip');
+        _showError('Failed to complete trip');
       }
     } catch (e) {
       _showError('Error completing trip: $e');
     }
+  }
+
+  Future<bool> _showCompletionConfirmation() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Complete Trip'),
+          content: const Text('Are you sure this trip is completed?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
   void _showError(String message) {
