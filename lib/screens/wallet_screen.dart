@@ -21,7 +21,7 @@ class _WalletScreenState extends State<WalletScreen> {
   final List<Map<String, String>> _periods = [
     {'value': 'all', 'label': 'All'},
     {'value': 'today', 'label': 'Today'},
-    {'value': 'week', 'label': 'This Week'},
+    {'value': 'week', 'label': 'Last 7 Days'},
     {'value': 'month', 'label': 'This Month'},
     {'value': 'year', 'label': 'This Year'},
   ];

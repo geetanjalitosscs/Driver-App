@@ -21,7 +21,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   final List<Map<String, String>> _periods = [
     {'value': 'all', 'label': 'All'},
     {'value': 'today', 'label': 'Today'},
-    {'value': 'week', 'label': 'This Week'},
+    {'value': 'week', 'label': 'Last 7 Days'},
     {'value': 'month', 'label': 'This Month'},
     {'value': 'year', 'label': 'This Year'},
   ];
@@ -44,10 +44,12 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     
     if (authProvider.currentUser != null) {
       final driverId = authProvider.currentUser!.driverIdAsInt;
-        await Future.wait([
-          tripProvider.loadCompletedTrips(driverId),
-          earningsProvider.loadDriverEarnings(driverId, 'all'), // Always load ALL earnings for summary
-        ]);
+      // Set period first to ensure proper filtering
+      tripProvider.setPeriod(_selectedPeriod);
+      await Future.wait([
+        tripProvider.loadCompletedTrips(driverId),
+        earningsProvider.loadDriverEarnings(driverId, _selectedPeriod), // Load earnings for selected period
+      ]);
     }
   }
 
@@ -102,7 +104,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Error loading trips',
+                    'Unable to load trips',
                     style: GoogleFonts.roboto(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -111,7 +113,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    tripProvider.errorMessage!,
+                    'Please check your internet connection and try again',
                     style: GoogleFonts.roboto(
                       fontSize: 14,
                       color: Colors.grey[500],
@@ -175,17 +177,17 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Trip Summary',
+            '${_getPeriodDisplayName(_selectedPeriod)} Trip Summary',
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              // Define card data - ALWAYS show ALL trips data (not filtered)
+              // Define card data - show filtered trips data based on selected period
               final cards = [
                 {
                   'title': 'Total Trips',
-                  'value': '${tripProvider.completedTrips.length}', // Use all trips, not filtered
+                  'value': '${tripProvider.filteredCompletedTrips.length}', // Use filtered trips
                   'icon': Icons.local_taxi,
                   'color': AppTheme.primaryBlue,
                 },
@@ -202,7 +204,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   'color': AppTheme.accentOrange,
                 },
                 {
-                  'title': 'This Week',
+                      'title': 'Last 7 Days',
                   'value': '₹${earningsProvider.weeklyTotal.toStringAsFixed(0)}',
                   'icon': Icons.date_range,
                   'color': AppTheme.accentPurple,
@@ -507,6 +509,23 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     }
   }
 
+  String _getPeriodDisplayName(String period) {
+    switch (period) {
+      case 'all':
+        return 'All';
+      case 'today':
+        return 'Today';
+      case 'week':
+        return 'Last 7 Days';
+      case 'month':
+        return 'This Month';
+      case 'year':
+        return 'This Year';
+      default:
+        return 'All';
+    }
+  }
+
   Widget _buildFilterSection() {
     return AppCard(
       child: Column(
@@ -541,9 +560,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 final tripProvider = Provider.of<TripProvider>(context, listen: false);
                 
                 if (authProvider.currentUser != null) {
-                  // Reload trips data for the new period
-                  await tripProvider.loadCompletedTrips(authProvider.currentUser!.driverIdAsInt);
+                  final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+                  // Set period first to ensure proper filtering
                   tripProvider.setPeriod(_selectedPeriod);
+                  // Reload trips and earnings data for the new period
+                  await Future.wait([
+                    tripProvider.loadCompletedTrips(authProvider.currentUser!.driverIdAsInt),
+                    earningsProvider.loadDriverEarnings(authProvider.currentUser!.driverIdAsInt, _selectedPeriod),
+                  ]);
                 }
               }
             },

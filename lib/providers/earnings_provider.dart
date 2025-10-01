@@ -9,6 +9,7 @@ class EarningsProvider extends ChangeNotifier {
   List<Earning> _earnings = [];
   List<Earning> _recentEarnings = [];
   Map<String, dynamic> _summary = {};
+  Map<String, dynamic> _allTimeSummary = {}; // Always shows all-time data
   List<Map<String, dynamic>> _weeklyData = [];
   
   bool _isLoading = false;
@@ -19,6 +20,7 @@ class EarningsProvider extends ChangeNotifier {
   List<Earning> get earnings => _earnings;
   List<Earning> get recentEarnings => _recentEarnings;
   Map<String, dynamic> get summary => _summary;
+  Map<String, dynamic> get allTimeSummary => _allTimeSummary; // Always shows all-time data
   List<Map<String, dynamic>> get weeklyData => _weeklyData;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -33,15 +35,41 @@ class EarningsProvider extends ChangeNotifier {
 
     try {
       // Load earnings for the selected period
-      _earnings = await CentralizedApiService.getDriverEarnings(
-        driverId: driverId,
-        period: period,
-      );
+      if (period == 'week') {
+        // For week period, load all data and filter client-side to ensure last 7 days
+        final allEarnings = await CentralizedApiService.getDriverEarnings(
+          driverId: driverId,
+          period: 'all',
+        );
+        
+        // Filter for last 7 days
+        final now = DateTime.now();
+        final sevenDaysAgo = now.subtract(const Duration(days: 7));
+        
+        _earnings = allEarnings.where((earning) {
+          return earning.earningDate.isAfter(sevenDaysAgo);
+        }).toList();
+        
+        print('Loaded ${allEarnings.length} total earnings, filtered to ${_earnings.length} for last 7 days');
+      } else {
+        _earnings = await CentralizedApiService.getDriverEarnings(
+          driverId: driverId,
+          period: period,
+        );
+        print('Loaded ${_earnings.length} earnings');
+      }
 
-      print('Loaded ${_earnings.length} earnings');
-
-      // Calculate summary from earnings data
+      // Calculate summary from filtered earnings data
       await _calculateSummaryWithTrips(driverId);
+
+      // Load all-time data for summary card (only if not already loaded or if period is 'all')
+      if (_allTimeSummary.isEmpty || period == 'all') {
+        final allTimeEarnings = await CentralizedApiService.getDriverEarnings(
+          driverId: driverId,
+          period: 'all',
+        );
+        await _calculateAllTimeSummaryWithTrips(driverId, allTimeEarnings);
+      }
 
       // Use earnings as recent earnings for now
       _recentEarnings = _earnings.take(10).toList();
@@ -50,6 +78,7 @@ class EarningsProvider extends ChangeNotifier {
       _weeklyData = [];
 
       print('Summary: $_summary');
+      print('All-time Summary: $_allTimeSummary');
       notifyListeners();
     } catch (e) {
       print('Error in loadDriverEarnings: $e');
@@ -120,6 +149,46 @@ class EarningsProvider extends ChangeNotifier {
     return 0.0;
   }
 
+  // Calculate all-time summary from earnings data with trip information
+  Future<void> _calculateAllTimeSummaryWithTrips(int driverId, List<Earning> allTimeEarnings) async {
+    if (allTimeEarnings.isEmpty) {
+      _allTimeSummary = {
+        'total_earnings': 0.0,
+        'total_trips': 0,
+        'average_per_trip': 0.0,
+        'total_hours': 0.0,
+      };
+      return;
+    }
+
+    try {
+      // Calculate basic earnings summary
+      final totalEarnings = allTimeEarnings.fold(0.0, (sum, earning) => sum + earning.amount);
+      final totalTrips = allTimeEarnings.length;
+      final averagePerTrip = totalTrips > 0 ? totalEarnings / totalTrips : 0.0;
+
+      // Calculate total hours from trip data
+      final totalHours = await _calculateTotalHoursFromTrips(driverId);
+
+      _allTimeSummary = {
+        'total_earnings': totalEarnings,
+        'total_trips': totalTrips,
+        'average_per_trip': averagePerTrip,
+        'total_hours': totalHours,
+      };
+
+      print('All-time summary calculated: $_allTimeSummary');
+    } catch (e) {
+      print('Error calculating all-time summary: $e');
+      _allTimeSummary = {
+        'total_earnings': 0.0,
+        'total_trips': 0,
+        'average_per_trip': 0.0,
+        'total_hours': 0.0,
+      };
+    }
+  }
+
   // Refresh earnings data
   Future<void> refreshEarnings(int driverId) async {
     await loadDriverEarnings(driverId, _selectedPeriod);
@@ -140,7 +209,7 @@ class EarningsProvider extends ChangeNotifier {
       case 'today':
         return 'Today';
       case 'week':
-        return 'This Week';
+        return 'Last 7 Days';
       case 'month':
         return 'This Month';
       case 'year':
@@ -152,6 +221,9 @@ class EarningsProvider extends ChangeNotifier {
 
   // Get total earnings for current period
   double get totalEarnings => _summary['total_earnings']?.toDouble() ?? 0.0;
+
+  // Get all-time total earnings (for summary card)
+  double get allTimeTotalEarnings => _allTimeSummary['total_earnings']?.toDouble() ?? 0.0;
 
   // Get today's earnings specifically
   double get todayEarnings {
@@ -166,11 +238,20 @@ class EarningsProvider extends ChangeNotifier {
   // Get total trips for current period
   int get totalTrips => _summary['total_trips'] ?? 0;
 
+  // Get all-time total trips (for summary card)
+  int get allTimeTotalTrips => _allTimeSummary['total_trips'] ?? 0;
+
   // Get average per trip
   double get averagePerTrip => _summary['average_per_trip']?.toDouble() ?? 0.0;
 
+  // Get all-time average per trip (for summary card)
+  double get allTimeAveragePerTrip => _allTimeSummary['average_per_trip']?.toDouble() ?? 0.0;
+
   // Get total hours worked
   double get totalHours => _summary['total_hours']?.toDouble() ?? 0.0;
+
+  // Get all-time total hours (for summary card)
+  double get allTimeTotalHours => _allTimeSummary['total_hours']?.toDouble() ?? 0.0;
 
   // Get weekly total for chart
   double get weeklyTotal {

@@ -1123,7 +1123,8 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, tripProvider, child) {
         final ongoingTrips = tripProvider.ongoingTrips;
         
-        if (ongoingTrips.isEmpty) {
+        // Only show ongoing trips when user is online
+        if (!_isOnDuty || ongoingTrips.isEmpty) {
           return const SizedBox.shrink();
         }
         

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/trip_provider.dart';
 import '../providers/accident_provider.dart';
 import '../models/trip.dart';
@@ -67,19 +68,35 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
         _errorMessage = null;
       });
 
+      print('=== TRIP INITIALIZATION DEBUG ===');
+      print('Trip ID: ${widget.trip.historyId}');
+      print('Trip location: ${widget.trip.location}');
+      print('Trip endLatitude: ${widget.trip.endLatitude}');
+      print('Trip endLongitude: ${widget.trip.endLongitude}');
+      print('Trip clientName: ${widget.trip.clientName}');
+      print('Trip amount: ${widget.trip.amount}');
+
       // Get current location
       final currentPos = await CentralizedApiService.getCurrentLocation();
       if (currentPos != null) {
         _currentLocation = LatLng(currentPos.latitude, currentPos.longitude);
         _startLocation = _currentLocation;
+        print('Current location: ${currentPos.latitude}, ${currentPos.longitude}');
+      } else {
+        print('Failed to get current location');
       }
 
       // Parse end location from trip
       _endLocation = await _parseLocationFromString(widget.trip.location);
       
       if (_endLocation == null) {
-        throw Exception('Could not parse end location');
+        // Final fallback: use a default location if all parsing fails
+        print('All location parsing failed, using default location');
+        _endLocation = const LatLng(22.7196, 75.8577); // Default to Indore, MP
       }
+
+      print('End location: ${_endLocation?.latitude}, ${_endLocation?.longitude}');
+      print('=== TRIP INITIALIZATION DEBUG END ===');
 
       // Get route from start to end
       await _getRoute();
@@ -98,6 +115,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       });
 
     } catch (e) {
+      print('Trip initialization error: $e');
       setState(() {
         _isLoading = false;
         _errorMessage = 'Error initializing trip: $e';
@@ -107,6 +125,12 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
 
   Future<LatLng?> _parseLocationFromString(String locationString) async {
     try {
+      // First, check if the trip has direct coordinate fields
+      if (widget.trip.endLatitude != null && widget.trip.endLongitude != null) {
+        print('Using direct coordinates: ${widget.trip.endLatitude}, ${widget.trip.endLongitude}');
+        return LatLng(widget.trip.endLatitude!, widget.trip.endLongitude!);
+      }
+      
       // Try to extract coordinates from location string
       final parts = locationString.split(',');
       double? lat, lng;
@@ -121,10 +145,12 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       }
       
       if (lat != null && lng != null) {
+        print('Using parsed coordinates from string: $lat, $lng');
         return LatLng(lat, lng);
       }
       
       // Fallback: use geocoding service
+      print('Using geocoding for location: $locationString');
       return await CentralizedApiService.geocodeAddress(locationString);
     } catch (e) {
       print('Error parsing location: $e');
@@ -362,6 +388,37 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
     );
   }
 
+  Future<void> _openInGoogleMaps() async {
+    if (_endLocation == null) {
+      _showError('Destination location not available');
+      return;
+    }
+
+    try {
+      // Create Google Maps navigation URL
+      String url;
+      if (_currentLocation != null) {
+        // Use current location as origin
+        url = 'https://www.google.com/maps/dir/?api=1&origin=${_currentLocation!.latitude},${_currentLocation!.longitude}&destination=${_endLocation!.latitude},${_endLocation!.longitude}&travelmode=driving';
+      } else {
+        // Use destination only
+        url = 'https://www.google.com/maps/dir/?api=1&destination=${_endLocation!.latitude},${_endLocation!.longitude}&travelmode=driving';
+      }
+
+      print('Opening Google Maps with URL: $url');
+
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      } else {
+        _showError('Could not open Google Maps');
+      }
+    } catch (e) {
+      print('Error opening Google Maps: $e');
+      _showError('Failed to open Google Maps: $e');
+    }
+  }
+
+
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
@@ -374,40 +431,42 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   Widget _buildMapWidget() {
-    // Always show trip details instead of map for better UX
+    // Always show trip details view
     return _buildTripDetailsView();
   }
 
   Widget _buildTripDetailsView() {
     return Container(
       color: Colors.grey[100],
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.directions_car,
-              size: 64,
-              color: AppTheme.primaryBlue,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Trip Details',
-              style: GoogleFonts.roboto(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 120, bottom: 120), // Adjusted padding for better spacing
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.directions_car,
+                size: 64,
                 color: AppTheme.primaryBlue,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Trip #${widget.trip.historyId}',
-              style: GoogleFonts.roboto(
-                fontSize: 16,
-                color: Colors.grey[600],
+              const SizedBox(height: 16),
+              Text(
+                'Trip Details',
+                style: GoogleFonts.roboto(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryBlue,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 8),
+              Text(
+                'Trip #${widget.trip.historyId}',
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 32),
@@ -443,8 +502,36 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            // Open in Map Button
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _openInGoogleMaps,
+                  icon: const Icon(Icons.map, color: Colors.white),
+                  label: Text(
+                    'Open in Google Maps',
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -530,13 +617,13 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               ),
             ),
           
-          // Top controls
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 16,
-            right: 16,
+           // Top controls
+           Positioned(
+             top: MediaQuery.of(context).padding.top + 8,
+             left: 16,
+             right: 16,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -602,13 +689,13 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
             ),
           ),
           
-          // Bottom controls
-          Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + 16,
-            left: 16,
-            right: 16,
+           // Bottom controls
+           Positioned(
+             bottom: MediaQuery.of(context).padding.bottom + 8,
+             left: 16,
+             right: 16,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -622,6 +709,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               ),
               child: Column(
                 children: [
+                  // Complete Trip Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

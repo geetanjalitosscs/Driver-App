@@ -16,22 +16,12 @@ class EarningsScreen extends StatefulWidget {
 
 class _EarningsScreenState extends State<EarningsScreen> {
   String _selectedPeriod = 'all';
-  String _selectedTrip = 'all';
   final List<Map<String, String>> _periods = [
     {'value': 'all', 'label': 'All'},
     {'value': 'today', 'label': 'Today'},
-    {'value': 'week', 'label': 'This Week'},
+    {'value': 'week', 'label': 'Last 7 Days'},
     {'value': 'month', 'label': 'This Month'},
     {'value': 'year', 'label': 'This Year'},
-  ];
-  
-  final List<Map<String, String>> _tripFilters = [
-    {'value': 'all', 'label': 'All Trips'},
-    {'value': '5', 'label': 'Trip #5'},
-    {'value': '6', 'label': 'Trip #6'},
-    {'value': '7', 'label': 'Trip #7'},
-    {'value': '8', 'label': 'Trip #8'},
-    {'value': '9', 'label': 'Trip #9'},
   ];
 
   @override
@@ -185,19 +175,20 @@ class _EarningsScreenState extends State<EarningsScreen> {
     );
   }
 
+
   Widget _buildSummaryCards(EarningsProvider earningsProvider) {
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${earningsProvider.getPeriodDisplayName()} Earnings',
+            '${earningsProvider.getPeriodDisplayName()} Earnings Summary',
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              // Define card data
+              // Define card data using filtered data based on selected period
               final cards = [
                 {
                   'title': 'Total Earnings',
@@ -321,7 +312,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Weekly Earnings',
+            'Last 7 Days Earnings',
             style: AppTheme.heading3,
           ),
           const SizedBox(height: 16),
@@ -411,7 +402,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     ),
                   ),
                   Text(
-                    'Total This Week',
+                    'Total Last 7 Days',
                     style: AppTheme.bodySmall.copyWith(
                       color: AppTheme.neutralGreyLight,
                     ),
@@ -430,7 +421,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     ),
                   ),
                   Text(
-                    'Total This Week',
+                    'Total Last 7 Days',
                     style: AppTheme.bodySmall.copyWith(
                       color: AppTheme.neutralGreyLight,
                     ),
@@ -449,7 +440,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Earnings',
+          '${earningsProvider.getPeriodDisplayName()} Earnings',
           style: AppTheme.heading3,
         ),
         const SizedBox(height: 12),
