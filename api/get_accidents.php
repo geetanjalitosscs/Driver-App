@@ -78,8 +78,32 @@ try {
         }
     }
     
-    // Default: Fetch accidents (only pending and not assigned to any driver)
-    $stmt = $pdo->prepare("SELECT * FROM accidents WHERE status = 'pending' AND (driver_status IS NULL OR driver_status = 'available') ORDER BY created_at DESC");
+    // First check if driver_status column exists
+    $checkColumn = $pdo->prepare("SHOW COLUMNS FROM accidents LIKE 'driver_status'");
+    $checkColumn->execute();
+    $columnExists = $checkColumn->fetch();
+    
+    if ($columnExists) {
+        // Column exists - use the full query with case-insensitive client filtering and collation fix
+        $stmt = $pdo->prepare("
+            SELECT a.* FROM accidents a 
+            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
+            WHERE a.status = 'pending' 
+            AND (a.driver_status IS NULL OR a.driver_status = 'available')
+            ORDER BY a.created_at DESC
+        ");
+        error_log("Using driver_status filter with case-insensitive client matching (collation fixed)");
+    } else {
+        // Column doesn't exist - use simple query with case-insensitive client filtering and collation fix
+        $stmt = $pdo->prepare("
+            SELECT a.* FROM accidents a 
+            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
+            WHERE a.status = 'pending' 
+            ORDER BY a.created_at DESC
+        ");
+        error_log("Driver_status column not found, using simple query with case-insensitive client matching (collation fixed)");
+    }
+    
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     

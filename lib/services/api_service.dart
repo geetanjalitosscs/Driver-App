@@ -618,11 +618,17 @@ class CentralizedApiService {
   // ============================================================================
 
   /// Get Accidents API
-  static Future<List<AccidentReport>> getAccidents() async {
+  static Future<List<AccidentReport>> getAccidents({int? driverId}) async {
     try {
+      // Build URL with driver_id parameter if provided
+      String baseUrl = '$_accidentBaseUrl/get_accidents.php';
+      if (driverId != null) {
+        baseUrl += '?driver_id=$driverId';
+      }
+      
       final urls = [
-        '$_accidentBaseUrl/get_accidents.php',
-        '$_accidentBaseUrl/get_accidents.php',
+        baseUrl,
+        baseUrl, // Keep duplicate for fallback
       ];
       
       http.Response? response;

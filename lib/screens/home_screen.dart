@@ -207,17 +207,45 @@ class _HomeScreenState extends State<HomeScreen> {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
       final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
       final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
       
-      // Load all data
+      // Get driver ID safely - driverId is String in ProfileData
+      int driverId = 1; // Default fallback
+      try {
+        final userData = authProvider.currentUser;
+        if (userData != null && userData.driverId.isNotEmpty) {
+          final parsed = int.tryParse(userData.driverId);
+          if (parsed != null) {
+            driverId = parsed;
+          }
+        }
+      } catch (e) {
+        print('Error getting driver ID: $e, using default: $driverId');
+      }
+      
+      // Load critical data first (fast operations)
       await Future.wait([
-        accidentProvider.loadAccidents(),
-        tripProvider.loadCompletedTrips(1), // Using driver ID 1
-        earningsProvider.loadDriverEarnings(1, 'all'), // Using driver ID 1
-        walletProvider.loadWalletData(1), // Using driver ID 1
+        accidentProvider.loadAccidents(driverId: driverId),
+        tripProvider.loadCompletedTrips(driverId),
+      ]);
+
+      // Load secondary data in background (non-blocking)
+      Future.wait([
+        earningsProvider.loadDriverEarnings(driverId, 'all'),
+        walletProvider.loadWalletData(driverId),
         _loadStatisticsData(),
         _loadOngoingTrips(),
-        _refreshLocation(),
-      ]);
+      ]).then((_) {
+        // Refresh UI after secondary data loads
+        if (mounted) {
+          setState(() {
+            // Trigger UI refresh
+          });
+        }
+      });
+
+      // Skip location refresh for faster loading
+      // _refreshLocation() - commented out for speed
 
       // Close loading dialog
       if (mounted) {

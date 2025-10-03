@@ -504,9 +504,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       if (success) {
         // Show next report automatically or close if no more reports
         if (provider.hasMoreAccidents) {
-          // Reset timer for next report
-          _startTimer();
-          // Refresh the dialog to show next report
+          // Show next report immediately (no timer for rejected reports)
           setState(() {});
         } else {
           // No more reports, close dialog and return to home page

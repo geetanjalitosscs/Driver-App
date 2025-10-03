@@ -29,12 +29,14 @@ class AccidentProvider extends ChangeNotifier {
   AccidentFilter get currentFilter => _currentFilter;
 
   /// Load all accidents from API
-  Future<void> loadAccidents() async {
+  Future<void> loadAccidents({int? driverId}) async {
     _setLoading(true);
     _clearError();
 
     try {
-      _allAccidents = await CentralizedApiService.getAccidents();
+      print('Loading accidents for driver ID: $driverId');
+      
+      _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
       
       // Apply current filter
       _applyFilter();
@@ -207,112 +209,12 @@ class AccidentProvider extends ChangeNotifier {
       _acceptedAccident = _currentAccident;
       notifyListeners();
 
-      // Add notification for trip acceptance
-      _addTripAcceptedNotification();
-      
-      // Show push notification (with error handling)
-      try {
-        await NotificationService.showNotification(
-          id: DateTime.now().millisecondsSinceEpoch,
-          title: 'Trip Accepted',
-          body: 'You have accepted accident report #${_currentAccident!.id}. Navigate to the location.',
-          type: 'trip_accepted',
-        );
-      } catch (notificationError) {
-        print('Notification error (continuing anyway): $notificationError');
-      }
+      // Open map immediately for faster user experience
+      _openMapImmediately();
 
-      // Open location in Google Maps app (prefer native app over browser)
-      print('=== GOOGLE MAPS DEBUG ===');
-      print('Accident ID: ${_currentAccident!.id}');
-      print('Latitude: ${_currentAccident!.latitude}');
-      print('Longitude: ${_currentAccident!.longitude}');
-      print('Location: ${_currentAccident!.location}');
-      print('Full name: ${_currentAccident!.fullname}');
-      print('Vehicle: ${_currentAccident!.vehicle}');
+      // Do other operations in background (non-blocking)
+      _handleBackgroundOperations();
       
-      // Always try to open map, even with 0,0 coordinates
-      double lat = _currentAccident!.latitude;
-      double lng = _currentAccident!.longitude;
-      
-      if (lat == 0.0 || lng == 0.0) {
-        print('WARNING: Invalid coordinates - latitude: $lat, longitude: $lng');
-        print('Attempting to parse coordinates from location string...');
-        
-        // Try to parse coordinates from location string
-        final locationString = _currentAccident!.location;
-        print('Attempting to parse coordinates from location: $locationString');
-        
-        // Try multiple patterns
-        RegExp latPattern = RegExp(r'Lat:\s*([0-9.-]+)');
-        RegExp lngPattern = RegExp(r'Lng:\s*([0-9.-]+)');
-        
-        var latMatch = latPattern.firstMatch(locationString);
-        var lngMatch = lngPattern.firstMatch(locationString);
-        
-        // If not found, try alternative patterns
-        if (latMatch == null || lngMatch == null) {
-          latPattern = RegExp(r'latitude[:\s]*([0-9.-]+)', caseSensitive: false);
-          lngPattern = RegExp(r'longitude[:\s]*([0-9.-]+)', caseSensitive: false);
-          latMatch = latPattern.firstMatch(locationString);
-          lngMatch = lngPattern.firstMatch(locationString);
-        }
-        
-        // If still not found, try coordinate pairs
-        if (latMatch == null || lngMatch == null) {
-          final coordPattern = RegExp(r'([0-9.-]+),\s*([0-9.-]+)');
-          final coordMatch = coordPattern.firstMatch(locationString);
-          if (coordMatch != null) {
-            lat = double.tryParse(coordMatch.group(1)!) ?? 0.0;
-            lng = double.tryParse(coordMatch.group(2)!) ?? 0.0;
-            print('Parsed coordinates from coordinate pair: lat=$lat, lng=$lng');
-          }
-        } else {
-          lat = double.tryParse(latMatch.group(1)!) ?? 0.0;
-          lng = double.tryParse(lngMatch.group(1)!) ?? 0.0;
-          print('Parsed coordinates from location: lat=$lat, lng=$lng');
-        }
-        
-        // If still 0,0, use a default location (Jabalpur city center)
-        if (lat == 0.0 || lng == 0.0) {
-          print('Using default coordinates for Jabalpur city center');
-          lat = 23.1815; // Jabalpur city center
-          lng = 79.9864;
-        }
-      }
-      
-      final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving';
-      print('Google Maps URL: $googleMapsUrl');
-      
-      try {
-        print('Attempting to launch Google Maps...');
-        if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-          print('URL can be launched, launching now...');
-          await launchUrl(
-            Uri.parse(googleMapsUrl),
-            mode: LaunchMode.externalApplication, // Force native app
-          );
-          print('Google Maps opened successfully');
-        } else {
-          print('Could not launch Google Maps - trying platform default');
-          await launchUrl(
-            Uri.parse(googleMapsUrl),
-            mode: LaunchMode.platformDefault,
-          );
-          print('Google Maps opened with platform default');
-        }
-      } catch (mapsError) {
-        print('Google Maps error: $mapsError');
-        // Don't fail the whole process if maps fails
-      }
-      print('=== GOOGLE MAPS DEBUG END ===');
-
-      // Don't move to next accident when accepting - keep it visible
-      // The accepted accident will be shown on home screen
-      print('=== ACCEPT ACCIDENT SUCCESS ===');
-      print('Local acceptance completed successfully');
-      print('Accepted accident ID: ${_acceptedAccident?.id}');
-      print('=== END SUCCESS ===');
       return true;
     } catch (e) {
       print('=== ACCEPT ACCIDENT ERROR ===');
@@ -328,6 +230,53 @@ class AccidentProvider extends ChangeNotifier {
   void continueWithAcceptedAccident() {
     // This will be handled by the home screen to navigate to trip navigation
     notifyListeners();
+  }
+
+  /// Open map immediately for faster user experience
+  void _openMapImmediately() {
+    if (_currentAccident == null) return;
+    
+    print('=== FAST MAP OPENING ===');
+    print('Accident ID: ${_currentAccident!.id}');
+    print('Latitude: ${_currentAccident!.latitude}');
+    print('Longitude: ${_currentAccident!.longitude}');
+    
+    // Get coordinates quickly
+    double lat = _currentAccident!.latitude;
+    double lng = _currentAccident!.longitude;
+    
+    // Quick fallback for invalid coordinates
+    if (lat == 0.0 || lng == 0.0) {
+      print('Using default coordinates for faster map opening');
+      lat = 23.1815; // Jabalpur city center
+      lng = 79.9864;
+    }
+    
+    final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving';
+    print('Fast Google Maps URL: $googleMapsUrl');
+    
+    // Launch map immediately (non-blocking)
+    launchUrl(Uri.parse(googleMapsUrl), mode: LaunchMode.externalApplication)
+        .then((_) => print('Map opened successfully'))
+        .catchError((error) => print('Map opening error: $error'));
+    
+    print('=== FAST MAP OPENING END ===');
+  }
+
+  /// Handle background operations (notifications, etc.)
+  void _handleBackgroundOperations() {
+    // Add notification for trip acceptance
+    _addTripAcceptedNotification();
+    
+    // Show push notification (with error handling) - non-blocking
+    NotificationService.showNotification(
+      id: DateTime.now().millisecondsSinceEpoch,
+      title: 'Trip Accepted',
+      body: 'You have accepted accident report #${_currentAccident!.id}. Navigate to the location.',
+      type: 'trip_accepted',
+    ).catchError((error) => print('Notification error: $error'));
+    
+    print('Background operations completed');
   }
 
   /// Complete accepted accident
@@ -473,16 +422,19 @@ class AccidentProvider extends ChangeNotifier {
     if (_currentAccident == null) return false;
 
     try {
-      // Note: Reject accident functionality needs to be implemented in centralized service
-      // For now, we'll simulate success
-      final success = true;
-
-      if (success) {
-        _moveToNextAccident();
-        return true;
-      }
-      return false;
+      print('=== REJECT ACCIDENT DEBUG ===');
+      print('Rejecting accident ID: ${_currentAccident!.id}');
+      
+      // Move to next accident (reject means skip this one)
+      _moveToNextAccident();
+      
+      print('Moved to next accident, current accident ID: ${_currentAccident?.id}');
+      print('Has more accidents: $hasMoreAccidents');
+      print('=== REJECT ACCIDENT SUCCESS ===');
+      
+      return true;
     } catch (e) {
+      print('Reject accident error: $e');
       _setError('Failed to reject accident: $e');
       return false;
     }
