@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AccidentProvider extends ChangeNotifier {
@@ -111,10 +112,24 @@ class AccidentProvider extends ChangeNotifier {
     }
     
     _accidentList = filteredAccidents;
-    _pendingCount = _accidentList.where((accident) => accident.status == 'pending').length;
+    _pendingCount = _accidentList.where((accident) => 
+        accident.status == 'pending' && 
+        (accident.driverStatus == null || accident.driverStatus == 'available')
+    ).length;
     
     if (_accidentList.isNotEmpty) {
-      _currentAccident = _accidentList[0];
+      // Prioritize accidents with valid coordinates
+      final validAccidents = _accidentList.where((accident) => 
+        accident.latitude != 0.0 && accident.longitude != 0.0
+      ).toList();
+      
+      if (validAccidents.isNotEmpty) {
+        _currentAccident = validAccidents[0];
+        print('Selected accident with valid coordinates: ID ${_currentAccident!.id}, Lat: ${_currentAccident!.latitude}, Lng: ${_currentAccident!.longitude}');
+      } else {
+        _currentAccident = _accidentList[0];
+        print('No accidents with valid coordinates, using first available: ID ${_currentAccident!.id}, Lat: ${_currentAccident!.latitude}, Lng: ${_currentAccident!.longitude}');
+      }
     } else {
       _currentAccident = null;
     }
@@ -148,6 +163,12 @@ class AccidentProvider extends ChangeNotifier {
     double? currentLng,
   }) async {
     if (_currentAccident == null) return false;
+    
+    // Check if driver already has an accepted accident
+    if (_acceptedAccident != null) {
+      print('Driver already has an accepted accident. Cannot accept another.');
+      return false;
+    }
 
     try {
       // Call the new accept accident API
@@ -169,33 +190,104 @@ class AccidentProvider extends ChangeNotifier {
         apiSuccess = result['success'] == true;
         
         if (!apiSuccess) {
-          print('API failed, but continuing with local acceptance');
+          print('API failed - cannot proceed with acceptance');
+          _setError('Failed to accept accident: API returned failure');
+          return false;
         }
       } catch (apiError) {
-        print('API Error (continuing anyway): $apiError');
-        apiSuccess = false;
+        print('API Error: $apiError');
+        _setError('Failed to accept accident: API call failed - $apiError');
+        return false;
       }
       
       print('=== ACCEPT ACCIDENT DEBUG END ===');
 
-      // Always proceed with local acceptance and Google Maps
+      // Only proceed if API succeeded
       // Store the accepted accident for home screen display
       _acceptedAccident = _currentAccident;
       notifyListeners();
 
       // Add notification for trip acceptance
       _addTripAcceptedNotification();
+      
+      // Show push notification (with error handling)
+      try {
+        await NotificationService.showNotification(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: 'Trip Accepted',
+          body: 'You have accepted accident report #${_currentAccident!.id}. Navigate to the location.',
+          type: 'trip_accepted',
+        );
+      } catch (notificationError) {
+        print('Notification error (continuing anyway): $notificationError');
+      }
 
       // Open location in Google Maps app (prefer native app over browser)
       print('=== GOOGLE MAPS DEBUG ===');
+      print('Accident ID: ${_currentAccident!.id}');
       print('Latitude: ${_currentAccident!.latitude}');
       print('Longitude: ${_currentAccident!.longitude}');
+      print('Location: ${_currentAccident!.location}');
+      print('Full name: ${_currentAccident!.fullname}');
+      print('Vehicle: ${_currentAccident!.vehicle}');
       
-      final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=${_currentAccident!.latitude},${_currentAccident!.longitude}&travelmode=driving';
+      // Always try to open map, even with 0,0 coordinates
+      double lat = _currentAccident!.latitude;
+      double lng = _currentAccident!.longitude;
+      
+      if (lat == 0.0 || lng == 0.0) {
+        print('WARNING: Invalid coordinates - latitude: $lat, longitude: $lng');
+        print('Attempting to parse coordinates from location string...');
+        
+        // Try to parse coordinates from location string
+        final locationString = _currentAccident!.location;
+        print('Attempting to parse coordinates from location: $locationString');
+        
+        // Try multiple patterns
+        RegExp latPattern = RegExp(r'Lat:\s*([0-9.-]+)');
+        RegExp lngPattern = RegExp(r'Lng:\s*([0-9.-]+)');
+        
+        var latMatch = latPattern.firstMatch(locationString);
+        var lngMatch = lngPattern.firstMatch(locationString);
+        
+        // If not found, try alternative patterns
+        if (latMatch == null || lngMatch == null) {
+          latPattern = RegExp(r'latitude[:\s]*([0-9.-]+)', caseSensitive: false);
+          lngPattern = RegExp(r'longitude[:\s]*([0-9.-]+)', caseSensitive: false);
+          latMatch = latPattern.firstMatch(locationString);
+          lngMatch = lngPattern.firstMatch(locationString);
+        }
+        
+        // If still not found, try coordinate pairs
+        if (latMatch == null || lngMatch == null) {
+          final coordPattern = RegExp(r'([0-9.-]+),\s*([0-9.-]+)');
+          final coordMatch = coordPattern.firstMatch(locationString);
+          if (coordMatch != null) {
+            lat = double.tryParse(coordMatch.group(1)!) ?? 0.0;
+            lng = double.tryParse(coordMatch.group(2)!) ?? 0.0;
+            print('Parsed coordinates from coordinate pair: lat=$lat, lng=$lng');
+          }
+        } else {
+          lat = double.tryParse(latMatch.group(1)!) ?? 0.0;
+          lng = double.tryParse(lngMatch.group(1)!) ?? 0.0;
+          print('Parsed coordinates from location: lat=$lat, lng=$lng');
+        }
+        
+        // If still 0,0, use a default location (Jabalpur city center)
+        if (lat == 0.0 || lng == 0.0) {
+          print('Using default coordinates for Jabalpur city center');
+          lat = 23.1815; // Jabalpur city center
+          lng = 79.9864;
+        }
+      }
+      
+      final googleMapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving';
       print('Google Maps URL: $googleMapsUrl');
       
       try {
+        print('Attempting to launch Google Maps...');
         if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+          print('URL can be launched, launching now...');
           await launchUrl(
             Uri.parse(googleMapsUrl),
             mode: LaunchMode.externalApplication, // Force native app
@@ -207,6 +299,7 @@ class AccidentProvider extends ChangeNotifier {
             Uri.parse(googleMapsUrl),
             mode: LaunchMode.platformDefault,
           );
+          print('Google Maps opened with platform default');
         }
       } catch (mapsError) {
         print('Google Maps error: $mapsError');
@@ -214,10 +307,18 @@ class AccidentProvider extends ChangeNotifier {
       }
       print('=== GOOGLE MAPS DEBUG END ===');
 
-      _moveToNextAccident();
+      // Don't move to next accident when accepting - keep it visible
+      // The accepted accident will be shown on home screen
+      print('=== ACCEPT ACCIDENT SUCCESS ===');
+      print('Local acceptance completed successfully');
+      print('Accepted accident ID: ${_acceptedAccident?.id}');
+      print('=== END SUCCESS ===');
       return true;
     } catch (e) {
-      print('Accept accident error: $e');
+      print('=== ACCEPT ACCIDENT ERROR ===');
+      print('Error: $e');
+      print('Stack trace: ${StackTrace.current}');
+      print('=== END ERROR ===');
       _setError('Failed to accept accident: $e');
       return false;
     }
@@ -250,20 +351,37 @@ class AccidentProvider extends ChangeNotifier {
         apiSuccess = result['success'] == true;
         
         if (!apiSuccess) {
-          print('Complete API failed, but continuing with local completion');
+          print('Complete API failed - cannot proceed with completion');
+          _setError('Failed to complete trip: API returned failure');
+          return false;
         }
       } catch (apiError) {
-        print('Complete API Error (continuing anyway): $apiError');
-        apiSuccess = false;
+        print('Complete API Error: $apiError');
+        _setError('Failed to complete trip: API call failed - $apiError');
+        return false;
       }
 
       if (confirmed) {
-        // Clear the accepted accident since it's completed
+        // Only proceed if API succeeded
         _acceptedAccident = null;
         notifyListeners();
         
         // Add notification for trip completion
         _addTripCompletedNotification();
+        
+        // Show push notification
+        await NotificationService.showNotification(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: 'Trip Completed',
+          body: 'You have successfully completed accident report. Great job!',
+          type: 'trip_completed',
+        );
+        
+        print('=== TRIP COMPLETION SUCCESS ===');
+        print('Trip completed successfully, returning true');
+        print('=== END SUCCESS ===');
+        
+        return true; // Return true only if API succeeded
       }
       return true;
     } catch (e) {
@@ -320,9 +438,30 @@ class AccidentProvider extends ChangeNotifier {
   }
 
   /// Cancel accepted accident
-  void cancelAcceptedAccident() {
-    _acceptedAccident = null;
-    notifyListeners();
+  Future<void> cancelAcceptedAccident() async {
+    if (_acceptedAccident == null) return;
+    
+    try {
+      // Reset database fields to null
+      final result = await CentralizedApiService.completeAccident(
+        accidentId: _acceptedAccident!.id,
+        driverId: 0, // Use 0 to indicate cancellation
+        confirmed: false, // false means cancel
+      );
+      
+      print('Cancel API Response: $result');
+      
+      // Clear the accepted accident locally
+      _acceptedAccident = null;
+      notifyListeners();
+      
+      print('Accident cancelled successfully');
+    } catch (e) {
+      print('Error cancelling accident: $e');
+      // Still clear locally even if API fails
+      _acceptedAccident = null;
+      notifyListeners();
+    }
   }
 
   /// Reject current accident report

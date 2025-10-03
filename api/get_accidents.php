@@ -58,15 +58,28 @@ try {
                         echo json_encode(['success' => false, 'message' => 'Failed to complete accident']);
                     }
                 } else {
-                    echo json_encode(['success' => true, 'message' => 'Completion cancelled']);
+                    // Cancel accident - reset all driver-related fields to NULL
+                    $cancelStmt = $pdo->prepare("UPDATE accidents SET 
+                        driver_status = NULL,
+                        driver_details = NULL,
+                        accepted_at = NULL,
+                        completed_at = NULL,
+                        completion_confirmed = FALSE
+                        WHERE id = ?");
+                    
+                    if ($cancelStmt->execute([$accident_id])) {
+                        echo json_encode(['success' => true, 'message' => 'Accident cancelled successfully']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Failed to cancel accident']);
+                    }
                 }
                 exit;
             }
         }
     }
     
-    // Default: Fetch accidents
-    $stmt = $pdo->prepare("SELECT * FROM accidents WHERE status = 'pending' ORDER BY created_at DESC");
+    // Default: Fetch accidents (only pending and not assigned to any driver)
+    $stmt = $pdo->prepare("SELECT * FROM accidents WHERE status = 'pending' AND (driver_status IS NULL OR driver_status = 'available') ORDER BY created_at DESC");
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -76,6 +89,12 @@ try {
         $photoStmt->execute([$accident['id']]);
         $photos = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
         $accident['photos'] = $photos;
+    }
+    
+    // Debug logging for coordinates
+    error_log("API Debug - Returning " . count($accidents) . " accidents");
+    foreach ($accidents as $accident) {
+        error_log("Accident ID: " . $accident['id'] . ", Lat: " . $accident['latitude'] . ", Lng: " . $accident['longitude']);
     }
     
     echo json_encode([

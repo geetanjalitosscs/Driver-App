@@ -12,6 +12,7 @@ import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/earnings_provider.dart';
+import '../providers/wallet_provider.dart';
 import '../providers/notification_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/navigation_provider.dart';
@@ -191,13 +192,63 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Refresh all data including reports
   Future<void> _refreshAllData() async {
-    await _loadStatisticsData();
-    await _loadOngoingTrips();
-    // Refresh accident reports
-    final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-    await accidentProvider.refreshPendingCount();
-    // Refresh location
-    await _refreshLocation();
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Refresh all providers
+      final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      final earningsProvider = Provider.of<EarningsProvider>(context, listen: false);
+      final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+      
+      // Load all data
+      await Future.wait([
+        accidentProvider.loadAccidents(),
+        tripProvider.loadCompletedTrips(1), // Using driver ID 1
+        earningsProvider.loadDriverEarnings(1, 'all'), // Using driver ID 1
+        walletProvider.loadWalletData(1), // Using driver ID 1
+        _loadStatisticsData(),
+        _loadOngoingTrips(),
+        _refreshLocation(),
+      ]);
+
+      // Close loading dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data refreshed successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+      
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to refresh data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _navigateToTrip(trip) async {

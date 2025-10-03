@@ -1364,6 +1364,12 @@ class CentralizedApiService {
     required String vehicleNumber,
   }) async {
     try {
+      print('=== API SERVICE ACCEPT ACCIDENT ===');
+      print('URL: $_accidentBaseUrl/get_accidents.php');
+      print('Accident ID: $accidentId');
+      print('Driver ID: $driverId');
+      print('Vehicle Number: $vehicleNumber');
+      
       final response = await http.post(
         Uri.parse('$_accidentBaseUrl/get_accidents.php'),
         headers: {'Content-Type': 'application/json'},
@@ -1375,12 +1381,19 @@ class CentralizedApiService {
         }),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
       } else {
+        print('HTTP Error: ${response.statusCode}');
         throw Exception('Accept accident failed: ${response.statusCode}');
       }
     } catch (e) {
+      print('API Service Error: $e');
       throw Exception('Accept accident error: $e');
     }
   }
@@ -1392,6 +1405,12 @@ class CentralizedApiService {
     required bool confirmed,
   }) async {
     try {
+      print('=== API SERVICE COMPLETE ACCIDENT ===');
+      print('URL: $_accidentBaseUrl/get_accidents.php');
+      print('Accident ID: $accidentId');
+      print('Driver ID: $driverId');
+      print('Confirmed: $confirmed');
+      
       final response = await http.post(
         Uri.parse('$_accidentBaseUrl/get_accidents.php'),
         headers: {'Content-Type': 'application/json'},
@@ -1403,12 +1422,19 @@ class CentralizedApiService {
         }),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
       } else {
+        print('HTTP Error: ${response.statusCode}');
         throw Exception('Complete accident failed: ${response.statusCode}');
       }
     } catch (e) {
+      print('API Service Error: $e');
       throw Exception('Complete accident error: $e');
     }
   }

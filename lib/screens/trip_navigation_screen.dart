@@ -482,7 +482,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       color: Colors.grey[100],
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: 120, bottom: 120), // Adjusted padding for better spacing
+          padding: const EdgeInsets.only(top: 140, bottom: 120), // Increased top padding to prevent overlap
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -697,6 +697,12 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                           ),
                         ),
                       ),
+                      IconButton(
+                        onPressed: _initializeTrip,
+                        icon: const Icon(Icons.refresh),
+                        color: AppTheme.primaryBlue,
+                        tooltip: 'Reload',
+                      ),
                       Text(
                         '₹${widget.trip.amount}',
                         style: GoogleFonts.roboto(
@@ -707,25 +713,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Duration: ${_formatDuration(_tripDuration)}',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  if (_currentStep.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      _currentStep,
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: AppTheme.primaryBlue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),

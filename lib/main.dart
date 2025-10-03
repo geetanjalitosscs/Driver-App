@@ -20,6 +20,7 @@ import 'providers/navigation_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/notification_provider.dart';
 import 'widgets/notification_banner.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   try {
@@ -27,8 +28,8 @@ void main() async {
     
     // Initialize notification service with error handling
     try {
-      // await NotificationService.initialize(); // Commented out - service not available
-      print('✅ NotificationService initialization skipped');
+      await NotificationService.initialize();
+      print('✅ NotificationService initialized successfully');
     } catch (e) {
       print('⚠️ Warning: Notification initialization failed: $e');
       // Continue app startup even if notifications fail

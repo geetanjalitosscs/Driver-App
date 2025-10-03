@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/earning.dart';
 import '../config/database_config.dart';
+import '../services/notification_service.dart';
 
 class EarningsProvider extends ChangeNotifier {
   List<Earning> _earnings = [];
@@ -107,6 +108,18 @@ class EarningsProvider extends ChangeNotifier {
 
       print('Summary: $_summary');
       print('All-time Summary: $_allTimeSummary');
+      
+      // Show push notification for new earnings
+      if (_earnings.isNotEmpty) {
+        final totalEarnings = _summary['total_earnings'] ?? 0.0;
+        await NotificationService.showNotification(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: 'New Earnings Update',
+          body: 'You have earned ₹${totalEarnings.toStringAsFixed(0)} in ${getPeriodDisplayName()}.',
+          type: 'earnings_update',
+        );
+      }
+      
       notifyListeners();
     } catch (e) {
       print('Error in loadDriverEarnings: $e');

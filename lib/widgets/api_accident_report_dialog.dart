@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/profile_provider.dart';
@@ -391,6 +392,12 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
     });
 
     try {
+      // Check if driver already has an accepted accident
+      if (provider.hasAcceptedAccident) {
+        _showErrorDialog('Complete or cancel accepted report first');
+        return;
+      }
+      
       // Get driver information from auth provider
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final driverId = authProvider.currentUser?.driverIdAsInt ?? 1;
@@ -419,6 +426,9 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
           amount: 500.0, // Default amount for accident response
         );
         
+        // Wait a moment for map to open before closing dialog
+        await Future.delayed(const Duration(milliseconds: 500));
+        
         // Close accident dialog and redirect to home screen
         Navigator.of(context).pop();
         
@@ -428,10 +438,10 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
         // Refresh the pending count in the background
         provider.refreshPendingCount();
       } else {
-        _showErrorSnackBar('Failed to accept accident report');
+        _showErrorDialog('Failed to accept accident report');
       }
     } catch (e) {
-      _showErrorSnackBar('Error: $e');
+      _showErrorDialog('Error: $e');
     } finally {
       setState(() {
         _isProcessing = false;
@@ -520,6 +530,57 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       SnackBar(
         content: Text(message),
         backgroundColor: AppTheme.errorRed,
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.errorRed,
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Error',
+              style: GoogleFonts.roboto(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.errorRed,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: GoogleFonts.roboto(
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primaryBlue,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

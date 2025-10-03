@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/wallet.dart';
 import '../models/withdrawal.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 
 class WalletProvider extends ChangeNotifier {
   Wallet? _wallet;
@@ -147,6 +148,15 @@ class WalletProvider extends ChangeNotifier {
       if (success) {
         // Reload wallet data to get updated balance and new withdrawal
         await loadWalletData(_wallet!.driverId);
+        
+        // Show push notification for withdrawal request
+        await NotificationService.showNotification(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: 'Withdrawal Requested',
+          body: 'Your withdrawal request of ₹${amount.toStringAsFixed(0)} has been submitted successfully.',
+          type: 'withdrawal_requested',
+        );
+        
         return true;
       } else {
         _setError('Failed to submit withdrawal request');

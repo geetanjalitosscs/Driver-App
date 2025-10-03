@@ -14,6 +14,7 @@ class AccidentReport {
   final List<String> photos; // Multiple photos from API
   final String createdAt;
   final String status;
+  final String? driverStatus;
 
   AccidentReport({
     required this.id,
@@ -29,6 +30,7 @@ class AccidentReport {
     required this.photos,
     required this.createdAt,
     required this.status,
+    this.driverStatus,
   });
 
   factory AccidentReport.fromMap(Map<String, dynamic> map) {
@@ -71,6 +73,7 @@ class AccidentReport {
       photos: map['photos'] != null ? List<String>.from(map['photos']) : [],
       createdAt: safeString(map['created_at']),
       status: safeString(map['status']),
+      driverStatus: map['driver_status'] != null ? safeString(map['driver_status']) : null,
     );
   }
 
@@ -102,6 +105,14 @@ class AccidentReport {
       return 0;
     }
 
+    // Debug logging for coordinates
+    print('=== ACCIDENT REPORT DEBUG ===');
+    print('Raw latitude: ${map['latitude']} (type: ${map['latitude'].runtimeType})');
+    print('Raw longitude: ${map['longitude']} (type: ${map['longitude'].runtimeType})');
+    print('Parsed latitude: ${safeDouble(map['latitude'])}');
+    print('Parsed longitude: ${safeDouble(map['longitude'])}');
+    print('=== END DEBUG ===');
+
     return AccidentReport(
       id: safeInt(map['id']),
       fullname: safeString(map['fullname']),
@@ -116,6 +127,7 @@ class AccidentReport {
       photos: map['photos'] != null ? List<String>.from(map['photos']) : [],
       createdAt: safeString(map['created_at']),
       status: 'pending', // Default status for API data
+      driverStatus: map['driver_status'] != null ? safeString(map['driver_status']) : null,
     );
   }
 
@@ -134,6 +146,7 @@ class AccidentReport {
       'photos': photos,
       'created_at': createdAt,
       'status': status,
+      'driver_status': driverStatus,
     };
   }
 
@@ -151,6 +164,7 @@ class AccidentReport {
     List<String>? photos,
     String? createdAt,
     String? status,
+    String? driverStatus,
   }) {
     return AccidentReport(
       id: id ?? this.id,
@@ -166,6 +180,7 @@ class AccidentReport {
       photos: photos ?? this.photos,
       createdAt: createdAt ?? this.createdAt,
       status: status ?? this.status,
+      driverStatus: driverStatus ?? this.driverStatus,
     );
   }
 
