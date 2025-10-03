@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
@@ -344,45 +345,104 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Widget _buildSearchBar() {
-    return AppCard(
-      margin: EdgeInsets.zero,
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search for help...',
-                hintStyle: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.neutralGreyLight,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              style: AppTheme.bodyMedium,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              if (_searchQuery.isNotEmpty) {
-                setState(() {
-                  _searchController.clear();
-                  _searchQuery = '';
-                });
-              }
-            },
-            icon: Icon(
-              _searchQuery.isEmpty ? Icons.search : Icons.clear,
-              color: AppTheme.primaryBlue,
-              size: 24,
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
           ),
         ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
+        decoration: InputDecoration(
+          hintText: 'Search for help...',
+          hintStyle: GoogleFonts.roboto(
+            fontSize: 16,
+            color: AppTheme.textLight.withOpacity(0.7),
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Container(
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.search_rounded,
+              color: AppTheme.primaryBlue,
+              size: 20,
+            ),
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? Container(
+                  margin: const EdgeInsets.all(8),
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _searchController.clear();
+                        _searchQuery = '';
+                      });
+                    },
+                    icon: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.textLight.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: AppTheme.textMedium,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                )
+              : null,
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: AppTheme.primaryBlue,
+              width: 2,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 18,
+          ),
+        ),
+        style: GoogleFonts.roboto(
+          fontSize: 16,
+          color: AppTheme.textDark,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -850,21 +910,9 @@ class _HelpScreenState extends State<HelpScreen> {
               // Stack vertically for very small screens
               return Column(
                 children: [
-                  AppButton(
-                    text: 'WhatsApp Us',
-                    icon: Icons.chat_bubble,
-                    variant: AppButtonVariant.secondary,
-                    isFullWidth: true,
-                    onPressed: _openWhatsApp,
-                  ),
+                  _buildWhatsAppButton('WhatsApp Us', _openWhatsApp),
                   const SizedBox(height: 12),
-                  AppButton(
-                    text: 'Message Us',
-                    icon: Icons.chat,
-                    variant: AppButtonVariant.primary,
-                    isFullWidth: true,
-                    onPressed: _openMessageApp,
-                  ),
+                  _buildMessageButton('Message Us', _openMessageApp),
                   const SizedBox(height: 12),
                   AppButton(
                     text: 'Call Us',
@@ -889,23 +937,9 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: AppButton(
-                          text: 'WhatsApp Us',
-                          icon: Icons.chat_bubble,
-                          variant: AppButtonVariant.secondary,
-                          onPressed: _openWhatsApp,
-                        ),
-                      ),
+                      Expanded(child: _buildWhatsAppButton('WhatsApp Us', _openWhatsApp)),
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: AppButton(
-                          text: 'Message Us',
-                          icon: Icons.chat,
-                          variant: AppButtonVariant.primary,
-                          onPressed: _openMessageApp,
-                        ),
-                      ),
+                      Expanded(child: _buildMessageButton('Message Us', _openMessageApp)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -938,23 +972,9 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: AppButton(
-                          text: 'WhatsApp Us',
-                          icon: Icons.chat_bubble,
-                          variant: AppButtonVariant.secondary,
-                          onPressed: _openWhatsApp,
-                        ),
-                      ),
+                      Expanded(child: _buildWhatsAppButton('WhatsApp Us', _openWhatsApp)),
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: AppButton(
-                          text: 'Message Us',
-                          icon: Icons.chat,
-                          variant: AppButtonVariant.primary,
-                          onPressed: _openMessageApp,
-                        ),
-                      ),
+                      Expanded(child: _buildMessageButton('Message Us', _openMessageApp)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -1025,6 +1045,43 @@ class _HelpScreenState extends State<HelpScreen> {
     );
   }
 
+  Widget _buildMessageButton(String text, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryBlue,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryBlue.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.phone_in_talk, size: 24, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: AppTheme.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildEmergencySupportLine() {
     return LayoutBuilder(
@@ -1085,3 +1142,69 @@ class _SpeechBubblePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+// Custom WhatsApp Icon Widget
+class WhatsAppIcon extends StatelessWidget {
+  final double size;
+  
+  const WhatsAppIcon({super.key, this.size = 24.0});
+  
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: WhatsAppIconPainter(),
+    );
+  }
+}
+
+class WhatsAppIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    // Outer white circle
+    paint.color = Colors.white;
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      size.width / 2,
+      paint,
+    );
+    
+    // Inner green circle
+    paint.color = const Color(0xFF25D366); // WhatsApp green
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      size.width / 2 - 2,
+      paint,
+    );
+    
+    // White phone icon
+    paint.color = Colors.white;
+    final phonePath = Path();
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+    final phoneSize = size.width * 0.4;
+    
+    // Phone receiver shape
+    phonePath.moveTo(centerX - phoneSize * 0.3, centerY - phoneSize * 0.2);
+    phonePath.lineTo(centerX + phoneSize * 0.3, centerY - phoneSize * 0.2);
+    phonePath.lineTo(centerX + phoneSize * 0.3, centerY + phoneSize * 0.2);
+    phonePath.lineTo(centerX - phoneSize * 0.3, centerY + phoneSize * 0.2);
+    phonePath.close();
+    
+    // Phone handle
+    phonePath.moveTo(centerX - phoneSize * 0.15, centerY + phoneSize * 0.2);
+    phonePath.lineTo(centerX - phoneSize * 0.15, centerY + phoneSize * 0.4);
+    phonePath.lineTo(centerX + phoneSize * 0.15, centerY + phoneSize * 0.4);
+    phonePath.lineTo(centerX + phoneSize * 0.15, centerY + phoneSize * 0.2);
+    phonePath.close();
+    
+    canvas.drawPath(phonePath, paint);
+  }
+  
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+

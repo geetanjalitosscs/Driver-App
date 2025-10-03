@@ -14,4 +14,24 @@ class NavigationProvider extends ChangeNotifier {
     _currentIndex = 0;
     notifyListeners();
   }
+
+  void navigateToTrips() {
+    _currentIndex = 1;
+    notifyListeners();
+  }
+
+  void navigateToEarnings() {
+    _currentIndex = 2;
+    notifyListeners();
+  }
+
+  void navigateToWallet() {
+    _currentIndex = 3;
+    notifyListeners();
+  }
+
+  void navigateToHelp() {
+    _currentIndex = 5;
+    notifyListeners();
+  }
 }

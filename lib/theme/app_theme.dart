@@ -62,6 +62,11 @@ class AppTheme {
   // Additional colors
   static const Color textSecondary = Color(0xFF757575);
   static const Color errorRed = Color(0xFFE53935);
+  
+  // Text colors for notifications and other components
+  static const Color textDark = Color(0xFF212121);
+  static const Color textMedium = Color(0xFF757575);
+  static const Color textLight = Color(0xFFBDBDBD);
 
   // Text Styles
   static TextStyle get heading1 => GoogleFonts.roboto(

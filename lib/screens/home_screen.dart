@@ -12,10 +12,10 @@ import '../providers/emergency_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/earnings_provider.dart';
-import '../providers/navigation_provider.dart';
+import '../providers/notification_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../providers/navigation_provider.dart';
 import '../services/api_service.dart';
-import '../widgets/api_accident_report_dialog.dart';
 import '../widgets/trip_completion_dialog.dart';
 import '../models/trip.dart';
 import '../models/accident_report.dart';
@@ -23,6 +23,7 @@ import 'profile_screen.dart';
 import 'accident_list_screen.dart';
 import 'trip_navigation_screen.dart';
 import 'settings_screen.dart';
+import '../widgets/api_accident_report_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -342,7 +343,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Accepted Accident Display
                   Consumer<AccidentProvider>(
                     builder: (context, accidentProvider, child) {
-                      if (accidentProvider.hasAcceptedAccident) {
+                      // Only show accepted accident when user is online
+                      if (_isOnDuty && accidentProvider.hasAcceptedAccident) {
                         return Column(
                           children: [
                             _buildAcceptedAccidentCard(accidentProvider.acceptedAccident!),
@@ -1507,6 +1509,14 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       
       if (trip != null && mounted) {
+        // Add notification for trip acceptance
+        final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        notificationProvider.addTripAcceptedNotification(
+          location: accident.location,
+          accidentId: accident.id,
+          amount: trip.amount,
+        );
+
         // Navigate to trip navigation screen (this will show trip details, not open map)
         Navigator.of(context).push(
           MaterialPageRoute(

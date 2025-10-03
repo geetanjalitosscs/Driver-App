@@ -5,6 +5,7 @@ import '../providers/accident_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/notification_provider.dart';
 import '../models/accident_report.dart';
 import '../models/trip.dart';
 import '../widgets/common/app_button.dart';
@@ -409,6 +410,15 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       );
       
       if (success) {
+        // Add notification for trip acceptance
+        final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        final accident = provider.currentAccident!;
+        notificationProvider.addTripAcceptedNotification(
+          location: accident.location,
+          accidentId: accident.id,
+          amount: 500.0, // Default amount for accident response
+        );
+        
         // Close accident dialog and redirect to home screen
         Navigator.of(context).pop();
         

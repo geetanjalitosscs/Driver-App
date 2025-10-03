@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/earning.dart';
-import '../services/api_service.dart';
 import '../config/database_config.dart';
 
 class EarningsProvider extends ChangeNotifier {
@@ -37,26 +36,42 @@ class EarningsProvider extends ChangeNotifier {
       // Load earnings for the selected period
       if (period == 'week') {
         // For week period, load all data and filter client-side to ensure last 7 days
-        final allEarnings = await CentralizedApiService.getDriverEarnings(
-          driverId: driverId,
-          period: 'all',
+        final response = await http.get(
+          Uri.parse('${DatabaseConfig.baseUrl}/get_driver_earnings.php?driver_id=$driverId&period=all'),
+          headers: {'Content-Type': 'application/json'},
         );
         
-        // Filter for last 7 days
-        final now = DateTime.now();
-        final sevenDaysAgo = now.subtract(const Duration(days: 7));
-        
-        _earnings = allEarnings.where((earning) {
-          return earning.earningDate.isAfter(sevenDaysAgo);
-        }).toList();
-        
-        print('Loaded ${allEarnings.length} total earnings, filtered to ${_earnings.length} for last 7 days');
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final List<dynamic> earningsData = data['earnings'];
+            final allEarnings = earningsData.map((earning) => Earning.fromJson(earning)).toList();
+            
+            // Filter for last 7 days
+            final now = DateTime.now();
+            final sevenDaysAgo = now.subtract(const Duration(days: 7));
+            
+            _earnings = allEarnings.where((earning) {
+              return earning.earningDate.isAfter(sevenDaysAgo);
+            }).toList();
+            
+            print('Loaded ${allEarnings.length} total earnings, filtered to ${_earnings.length} for last 7 days');
+          }
+        }
       } else {
-        _earnings = await CentralizedApiService.getDriverEarnings(
-          driverId: driverId,
-          period: period,
+        final response = await http.get(
+          Uri.parse('${DatabaseConfig.baseUrl}/get_driver_earnings.php?driver_id=$driverId&period=$period'),
+          headers: {'Content-Type': 'application/json'},
         );
-        print('Loaded ${_earnings.length} earnings');
+        
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final List<dynamic> earningsData = data['earnings'];
+            _earnings = earningsData.map((earning) => Earning.fromJson(earning)).toList();
+            print('Loaded ${_earnings.length} earnings');
+          }
+        }
       }
 
       // Calculate summary from filtered earnings data
@@ -64,15 +79,28 @@ class EarningsProvider extends ChangeNotifier {
 
       // Load all-time data for summary card (only if not already loaded or if period is 'all')
       if (_allTimeSummary.isEmpty || period == 'all') {
-        final allTimeEarnings = await CentralizedApiService.getDriverEarnings(
-          driverId: driverId,
-          period: 'all',
+        final response = await http.get(
+          Uri.parse('${DatabaseConfig.baseUrl}/get_driver_earnings.php?driver_id=$driverId&period=all'),
+          headers: {'Content-Type': 'application/json'},
         );
-        await _calculateAllTimeSummaryWithTrips(driverId, allTimeEarnings);
+        
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['success'] == true) {
+            final List<dynamic> earningsData = data['earnings'];
+            final allTimeEarnings = earningsData.map((earning) => Earning.fromJson(earning)).toList();
+            await _calculateAllTimeSummaryWithTrips(driverId, allTimeEarnings);
+          }
+        }
       }
 
       // Use earnings as recent earnings for now
       _recentEarnings = _earnings.take(10).toList();
+
+      // Add earnings notification if there are new earnings
+      if (_earnings.isNotEmpty) {
+        _addEarningsNotification();
+      }
 
       // Clear weekly data for now
       _weeklyData = [];
@@ -199,6 +227,12 @@ class EarningsProvider extends ChangeNotifier {
     if (period != _selectedPeriod) {
       await loadDriverEarnings(driverId, period);
     }
+  }
+
+  // Add earnings notification
+  void _addEarningsNotification() {
+    // This will be called from the UI context where NotificationProvider is available
+    print('Earnings notification should be added for ${_earnings.length} earnings');
   }
 
   // Get formatted period name

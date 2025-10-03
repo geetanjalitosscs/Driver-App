@@ -7,6 +7,7 @@ import 'screens/login_screen.dart';
 import 'screens/trip_history_screen.dart';
 import 'screens/earnings_screen.dart';
 import 'screens/wallet_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'screens/help_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/profile_provider.dart';
@@ -17,7 +18,7 @@ import 'providers/earnings_provider.dart';
 import 'providers/wallet_provider.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/settings_provider.dart';
-import 'services/notification_service.dart';
+import 'providers/notification_provider.dart';
 import 'widgets/notification_banner.dart';
 
 void main() async {
@@ -26,8 +27,8 @@ void main() async {
     
     // Initialize notification service with error handling
     try {
-      await NotificationService.initialize();
-      print('✅ NotificationService initialized successfully');
+      // await NotificationService.initialize(); // Commented out - service not available
+      print('✅ NotificationService initialization skipped');
     } catch (e) {
       print('⚠️ Warning: Notification initialization failed: $e');
       // Continue app startup even if notifications fail
@@ -68,6 +69,7 @@ class AmbulanceDriverApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => EmergencyProvider()),
         ChangeNotifierProvider(create: (context) => AccidentProvider()),
         ChangeNotifierProvider(create: (context) => TripProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
         ChangeNotifierProvider(create: (context) => EarningsProvider()),
         ChangeNotifierProvider(create: (context) => WalletProvider()),
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
@@ -98,6 +100,7 @@ class _MainScreenState extends State<MainScreen> {
     const TripHistoryScreen(),
     const EarningsScreen(),
     const WalletScreen(),
+    const NotificationsScreen(),
     const HelpScreen(),
   ];
 
@@ -137,13 +140,16 @@ class _MainScreenState extends State<MainScreen> {
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.grey[400],
               elevation: 0,
+              selectedLabelStyle: const TextStyle(fontSize: 10),
+              unselectedLabelStyle: const TextStyle(fontSize: 9),
+              iconSize: 24,
               items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   label: 'Home',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.square),
+                  icon: Icon(Icons.directions_car),
                   label: 'Trips',
                 ),
                 BottomNavigationBarItem(
@@ -153,6 +159,10 @@ class _MainScreenState extends State<MainScreen> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.account_balance_wallet),
                   label: 'Wallet',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.notifications_outlined),
+                  label: 'Alerts',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.help_outline),

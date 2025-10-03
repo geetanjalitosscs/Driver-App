@@ -183,6 +183,9 @@ class AccidentProvider extends ChangeNotifier {
       _acceptedAccident = _currentAccident;
       notifyListeners();
 
+      // Add notification for trip acceptance
+      _addTripAcceptedNotification();
+
       // Open location in Google Maps app (prefer native app over browser)
       print('=== GOOGLE MAPS DEBUG ===');
       print('Latitude: ${_currentAccident!.latitude}');
@@ -258,12 +261,61 @@ class AccidentProvider extends ChangeNotifier {
         // Clear the accepted accident since it's completed
         _acceptedAccident = null;
         notifyListeners();
+        
+        // Add notification for trip completion
+        _addTripCompletedNotification();
       }
       return true;
     } catch (e) {
       print('Complete accident error: $e');
       _setError('Failed to complete accident: $e');
       return false;
+    }
+  }
+
+  // Async Google Maps opening to avoid blocking
+  void _openGoogleMapsAsync(String url) {
+    Future.microtask(() async {
+      try {
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(
+            Uri.parse(url),
+            mode: LaunchMode.externalApplication, // Force native app
+          );
+          print('Google Maps opened successfully');
+        } else {
+          print('Could not launch Google Maps - trying platform default');
+          await launchUrl(
+            Uri.parse(url),
+            mode: LaunchMode.platformDefault,
+          );
+        }
+      } catch (mapsError) {
+        print('Google Maps error: $mapsError');
+        // Don't fail the whole process if maps fails
+      }
+    });
+  }
+
+  // Notification helper methods
+  void _addTripAcceptedNotification() {
+    if (_currentAccident != null) {
+      // This will be called from the UI context where NotificationProvider is available
+      print('Trip accepted notification should be added for accident ${_currentAccident!.id}');
+    }
+  }
+
+  void _addTripCompletedNotification() {
+    if (_acceptedAccident != null) {
+      // This will be called from the UI context where NotificationProvider is available
+      print('Trip completed notification should be added for accident ${_acceptedAccident!.id}');
+    }
+  }
+
+  void _addNewAccidentNotification() {
+    if (_currentAccident != null) {
+      // This will be called from the UI context where NotificationProvider is available
+      print('New accident notification should be added for accident ${_currentAccident!.id}');
     }
   }
 

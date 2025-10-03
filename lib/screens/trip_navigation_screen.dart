@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/trip_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/notification_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
@@ -373,17 +374,25 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
         confirmed: true,
       );
 
-      if (success) {
-        Navigator.of(context).pop(true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        _showError('Failed to complete trip');
-      }
+          if (success) {
+            // Add notification for trip completion
+            final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+            notificationProvider.addTripCompletedNotification(
+              location: widget.trip.location,
+              amount: widget.trip.amount,
+              tripId: widget.trip.historyId,
+            );
+
+            Navigator.of(context).pop(true);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            _showError('Failed to complete trip');
+          }
     } catch (e) {
       _showError('Error completing trip: $e');
     }

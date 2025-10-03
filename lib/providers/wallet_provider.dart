@@ -86,6 +86,11 @@ class WalletProvider extends ChangeNotifier {
       final transactions = await CentralizedApiService.getWalletTransactions(driverId);
       _transactions = transactions.map((payment) => payment.toJson()).toList();
 
+      // Add wallet balance notification if balance changed
+      if (_wallet != null) {
+        _addWalletBalanceNotification();
+      }
+
       notifyListeners();
     } catch (e) {
       _setError('Failed to load wallet data: $e');
@@ -256,5 +261,11 @@ class WalletProvider extends ChangeNotifier {
       'withdrawals': totalWithdrawals,
       'net': totalCredits - totalDebits - totalWithdrawals,
     };
+  }
+
+  // Add wallet balance notification
+  void _addWalletBalanceNotification() {
+    // This will be called from the UI context where NotificationProvider is available
+    print('Wallet balance notification should be added for balance ${_wallet?.balance}');
   }
 }
