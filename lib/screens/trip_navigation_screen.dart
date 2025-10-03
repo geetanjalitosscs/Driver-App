@@ -13,6 +13,7 @@ import '../providers/notification_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import '../config/maps_config.dart';
 
 class TripNavigationScreen extends StatefulWidget {
@@ -381,6 +382,14 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               location: widget.trip.location,
               amount: widget.trip.amount,
               tripId: widget.trip.historyId,
+            );
+
+            // Show system notification for trip completion
+            await NotificationService.showTripCompletedNotification(
+              tripId: widget.trip.historyId,
+              vehicle: widget.trip.clientName, // Use clientName instead of vehicleNumber
+              location: widget.trip.endLocation,
+              earnings: widget.trip.amount,
             );
 
             Navigator.of(context).pop(true);

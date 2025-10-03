@@ -17,6 +17,7 @@ import '../providers/notification_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/navigation_provider.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/trip_completion_dialog.dart';
 import '../models/trip.dart';
 import '../models/accident_report.dart';
@@ -85,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
+
 
   void _loadInitialAccidentCount() {
     // Load accident count immediately when app starts

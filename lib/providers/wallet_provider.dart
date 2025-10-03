@@ -150,11 +150,10 @@ class WalletProvider extends ChangeNotifier {
         await loadWalletData(_wallet!.driverId);
         
         // Show push notification for withdrawal request
-        await NotificationService.showNotification(
-          id: DateTime.now().millisecondsSinceEpoch,
-          title: 'Withdrawal Requested',
-          body: 'Your withdrawal request of ₹${amount.toStringAsFixed(0)} has been submitted successfully.',
-          type: 'withdrawal_requested',
+        await NotificationService.showWithdrawalNotification(
+          amount: amount,
+          status: 'requested',
+          method: 'Bank Transfer',
         );
         
         return true;

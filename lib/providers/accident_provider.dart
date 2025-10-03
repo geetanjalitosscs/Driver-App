@@ -36,7 +36,31 @@ class AccidentProvider extends ChangeNotifier {
     try {
       print('Loading accidents for driver ID: $driverId');
       
+      // Store previous accident IDs to detect new ones
+      final previousAccidentIds = _allAccidents.map((a) => a.id).toSet();
+      
       _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
+      
+      // Detect and notify about NEW accidents only
+      if (driverId != null && _allAccidents.isNotEmpty) {
+        final newAccidents = _allAccidents.where((accident) => 
+          !previousAccidentIds.contains(accident.id)
+        ).toList();
+        
+        print('Found ${newAccidents.length} new accidents');
+        
+        // Show notifications only for NEW accidents
+        for (final accident in newAccidents) {
+          print('Creating notification for new accident ID: ${accident.id}');
+          await NotificationService.showNewAccidentNotification(
+            accidentId: accident.id,
+            vehicle: accident.vehicle,
+            location: accident.location,
+            latitude: accident.latitude,
+            longitude: accident.longitude,
+          );
+        }
+      }
       
       // Apply current filter
       _applyFilter();

@@ -112,11 +112,10 @@ class EarningsProvider extends ChangeNotifier {
       // Show push notification for new earnings
       if (_earnings.isNotEmpty) {
         final totalEarnings = _summary['total_earnings'] ?? 0.0;
-        await NotificationService.showNotification(
-          id: DateTime.now().millisecondsSinceEpoch,
-          title: 'New Earnings Update',
-          body: 'You have earned ₹${totalEarnings.toStringAsFixed(0)} in ${getPeriodDisplayName()}.',
-          type: 'earnings_update',
+        await NotificationService.showEarningsNotification(
+          amount: totalEarnings,
+          period: getPeriodDisplayName(),
+          tripCount: earnings.length,
         );
       }
       

@@ -62,14 +62,52 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
+
+    // Create notification channel for Android (required for Android 8.0+)
+    await _createNotificationChannel();
+  }
+
+  /// Create notification channel for Android
+  static Future<void> _createNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'driver_app_channel',
+      'Driver App Notifications',
+      description: 'Notifications for accident reports, trips, earnings, and withdrawals',
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+      enableLights: true,
+      ledColor: Color(0xFF2196F3), // Blue LED color
+    );
+
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidImplementation != null) {
+      await androidImplementation.createNotificationChannel(channel);
+      print('✅ Android notification channel created successfully');
+    }
   }
 
   /// Request permissions
   static Future<void> _requestPermissions() async {
     // Request local notification permissions
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    
+    if (androidImplementation != null) {
+      // Request notification permission for Android 13+
+      await androidImplementation.requestNotificationsPermission();
+      
+      // Request exact alarm permission for Android 12+
+      await androidImplementation.requestExactAlarmsPermission();
+      
+      print('✅ Android notification permissions requested');
+    }
+
+    // For iOS, permissions are requested in DarwinInitializationSettings
+    print('✅ iOS notification permissions requested');
   }
 
   /// Handle notification tap
@@ -78,7 +116,7 @@ class NotificationService {
     // Handle notification tap logic here
   }
 
-  /// Show local notification
+  /// Show local notification (system notification outside app)
   static Future<void> showNotification({
     required int id,
     required String title,
@@ -95,15 +133,44 @@ class NotificationService {
       'driver_app_channel',
       'Driver App Notifications',
       channelDescription: 'Notifications for the Driver App',
-      importance: Importance.high,
+      importance: Importance.max, // Maximum importance for better visibility
       priority: Priority.high,
       showWhen: true,
+      enableVibration: true,
+      playSound: true,
+      autoCancel: false, // Don't auto-cancel so it stays in notification tray
+      ongoing: false,
+      visibility: NotificationVisibility.public, // Show on lock screen
+      fullScreenIntent: true, // Show full screen intent for important notifications
+      category: AndroidNotificationCategory.message, // Categorize as message
+      channelShowBadge: true, // Show badge on app icon
+      icon: '@mipmap/ic_launcher', // Use app icon
+      largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'), // Large icon
+      styleInformation: BigTextStyleInformation(''), // Allow expandable text
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          'view',
+          'View',
+          showsUserInterface: true,
+        ),
+        AndroidNotificationAction(
+          'dismiss',
+          'Dismiss',
+          cancelNotification: true,
+        ),
+      ],
     );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      interruptionLevel: InterruptionLevel.critical, // Critical level for better visibility
+      sound: 'default', // Use default system sound
+      badgeNumber: 1, // Show badge number
+      threadIdentifier: 'driver_app_notifications', // Group notifications
+      categoryIdentifier: 'driver_app_category', // Category for actions
+      attachments: <DarwinNotificationAttachment>[], // No attachments for now
     );
 
     const NotificationDetails notificationDetails = NotificationDetails(
@@ -111,31 +178,35 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _localNotifications.show(
-      id,
-      title,
-      body,
-      notificationDetails,
-      payload: payload,
-    );
+    try {
+      await _localNotifications.show(
+        id,
+        title,
+        body,
+        notificationDetails,
+        payload: payload,
+      );
 
-    // Add to history
-    _notificationHistory.insert(0, NotificationData(
-      id: id,
-      title: title,
-      body: body,
-      timestamp: DateTime.now(),
-      payload: payload,
-      type: type,
-    ));
+      print('📱 System notification shown successfully: $title');
 
-    // Keep only last 50 notifications
-    if (_notificationHistory.length > 50) {
-      _notificationHistory.removeRange(50, _notificationHistory.length);
+      // Add to history
+      _notificationHistory.insert(0, NotificationData(
+        id: id,
+        title: title,
+        body: body,
+        timestamp: DateTime.now(),
+        payload: payload,
+        type: type,
+      ));
+
+      // Keep only last 50 notifications
+      if (_notificationHistory.length > 50) {
+        _notificationHistory.removeRange(50, _notificationHistory.length);
+      }
+    } catch (e) {
+      print('❌ Failed to show system notification: $e');
     }
   }
-
-  // Scheduled notifications removed to avoid timezone dependency issues
 
   /// Cancel notification
   static Future<void> cancelNotification(int id) async {
@@ -161,6 +232,114 @@ class NotificationService {
   static Future<bool> areNotificationsEnabled() async {
     // For local notifications, we assume they're enabled if initialized
     return _isInitialized;
+  }
+
+  // ===== NOTIFICATION METHODS FOR DIFFERENT EVENTS =====
+
+  /// Show notification for new accident reports
+  static Future<void> showNewAccidentNotification({
+    required int accidentId,
+    required String vehicle,
+    required String location,
+    double? latitude,
+    double? longitude,
+  }) async {
+    final title = "🚨 New Accident Report #$accidentId";
+    final message = "Accident reported for vehicle $vehicle at $location";
+    
+    print('🔔 Creating notification for accident ID: $accidentId');
+    
+    await showNotification(
+      id: accidentId,
+      title: title,
+      body: message,
+      payload: json.encode({
+        'type': 'new_accident',
+        'accident_id': accidentId,
+        'vehicle': vehicle,
+        'location': location,
+        'latitude': latitude,
+        'longitude': longitude,
+      }),
+      type: 'new_accident',
+    );
+  }
+
+  /// Show notification for trip completion
+  static Future<void> showTripCompletedNotification({
+    required int tripId,
+    required String vehicle,
+    required String location,
+    required double earnings,
+  }) async {
+    final title = "✅ Trip Completed";
+    final message = "Trip #$tripId completed for vehicle $vehicle. Earnings: ₹$earnings";
+    
+    print('🔔 Creating notification for completed trip ID: $tripId');
+    
+    await showNotification(
+      id: tripId,
+      title: title,
+      body: message,
+      payload: json.encode({
+        'type': 'trip_completed',
+        'trip_id': tripId,
+        'vehicle': vehicle,
+        'location': location,
+        'earnings': earnings,
+      }),
+      type: 'trip_completed',
+    );
+  }
+
+  /// Show notification for earnings
+  static Future<void> showEarningsNotification({
+    required double amount,
+    required String period,
+    required int tripCount,
+  }) async {
+    final title = "💰 Earnings Update";
+    final message = "₹$amount earned in $period from $tripCount trips";
+    
+    print('🔔 Creating notification for earnings: ₹$amount');
+    
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Use timestamp as ID
+      title: title,
+      body: message,
+      payload: json.encode({
+        'type': 'earnings',
+        'amount': amount,
+        'period': period,
+        'trip_count': tripCount,
+      }),
+      type: 'earnings',
+    );
+  }
+
+  /// Show notification for withdrawal
+  static Future<void> showWithdrawalNotification({
+    required double amount,
+    required String status,
+    required String method,
+  }) async {
+    final title = "💳 Withdrawal $status";
+    final message = "₹$amount withdrawal via $method is $status";
+    
+    print('🔔 Creating notification for withdrawal: ₹$amount');
+    
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Use timestamp as ID
+      title: title,
+      body: message,
+      payload: json.encode({
+        'type': 'withdrawal',
+        'amount': amount,
+        'status': status,
+        'method': method,
+      }),
+      type: 'withdrawal',
+    );
   }
 }
 
