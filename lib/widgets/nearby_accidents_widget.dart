@@ -35,16 +35,16 @@ class _NearbyAccidentsWidgetState extends State<NearbyAccidentsWidget> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final locationProvider = Provider.of<LocationAccidentProvider>(context, listen: false);
     
-    if (authProvider.isAuthenticated && authProvider.driver != null) {
+    if (authProvider.isAuthenticated && authProvider.currentUser != null) {
       if (widget.latitude != null && widget.longitude != null) {
         locationProvider.getNearbyAccidents(
-          driverId: authProvider.driver!['driver_id'],
+          driverId: int.parse(authProvider.currentUser!.driverId),
           latitude: widget.latitude!,
           longitude: widget.longitude!,
         );
       } else {
         locationProvider.getDriverNearbyAccidents(
-          driverId: authProvider.driver!['driver_id'],
+          driverId: int.parse(authProvider.currentUser!.driverId),
         );
       }
     }

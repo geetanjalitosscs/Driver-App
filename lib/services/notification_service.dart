@@ -15,6 +15,14 @@ class NotificationService {
   // Notification state
   static bool _isInitialized = false;
   static final List<NotificationData> _notificationHistory = [];
+  
+  // Callback to save notifications to NotificationProvider
+  static Function(String title, String body, String type, Map<String, dynamic> actionData)? _saveToProviderCallback;
+
+  /// Set callback to save notifications to NotificationProvider
+  static void setSaveToProviderCallback(Function(String title, String body, String type, Map<String, dynamic> actionData) callback) {
+    _saveToProviderCallback = callback;
+  }
 
   /// Initialize the notification service
   static Future<void> initialize() async {
@@ -100,8 +108,8 @@ class NotificationService {
       // Request notification permission for Android 13+
       await androidImplementation.requestNotificationsPermission();
       
-      // Request exact alarm permission for Android 12+
-      await androidImplementation.requestExactAlarmsPermission();
+      // Removed requestExactAlarmsPermission() to avoid "Alarms and Reminders" dialog
+      // This permission is not needed for basic notifications
       
       print('✅ Android notification permissions requested');
     }
@@ -202,6 +210,25 @@ class NotificationService {
       // Keep only last 50 notifications
       if (_notificationHistory.length > 50) {
         _notificationHistory.removeRange(50, _notificationHistory.length);
+      }
+
+      // Also save to NotificationProvider if callback is set
+      if (_saveToProviderCallback != null) {
+        try {
+          Map<String, dynamic> actionData = {};
+          if (payload != null) {
+            try {
+              actionData = json.decode(payload);
+            } catch (e) {
+              print('⚠️ Failed to parse payload: $e');
+            }
+          }
+          
+          _saveToProviderCallback!(title, body, type, actionData);
+          print('✅ Notification saved to NotificationProvider');
+        } catch (e) {
+          print('❌ Failed to save to NotificationProvider: $e');
+        }
       }
     } catch (e) {
       print('❌ Failed to show system notification: $e');
@@ -339,6 +366,102 @@ class NotificationService {
         'method': method,
       }),
       type: 'withdrawal',
+    );
+  }
+
+  /// Show notification for accident accepted
+  static Future<void> showAccidentAcceptedNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+  }) async {
+    await showNotification(
+      id: accidentId + 1000,
+      title: 'Accident Report Accepted',
+      body: 'You accepted accident #$accidentId at $location for $clientName',
+      type: 'accident_accepted',
+    );
+  }
+
+  /// Show notification for accident rejected
+  static Future<void> showAccidentRejectedNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+  }) async {
+    await showNotification(
+      id: accidentId + 2000,
+      title: 'Accident Report Rejected',
+      body: 'You rejected accident #$accidentId at $location for $clientName',
+      type: 'accident_rejected',
+    );
+  }
+
+  /// Show notification for accident cancelled
+  static Future<void> showAccidentCancelledNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+  }) async {
+    await showNotification(
+      id: accidentId + 3000,
+      title: 'Accident Report Cancelled',
+      body: 'You cancelled accident #$accidentId at $location for $clientName',
+      type: 'accident_cancelled',
+    );
+  }
+
+  /// Show notification for earning added
+  static Future<void> showEarningAddedNotification({
+    required int tripId,
+    required double amount,
+    required String clientName,
+  }) async {
+    await showNotification(
+      id: tripId + 5000,
+      title: 'Earning Added',
+      body: 'Earning of ₹${amount.toStringAsFixed(0)} added for trip #$tripId with $clientName',
+      type: 'earning_added',
+    );
+  }
+
+  /// Show notification for withdrawal requested
+  static Future<void> showWithdrawalRequestedNotification({
+    required int withdrawalId,
+    required double amount,
+  }) async {
+    await showNotification(
+      id: withdrawalId + 6000,
+      title: 'Withdrawal Requested',
+      body: 'Withdrawal of ₹${amount.toStringAsFixed(0)} has been requested',
+      type: 'withdrawal_requested',
+    );
+  }
+
+  /// Show notification for withdrawal completed
+  static Future<void> showWithdrawalCompletedNotification({
+    required int withdrawalId,
+    required double amount,
+  }) async {
+    await showNotification(
+      id: withdrawalId + 7000,
+      title: 'Withdrawal Completed',
+      body: 'Withdrawal of ₹${amount.toStringAsFixed(0)} has been completed',
+      type: 'withdrawal_completed',
+    );
+  }
+
+  /// Show notification for wallet balance updated
+  static Future<void> showWalletBalanceNotification({
+    required double newBalance,
+    required double amount,
+    required String transactionType,
+  }) async {
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch,
+      title: 'Wallet Balance Updated',
+      body: 'Wallet balance is now ₹${newBalance.toStringAsFixed(0)} ($transactionType: ₹${amount.toStringAsFixed(0)})',
+      type: 'wallet_balance',
     );
   }
 }

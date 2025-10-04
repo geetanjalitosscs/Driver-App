@@ -151,6 +151,36 @@ class CentralizedApiService {
     }
   }
 
+  /// Delete Account API
+  static Future<Map<String, dynamic>> deleteAccount({
+    required int driverId,
+  }) async {
+    try {
+      final url = '$_baseUrl/delete_account.php';
+      print('Deleting account for driver ID: $driverId');
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'driver_id': driverId,
+        }),
+      );
+      
+      print('Delete account response status: ${response.statusCode}');
+      print('Delete account response body: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to delete account: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Account deletion error: $e');
+    }
+  }
+
   // ============================================================================
   // EARNINGS APIs
   // ============================================================================

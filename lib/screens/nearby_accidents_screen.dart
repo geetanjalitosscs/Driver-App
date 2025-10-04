@@ -18,7 +18,7 @@ class _NearbyAccidentsScreenState extends State<NearbyAccidentsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Nearby Accidents'),
-        backgroundColor: AppTheme.primaryColor,
+        backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -48,7 +48,7 @@ class _NearbyAccidentsScreenState extends State<NearbyAccidentsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _updateLocation,
-        backgroundColor: AppTheme.primaryColor,
+        backgroundColor: AppTheme.primaryBlue,
         child: const Icon(Icons.my_location, color: Colors.white),
         tooltip: 'Update Location',
       ),
@@ -59,9 +59,9 @@ class _NearbyAccidentsScreenState extends State<NearbyAccidentsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final locationProvider = Provider.of<LocationAccidentProvider>(context, listen: false);
     
-    if (authProvider.isAuthenticated && authProvider.driver != null) {
+    if (authProvider.isAuthenticated && authProvider.currentUser != null) {
       locationProvider.getDriverNearbyAccidents(
-        driverId: authProvider.driver!['driver_id'],
+        driverId: int.parse(authProvider.currentUser!.driverId),
       );
     }
   }
@@ -135,16 +135,16 @@ class _NearbyAccidentsScreenState extends State<NearbyAccidentsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final locationProvider = Provider.of<LocationAccidentProvider>(context, listen: false);
     
-    if (authProvider.isAuthenticated && authProvider.driver != null) {
+    if (authProvider.isAuthenticated && authProvider.currentUser != null) {
       await locationProvider.updateDriverLocation(
-        driverId: authProvider.driver!['driver_id'],
+        driverId: int.parse(authProvider.currentUser!.driverId),
         latitude: latitude,
         longitude: longitude,
       );
       
       // Refresh nearby accidents after updating location
       await locationProvider.getDriverNearbyAccidents(
-        driverId: authProvider.driver!['driver_id'],
+        driverId: int.parse(authProvider.currentUser!.driverId),
       );
       
       if (mounted) {

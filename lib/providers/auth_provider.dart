@@ -113,6 +113,7 @@ class AuthProvider extends ChangeNotifier {
         print('Parsed user data: ${_currentUser?.driverName}'); // Debug log
         print('Parsed driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
         await _saveUserData(); // Save user data to storage
+        await _setDefaultOfflineState(); // Set default offline state on login
         _setLoading(false);
         return true;
       } else {
@@ -163,6 +164,8 @@ class AuthProvider extends ChangeNotifier {
       
       if (data['success'] == true) {
         _currentUser = ProfileData.fromJson(data['driver']);
+        await _saveUserData(); // Save user data to storage
+        await _setDefaultOfflineState(); // Set default offline state on signup
         _setLoading(false);
         return true;
       } else {
@@ -187,13 +190,89 @@ class AuthProvider extends ChangeNotifier {
     _currentUser = null;
     _errorMessage = null;
     await _clearUserData(); // Clear stored user data
+    await _clearOnlineState(); // Clear online/offline state
     notifyListeners();
   }
 
-  // Force clear stored data (for debugging)
-  Future<void> clearStoredData() async {
-    await _clearUserData();
-    print('Cleared all stored user data');
+  // Clear online/offline state from storage
+  Future<void> _clearOnlineState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_on_duty', false); // Set to offline instead of removing
+      print('Set user to offline on logout');
+    } catch (e) {
+      print('Error setting offline state: $e');
+    }
+  }
+
+  // Set default offline state on login/signup
+  Future<void> _setDefaultOfflineState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_on_duty', false); // Set to offline by default
+      print('Set default offline state on login/signup');
+    } catch (e) {
+      print('Error setting default offline state: $e');
+    }
+  }
+
+  // Delete account method (clears all data including notifications)
+  Future<bool> deleteAccount() async {
+    if (_currentUser == null) {
+      _setError('No user logged in');
+      return false;
+    }
+
+    _setLoading(true);
+    _clearError();
+
+    try {
+      // Call API to delete account from server
+      final data = await CentralizedApiService.deleteAccount(
+        driverId: _currentUser!.driverIdAsInt,
+      );
+      
+      if (data['success'] == true) {
+        // Clear all local data including notifications
+        await _clearAllUserData();
+        
+        _currentUser = null;
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(data['message'] ?? 'Account deletion failed');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('Network error: $e');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Clear all user data including notifications
+  Future<void> _clearAllUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Clear user data
+      await prefs.remove('user_data');
+      
+      // Clear online/offline state
+      await prefs.setBool('is_on_duty', false);
+      
+      // Clear notifications for this driver
+      final driverId = _currentUser?.driverId ?? '';
+      if (driverId.isNotEmpty) {
+        await prefs.remove('driver_notifications_$driverId');
+        print('Cleared notifications for driver $driverId');
+      }
+      
+      print('Cleared all user data and notifications');
+    } catch (e) {
+      print('Error clearing all user data: $e');
+    }
   }
 
   // Update profile method

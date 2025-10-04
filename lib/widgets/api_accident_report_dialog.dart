@@ -417,13 +417,16 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
       );
       
       if (success) {
-        // Add notification for trip acceptance
+        // Add notification for accident acceptance
         final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final driverId = authProvider.currentUser?.driverId ?? 'unknown';
         final accident = provider.currentAccident!;
-        notificationProvider.addTripAcceptedNotification(
-          location: accident.location,
+        notificationProvider.addAccidentAcceptedNotification(
           accidentId: accident.id,
-          amount: 500.0, // Default amount for accident response
+          location: accident.location,
+          clientName: accident.fullname,
+          driverId: driverId,
         );
         
         // Wait a moment for map to open before closing dialog

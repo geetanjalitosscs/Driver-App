@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/accident_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/accident_report.dart';
 
 class AccidentReportDialog extends StatefulWidget {
@@ -296,8 +297,16 @@ class _AccidentReportDialogState extends State<AccidentReportDialog> {
     final accident = accidentProvider.currentAccident;
     if (accident == null) return;
 
+    // Get driver details from AuthProvider
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final driverId = int.parse(authProvider.currentUser?.driverId ?? '0');
+    final vehicleNumber = authProvider.currentUser?.vehicleNumber ?? '';
+
     // First accept the report
-    final success = await accidentProvider.acceptCurrentAccident(showNext: true);
+    final success = await accidentProvider.acceptCurrentAccident(
+      driverId: driverId,
+      vehicleNumber: vehicleNumber,
+    );
     
     if (mounted && success) {
       // Automatically open location in maps

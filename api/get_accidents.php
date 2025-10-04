@@ -45,17 +45,148 @@ try {
                 $confirmed = $input['confirmed'] ?? false;
                 
                 if ($confirmed) {
-                    $updateStmt = $pdo->prepare("UPDATE accidents SET 
-                        driver_status = 'completed',
-                        completed_at = NOW(),
-                        completion_confirmed = TRUE,
-                        status = 'resolved'
-                        WHERE id = ?");
+                    // First, get accident details to create trip
+                    $accidentStmt = $pdo->prepare("SELECT * FROM accidents WHERE id = ?");
+                    $accidentStmt->execute([$accident_id]);
+                    $accident = $accidentStmt->fetch(PDO::FETCH_ASSOC);
                     
-                    if ($updateStmt->execute([$accident_id])) {
-                        echo json_encode(['success' => true, 'message' => 'Accident completed successfully']);
+                    if ($accident) {
+                        // Update accident status
+                        $updateStmt = $pdo->prepare("UPDATE accidents SET 
+                            driver_status = 'completed',
+                            completed_at = NOW(),
+                            completion_confirmed = TRUE,
+                            status = 'resolved'
+                            WHERE id = ?");
+                        
+                        if ($updateStmt->execute([$accident_id])) {
+                            // Create trip record
+                            $client_name = $accident['fullname'];
+                            $location = $accident['location'];
+                            $accepted_at = $accident['accepted_at'];
+                            $completed_at = date('Y-m-d H:i:s'); // Current time
+                            
+                            // Calculate duration in minutes
+                            $start_timestamp = strtotime($accepted_at);
+                            $end_timestamp = strtotime($completed_at);
+                            $duration = round(($end_timestamp - $start_timestamp) / 60); // Duration in minutes
+                            
+                            // Ensure duration is never negative (minimum 1 minute)
+                            if ($duration < 0) {
+                                $duration = 1; // Minimum 1 minute for accident response
+                            }
+                            
+                            // Calculate amount (Base fare + per minute charge)
+                            // Using ₹500 base fare instead of ₹1500
+                            $base_fare = 500.00; // Base fare for accident response
+                            $per_minute_rate = 5.00; // Per minute charge
+                            $amount = $base_fare + ($duration * $per_minute_rate);
+                            
+                            // Ensure amount is never negative
+                            if ($amount < 0) {
+                                $amount = $base_fare; // At least base fare
+                            }
+                            
+                            // Debug logging for amount calculation
+                            error_log("Amount Calculation Debug:");
+                            error_log("Base Fare: ₹$base_fare");
+                            error_log("Duration: $duration minutes");
+                            error_log("Per Minute Rate: ₹$per_minute_rate");
+                            error_log("Calculated Amount: ₹$amount");
+                            error_log("Accident ID: $accident_id");
+                            error_log("Client Name: $client_name");
+                            error_log("Location: $location");
+                            error_log("Accepted At: $accepted_at");
+                            error_log("Completed At: $completed_at");
+                            error_log("Start Timestamp: $start_timestamp");
+                            error_log("End Timestamp: $end_timestamp");
+                            error_log("Duration Calculation: ($end_timestamp - $start_timestamp) / 60 = $duration");
+                            
+                            // Debug logging for ID consistency
+                            error_log("ID Consistency Debug:");
+                            error_log("Accident ID: $accident_id");
+                            error_log("Using Accident ID as Trip ID: $accident_id");
+                            error_log("Trip Amount: ₹$amount");
+                            
+                            // Insert trip record using accident ID as trip ID
+                            // Temporarily disable auto-increment to force specific ID
+                            $pdo->exec("SET SESSION sql_mode = 'NO_AUTO_VALUE_ON_ZERO'");
+                            
+                            // First check if trip with this ID already exists
+                            $checkStmt = $pdo->prepare("SELECT history_id FROM trips WHERE history_id = ?");
+                            $checkStmt->execute([$accident_id]);
+                            $existingTrip = $checkStmt->fetch();
+                            
+                            if (!$existingTrip) {
+                                // Insert trip record using accident ID as trip ID
+                                $tripStmt = $pdo->prepare("INSERT INTO trips 
+                                    (history_id, driver_id, client_name, location, timing, amount, duration, start_time, end_time, created_at) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                                
+                                $tripInserted = $tripStmt->execute([
+                                    $accident_id,  // Use accident ID as trip ID
+                                    $driver_id,
+                                    $client_name,
+                                    $location,
+                                    $accepted_at,
+                                    $amount,
+                                    $duration,
+                                    $accepted_at,
+                                    $completed_at
+                                ]);
+                                
+                                if ($tripInserted) {
+                                    error_log("✅ SUCCESS: Trip inserted with accident ID: $accident_id");
+                                } else {
+                                    error_log("❌ ERROR: Failed to insert trip with accident ID: $accident_id");
+                                }
+                            } else {
+                                error_log("⚠️ WARNING: Trip with accident ID $accident_id already exists, skipping insertion");
+                                $tripInserted = true; // Consider it successful since trip already exists
+                            }
+                            
+                            if ($tripInserted) {
+                                $trip_id = $accident_id; // Use accident ID as trip ID
+                                
+                                // Create earning record using accident ID as trip ID
+                                $earningStmt = $pdo->prepare("INSERT INTO earnings 
+                                    (driver_id, trip_id, amount, earning_date, created_at) 
+                                    VALUES (?, ?, ?, CURDATE(), NOW())");
+                                
+                                $earningInserted = $earningStmt->execute([
+                                    $driver_id,
+                                    $accident_id,  // Use accident ID as trip ID
+                                    $amount
+                                ]);
+                                
+                                // Update wallet balance
+                                $walletStmt = $pdo->prepare("UPDATE wallet 
+                                    SET balance = balance + ? 
+                                    WHERE driver_id = ?");
+                                $walletStmt->execute([$amount, $driver_id]);
+                                
+                                // Create wallet transaction using accident ID
+                                $transactionStmt = $pdo->prepare("INSERT INTO wallet_transactions 
+                                    (wallet_id, transaction_type, amount, description, transaction_date) 
+                                    SELECT wallet_id, 'credit', ?, CONCAT('Trip #', ?, ' - ', ?), NOW() 
+                                    FROM wallet WHERE driver_id = ?");
+                                $transactionStmt->execute([$amount, $accident_id, $client_name, $driver_id]);
+                                
+                                echo json_encode([
+                                    'success' => true, 
+                                    'message' => 'Accident completed and trip created successfully',
+                                    'trip_id' => $accident_id,  // Return accident ID as trip ID
+                                    'accident_id' => $accident_id,
+                                    'earning_inserted' => $earningInserted
+                                ]);
+                            } else {
+                                echo json_encode(['success' => false, 'message' => 'Accident completed but failed to create trip record']);
+                            }
+                        } else {
+                            echo json_encode(['success' => false, 'message' => 'Failed to complete accident']);
+                        }
                     } else {
-                        echo json_encode(['success' => false, 'message' => 'Failed to complete accident']);
+                        echo json_encode(['success' => false, 'message' => 'Accident not found']);
                     }
                 } else {
                     // Cancel accident - reset all driver-related fields to NULL
@@ -115,10 +246,10 @@ try {
         $accident['photos'] = $photos;
     }
     
-    // Debug logging for coordinates
+    // Debug logging for coordinates and IDs
     error_log("API Debug - Returning " . count($accidents) . " accidents");
     foreach ($accidents as $accident) {
-        error_log("Accident ID: " . $accident['id'] . ", Lat: " . $accident['latitude'] . ", Lng: " . $accident['longitude']);
+        error_log("Accident ID: " . $accident['id'] . " (type: " . gettype($accident['id']) . "), Name: " . $accident['fullname'] . ", Lat: " . $accident['latitude'] . ", Lng: " . $accident['longitude']);
     }
     
     echo json_encode([

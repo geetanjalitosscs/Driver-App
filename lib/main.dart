@@ -21,6 +21,7 @@ import 'providers/settings_provider.dart';
 import 'providers/notification_provider.dart';
 import 'widgets/notification_banner.dart';
 import 'services/notification_service.dart';
+import 'models/notification_item.dart' as notification_model;
 
 void main() async {
   try {
@@ -76,13 +77,58 @@ class AmbulanceDriverApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()),
       ],
-      child: MaterialApp(
-        title: 'Driver App',
-        theme: AppTheme.lightTheme,
-        home: const NotificationBannerOverlay(
-          child: AuthWrapper(),
-        ),
-        debugShowCheckedModeBanner: false,
+      child: Builder(
+        builder: (context) {
+          // Set up notification callback after providers are available
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            
+            NotificationService.setSaveToProviderCallback((title, body, type, actionData) {
+              // Get current driver ID
+              final driverId = authProvider.currentUser?.driverId ?? 'unknown';
+              
+              // Map system notification types to NotificationType enum
+              notification_model.NotificationType notificationType;
+              switch (type) {
+                case 'new_accident':
+                  notificationType = notification_model.NotificationType.accident;
+                  break;
+                case 'trip_completed':
+                case 'accident_accepted':
+                  notificationType = notification_model.NotificationType.trip;
+                  break;
+                case 'earning_added':
+                  notificationType = notification_model.NotificationType.earning;
+                  break;
+                case 'withdrawal_requested':
+                case 'withdrawal_completed':
+                case 'wallet_balance':
+                  notificationType = notification_model.NotificationType.wallet;
+                  break;
+                default:
+                  notificationType = notification_model.NotificationType.system;
+              }
+              
+              notificationProvider.addNotification(
+                title: title,
+                message: body,
+                type: notificationType,
+                actionData: actionData,
+                driverId: driverId,
+              );
+            });
+          });
+          
+          return MaterialApp(
+            title: 'Driver App',
+            theme: AppTheme.lightTheme,
+            home: const NotificationBannerOverlay(
+              child: AuthWrapper(),
+            ),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }
@@ -144,7 +190,7 @@ class _MainScreenState extends State<MainScreen> {
               selectedLabelStyle: const TextStyle(fontSize: 10),
               unselectedLabelStyle: const TextStyle(fontSize: 9),
               iconSize: 24,
-              items: const [
+              items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
                   label: 'Home',
@@ -162,7 +208,40 @@ class _MainScreenState extends State<MainScreen> {
                   label: 'Wallet',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications_outlined),
+                  icon: Consumer<NotificationProvider>(
+                    builder: (context, notificationProvider, child) {
+                      return Stack(
+                        children: [
+                          const Icon(Icons.notifications_outlined),
+                          if (notificationProvider.unreadCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '${notificationProvider.unreadCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                   label: 'Alerts',
                 ),
                 BottomNavigationBarItem(

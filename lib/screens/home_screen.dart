@@ -33,6 +33,11 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+
+  // Static method to reset online state (called during logout)
+  static void resetOnlineState() {
+    _HomeScreenState.resetOnlineState();
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -108,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       // Use SharedPreferences.getInstance() synchronously
       SharedPreferences.getInstance().then((prefs) {
-        final savedState = prefs.getBool('is_on_duty') ?? false;
+        final savedState = prefs.getBool('is_on_duty') ?? false; // Default to offline if no saved state
         
         // Update both persistent and local state
         _persistentIsOnDuty = savedState;
@@ -121,12 +126,13 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         }
         
-        print('Loaded online/offline state: $_isOnDuty');
+        print('Loaded online/offline state: $_isOnDuty (default: false if no saved state)');
       }).catchError((e) {
         print('Error loading online/offline state: $e');
         _hasLoadedPersistentState = true;
         if (mounted) {
           setState(() {
+            _isOnDuty = false; // Default to offline on error
             _hasLoadedState = true;
           });
         }
@@ -136,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _hasLoadedPersistentState = true;
       if (mounted) {
         setState(() {
+          _isOnDuty = false; // Default to offline on error
           _hasLoadedState = true;
         });
       }
@@ -156,6 +163,13 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error saving online/offline state: $e');
     }
+  }
+
+  // Static method to reset online state (called during logout)
+  static void resetOnlineState() {
+    _persistentIsOnDuty = false;
+    _hasLoadedPersistentState = false;
+    print('Reset online state to offline');
   }
 
 
@@ -1675,10 +1689,13 @@ class _HomeScreenState extends State<HomeScreen> {
       if (trip != null && mounted) {
         // Add notification for trip acceptance
         final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final driverId = authProvider.currentUser?.driverId ?? 'unknown';
         notificationProvider.addTripAcceptedNotification(
           location: accident.location,
           accidentId: accident.id,
           amount: trip.amount,
+          driverId: driverId,
         );
 
         // Navigate to trip navigation screen (this will show trip details, not open map)
@@ -1732,7 +1749,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final locationString = '${accident.location}, Lat: ${accident.latitude}, Lng: ${accident.longitude}';
         
         final trip = Trip(
-          historyId: DateTime.now().millisecondsSinceEpoch, // Use timestamp as ID
+          historyId: accident.id, // Use accident ID as trip ID
           driverId: driverId,
           clientName: accident.fullname,
           location: locationString, // Include coordinates for parsing

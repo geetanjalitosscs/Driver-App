@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notification_item.dart';
 
 class NotificationProvider extends ChangeNotifier {
   List<NotificationItem> _notifications = [];
+  Set<String> _notificationIds = {}; // Track unique notification IDs
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -22,16 +24,64 @@ class NotificationProvider extends ChangeNotifier {
     return _notifications.where((n) => n.type == type).toList();
   }
 
-  // Add a new notification
+  // Initialize notifications from storage for specific driver
+  Future<void> initializeNotifications(String driverId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final notificationsJson = prefs.getString('driver_notifications_$driverId');
+      
+      if (notificationsJson != null) {
+        final List<dynamic> notificationsList = json.decode(notificationsJson);
+        _notifications = notificationsList
+            .map((json) => NotificationItem.fromJson(json))
+            .toList();
+        
+        // Update notification IDs set
+        _notificationIds = _notifications.map((n) => n.id).toSet();
+        
+        notifyListeners();
+        print('Loaded ${_notifications.length} notifications for driver $driverId from storage');
+      } else {
+        print('No notifications found for driver $driverId');
+      }
+    } catch (e) {
+      print('Error loading notifications for driver $driverId: $e');
+    }
+  }
+
+  // Save notifications to storage for specific driver
+  Future<void> _saveNotifications(String driverId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final notificationsJson = json.encode(
+        _notifications.map((n) => n.toJson()).toList(),
+      );
+      await prefs.setString('driver_notifications_$driverId', notificationsJson);
+      print('Saved ${_notifications.length} notifications for driver $driverId to storage');
+    } catch (e) {
+      print('Error saving notifications for driver $driverId: $e');
+    }
+  }
+
+  // Add a new notification (ensures uniqueness)
   void addNotification({
     required String title,
     required String message,
     required NotificationType type,
     required Map<String, dynamic> actionData,
+    required String driverId,
     String? id,
   }) {
+    final notificationId = id ?? DateTime.now().millisecondsSinceEpoch.toString();
+    
+    // Check if notification already exists
+    if (_notificationIds.contains(notificationId)) {
+      print('Notification $notificationId already exists, skipping...');
+      return;
+    }
+
     final notification = NotificationItem(
-      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: notificationId,
       title: title,
       message: message,
       type: type,
@@ -41,24 +91,30 @@ class NotificationProvider extends ChangeNotifier {
     );
 
     _notifications.insert(0, notification); // Add to beginning
+    _notificationIds.add(notificationId); // Track ID
     notifyListeners();
+    
+    // Save to persistent storage
+    _saveNotifications(driverId);
   }
 
   // Mark notification as read
-  void markAsRead(String id) {
+  void markAsRead(String id, String driverId) {
     final index = _notifications.indexWhere((n) => n.id == id);
     if (index != -1) {
       _notifications[index].isRead = true;
       notifyListeners();
+      _saveNotifications(driverId); // Save to persistent storage
     }
   }
 
   // Mark all notifications as read
-  void markAllAsRead() {
+  void markAllAsRead(String driverId) {
     for (var notification in _notifications) {
       notification.isRead = true;
     }
     notifyListeners();
+    _saveNotifications(driverId); // Save to persistent storage
   }
 
   // Remove notification
@@ -70,28 +126,47 @@ class NotificationProvider extends ChangeNotifier {
   // Clear all notifications
   void clearAllNotifications() {
     _notifications.clear();
+    _notificationIds.clear();
     notifyListeners();
   }
 
-  // Clear old notifications (older than 7 days)
-  void clearOldNotifications() {
-    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
-    _notifications.removeWhere((n) => n.timestamp.isBefore(sevenDaysAgo));
+  // Clear old notifications (older than 30 days) - but keep them longer for account persistence
+  void clearOldNotifications(String driverId) {
+    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+    _notifications.removeWhere((n) => n.timestamp.isBefore(thirtyDaysAgo));
     notifyListeners();
+    _saveNotifications(driverId);
+  }
+
+  // Clear ALL notifications for a driver (for account deletion)
+  Future<void> clearAllNotificationsForDriver(String driverId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('driver_notifications_$driverId');
+      _notifications.clear();
+      _notificationIds.clear();
+      notifyListeners();
+      print('Cleared all notifications for driver $driverId');
+    } catch (e) {
+      print('Error clearing notifications for driver $driverId: $e');
+    }
   }
 
   // Notification methods for different events
   
-  // Accident Report Notifications
+  // Complete Notification Flow Methods
+  
+  // 1. New Accident Report Added
   void addAccidentReportNotification({
     required String location,
     required int accidentId,
     required String clientName,
+    required String driverId,
   }) {
     addNotification(
-      id: 'accident_$accidentId',
-      title: 'New Accident Report',
-      message: 'Accident reported at $location by $clientName. Click to accept.',
+      id: 'accident_report_$accidentId',
+      title: 'New Accident Report Added',
+      message: 'Accident report #$accidentId at $location by $clientName',
       type: NotificationType.accident,
       actionData: {
         'accident_id': accidentId,
@@ -99,6 +174,73 @@ class NotificationProvider extends ChangeNotifier {
         'client_name': clientName,
         'action': 'view_accident',
       },
+      driverId: driverId,
+    );
+  }
+
+  // 2. Accident Report Accepted
+  void addAccidentAcceptedNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+    required String driverId,
+  }) {
+    addNotification(
+      id: 'accident_accepted_$accidentId',
+      title: 'Accident Report Accepted',
+      message: 'You accepted accident #$accidentId at $location for $clientName',
+      type: NotificationType.trip,
+      actionData: {
+        'accident_id': accidentId,
+        'location': location,
+        'client_name': clientName,
+        'action': 'navigate_to_trip',
+      },
+      driverId: driverId,
+    );
+  }
+
+  // 3. Accident Report Rejected
+  void addAccidentRejectedNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+    required String driverId,
+  }) {
+    addNotification(
+      id: 'accident_rejected_$accidentId',
+      title: 'Accident Report Rejected',
+      message: 'You rejected accident #$accidentId at $location for $clientName',
+      type: NotificationType.accident,
+      actionData: {
+        'accident_id': accidentId,
+        'location': location,
+        'client_name': clientName,
+        'action': 'view_home',
+      },
+      driverId: driverId,
+    );
+  }
+
+  // 4. Accident Report Cancelled
+  void addAccidentCancelledNotification({
+    required int accidentId,
+    required String location,
+    required String clientName,
+    required String driverId,
+  }) {
+    addNotification(
+      id: 'accident_cancelled_$accidentId',
+      title: 'Accident Report Cancelled',
+      message: 'You cancelled accident #$accidentId at $location for $clientName',
+      type: NotificationType.accident,
+      actionData: {
+        'accident_id': accidentId,
+        'location': location,
+        'client_name': clientName,
+        'action': 'view_home',
+      },
+      driverId: driverId,
     );
   }
 
@@ -107,11 +249,12 @@ class NotificationProvider extends ChangeNotifier {
     required String location,
     required int accidentId,
     required double amount,
+    required String driverId,
   }) {
     addNotification(
       id: 'trip_accepted_$accidentId',
-      title: 'Trip Accepted',
-      message: 'You have accepted the accident report at $location. Navigate to complete the trip.',
+      title: 'Accident Report Accepted',
+      message: 'You accepted accident #$accidentId at $location. Navigate to complete the trip.',
       type: NotificationType.trip,
       actionData: {
         'accident_id': accidentId,
@@ -119,6 +262,7 @@ class NotificationProvider extends ChangeNotifier {
         'amount': amount,
         'action': 'navigate_to_trip',
       },
+      driverId: driverId,
     );
   }
 
@@ -127,18 +271,20 @@ class NotificationProvider extends ChangeNotifier {
     required String location,
     required double amount,
     required int tripId,
+    required String driverId,
   }) {
     addNotification(
       id: 'trip_completed_$tripId',
-      title: 'Trip Completed',
-      message: 'Trip completed successfully! Fare: ₹${amount.toStringAsFixed(0)} has been added to your earnings.',
-      type: NotificationType.earning,
+      title: 'Trip #$tripId Completed',
+      message: 'Trip #$tripId completed successfully! Earned ₹${amount.toStringAsFixed(0)}.',
+      type: NotificationType.trip,
       actionData: {
         'trip_id': tripId,
         'amount': amount,
         'location': location,
-        'action': 'view_earnings',
+        'action': 'view_trips',
       },
+      driverId: driverId,
     );
   }
 
@@ -147,11 +293,12 @@ class NotificationProvider extends ChangeNotifier {
     required double amount,
     required String period,
     required int totalTrips,
+    required String driverId,
   }) {
     addNotification(
       id: 'earnings_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Earnings Updated',
-      message: 'Your $period earnings: ₹${amount.toStringAsFixed(0)} from $totalTrips trips. Keep up the great work!',
+      title: 'Earnings Update',
+      message: 'Trip #${totalTrips} earned ₹${amount.toStringAsFixed(0)}.',
       type: NotificationType.earning,
       actionData: {
         'amount': amount,
@@ -159,6 +306,7 @@ class NotificationProvider extends ChangeNotifier {
         'total_trips': totalTrips,
         'action': 'view_earnings',
       },
+      driverId: driverId,
     );
   }
 
@@ -167,6 +315,7 @@ class NotificationProvider extends ChangeNotifier {
     required double amount,
     required String status,
     required String withdrawalId,
+    required String driverId,
   }) {
     String message;
     switch (status.toLowerCase()) {
@@ -197,6 +346,7 @@ class NotificationProvider extends ChangeNotifier {
         'withdrawal_id': withdrawalId,
         'action': 'view_wallet',
       },
+      driverId: driverId,
     );
   }
 
@@ -204,6 +354,7 @@ class NotificationProvider extends ChangeNotifier {
   void addWalletBalanceNotification({
     required double balance,
     required double previousBalance,
+    required String driverId,
   }) {
     final difference = balance - previousBalance;
     String message;
@@ -227,6 +378,7 @@ class NotificationProvider extends ChangeNotifier {
         'difference': difference,
         'action': 'view_wallet',
       },
+      driverId: driverId,
     );
   }
 
@@ -234,6 +386,7 @@ class NotificationProvider extends ChangeNotifier {
   void addSystemNotification({
     required String title,
     required String message,
+    required String driverId,
     String? action,
   }) {
     addNotification(
@@ -244,18 +397,18 @@ class NotificationProvider extends ChangeNotifier {
       actionData: {
         'action': action ?? 'view_system',
       },
+      driverId: driverId,
     );
   }
 
   // Load notifications from storage (for persistence)
-  Future<void> loadNotifications() async {
+  Future<void> loadNotifications(String driverId) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // In a real app, you would load from local storage or API
-      // For now, we'll just clear old notifications
-      clearOldNotifications();
+      // Initialize notifications for the driver
+      await initializeNotifications(driverId);
     } catch (e) {
       _errorMessage = 'Failed to load notifications: $e';
     } finally {
@@ -265,11 +418,10 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Save notifications to storage (for persistence)
-  Future<void> saveNotifications() async {
+  Future<void> saveNotifications(String driverId) async {
     try {
-      // In a real app, you would save to local storage or API
-      // For now, we'll just clear old notifications
-      clearOldNotifications();
+      // Save notifications for the driver
+      await _saveNotifications(driverId);
     } catch (e) {
       _errorMessage = 'Failed to save notifications: $e';
       notifyListeners();
@@ -277,12 +429,14 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Initialize with some sample notifications
-  void initializeWithSampleNotifications() {
+  void initializeWithSampleNotifications(String driverId) {
     if (_notifications.isEmpty) {
       addSystemNotification(
         title: 'Welcome to Apatkal Driver App',
         message: 'You\'re all set! Start by accepting accident reports to begin earning.',
+        driverId: driverId,
       );
     }
   }
 }
+

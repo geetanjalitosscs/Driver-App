@@ -26,16 +26,16 @@ try {
             $dateCondition = "1=1"; // Show all records
             break;
         case 'today':
-            $dateCondition = "DATE(earning_date) = CURDATE()";
+            $dateCondition = "(DATE(earning_date) = CURDATE() OR DATE(t.end_time) = CURDATE())";
             break;
         case 'week':
-            $dateCondition = "earning_date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)";
+            $dateCondition = "(earning_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) OR t.end_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY))";
             break;
         case 'month':
-            $dateCondition = "MONTH(earning_date) = MONTH(CURDATE()) AND YEAR(earning_date) = YEAR(CURDATE())";
+            $dateCondition = "(MONTH(earning_date) = MONTH(CURDATE()) AND YEAR(earning_date) = YEAR(CURDATE())) OR (MONTH(t.end_time) = MONTH(CURDATE()) AND YEAR(t.end_time) = YEAR(CURDATE()))";
             break;
         case 'year':
-            $dateCondition = "YEAR(earning_date) = YEAR(CURDATE())";
+            $dateCondition = "(YEAR(earning_date) = YEAR(CURDATE()) OR YEAR(t.end_time) = YEAR(CURDATE()))";
             break;
         default:
             $dateCondition = "1=1"; // Default to all records

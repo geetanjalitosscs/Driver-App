@@ -5,6 +5,7 @@ import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/notification_provider.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/notification_item.dart' as notification_model;
 
 class NotificationsScreen extends StatefulWidget {
@@ -33,8 +34,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     // Load notifications when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-      notificationProvider.loadNotifications();
-      notificationProvider.initializeWithSampleNotifications();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      // Get driver ID and initialize notifications
+      final driverId = authProvider.currentUser?.driverId ?? 'unknown';
+      notificationProvider.initializeNotifications(driverId);
+      notificationProvider.initializeWithSampleNotifications(driverId);
     });
   }
 
@@ -305,7 +310,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
          void _handleNotificationTap(notification_model.NotificationItem notification) {
     // Mark as read
     final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-    notificationProvider.markAsRead(notification.id);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final driverId = authProvider.currentUser?.driverId ?? 'unknown';
+    notificationProvider.markAsRead(notification.id, driverId);
 
     // Handle navigation based on action data
     final action = notification.actionData['action'] as String?;

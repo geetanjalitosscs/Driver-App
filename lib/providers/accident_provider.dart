@@ -41,6 +41,14 @@ class AccidentProvider extends ChangeNotifier {
       
       _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
       
+      // Debug logging for accident IDs
+      print('=== ACCIDENT PROVIDER DEBUG ===');
+      print('Loaded ${_allAccidents.length} accidents');
+      for (final accident in _allAccidents) {
+        print('Accident ID: ${accident.id}, Name: ${accident.fullname}, Vehicle: ${accident.vehicle}');
+      }
+      print('=== END ACCIDENT PROVIDER DEBUG ===');
+      
       // Detect and notify about NEW accidents only
       if (driverId != null && _allAccidents.isNotEmpty) {
         final newAccidents = _allAccidents.where((accident) => 
@@ -52,6 +60,11 @@ class AccidentProvider extends ChangeNotifier {
         // Show notifications only for NEW accidents
         for (final accident in newAccidents) {
           print('Creating notification for new accident ID: ${accident.id}');
+          
+          // Add in-app notification (handled in UI layer)
+          // Note: In-app notifications are handled in the UI where NotificationProvider is available
+          
+          // Show system notification
           await NotificationService.showNewAccidentNotification(
             accidentId: accident.id,
             vehicle: accident.vehicle,
@@ -395,22 +408,58 @@ class AccidentProvider extends ChangeNotifier {
   // Notification helper methods
   void _addTripAcceptedNotification() {
     if (_currentAccident != null) {
-      // This will be called from the UI context where NotificationProvider is available
-      print('Trip accepted notification should be added for accident ${_currentAccident!.id}');
+      try {
+        // In-app notifications are handled in UI layer where NotificationProvider is available
+        // System notification is handled by NotificationService
+        
+        // Show system notification
+        NotificationService.showAccidentAcceptedNotification(
+          accidentId: _currentAccident!.id,
+          location: _currentAccident!.location,
+          clientName: _currentAccident!.fullname,
+        );
+      } catch (e) {
+        print('Error adding accident accepted notification: $e');
+      }
     }
   }
 
   void _addTripCompletedNotification() {
     if (_acceptedAccident != null) {
-      // This will be called from the UI context where NotificationProvider is available
-      print('Trip completed notification should be added for accident ${_acceptedAccident!.id}');
+      try {
+        // In-app notifications are handled in UI layer where NotificationProvider is available
+        // System notification is handled by NotificationService
+        
+        // Show system notification
+        NotificationService.showTripCompletedNotification(
+          tripId: _acceptedAccident!.id,
+          vehicle: _acceptedAccident!.fullname,
+          location: _acceptedAccident!.location,
+          earnings: 1500.0,
+        );
+      } catch (e) {
+        print('Error adding trip completed notification: $e');
+      }
     }
   }
 
   void _addNewAccidentNotification() {
     if (_currentAccident != null) {
-      // This will be called from the UI context where NotificationProvider is available
-      print('New accident notification should be added for accident ${_currentAccident!.id}');
+      try {
+        // In-app notifications are handled in UI layer where NotificationProvider is available
+        // System notification is handled by NotificationService
+        
+        // Show system notification
+        NotificationService.showNewAccidentNotification(
+          accidentId: _currentAccident!.id,
+          vehicle: _currentAccident!.vehicle,
+          location: _currentAccident!.location,
+          latitude: _currentAccident!.latitude,
+          longitude: _currentAccident!.longitude,
+        );
+      } catch (e) {
+        print('Error adding new accident notification: $e');
+      }
     }
   }
 
@@ -419,6 +468,21 @@ class AccidentProvider extends ChangeNotifier {
     if (_acceptedAccident == null) return;
     
     try {
+      // Add notification for accident cancelled
+      try {
+        // In-app notifications are handled in UI layer where NotificationProvider is available
+        // System notification is handled by NotificationService
+        
+        // Show system notification
+        NotificationService.showAccidentCancelledNotification(
+          accidentId: _acceptedAccident!.id,
+          location: _acceptedAccident!.location,
+          clientName: _acceptedAccident!.fullname,
+        );
+      } catch (e) {
+        print('Error adding accident cancelled notification: $e');
+      }
+      
       // Reset database fields to null
       final result = await CentralizedApiService.completeAccident(
         accidentId: _acceptedAccident!.id,
@@ -448,6 +512,21 @@ class AccidentProvider extends ChangeNotifier {
     try {
       print('=== REJECT ACCIDENT DEBUG ===');
       print('Rejecting accident ID: ${_currentAccident!.id}');
+      
+      // Add notification for accident rejected
+      try {
+        // In-app notifications are handled in UI layer where NotificationProvider is available
+        // System notification is handled by NotificationService
+        
+        // Show system notification
+        NotificationService.showAccidentRejectedNotification(
+          accidentId: _currentAccident!.id,
+          location: _currentAccident!.location,
+          clientName: _currentAccident!.fullname,
+        );
+      } catch (e) {
+        print('Error adding accident rejected notification: $e');
+      }
       
       // Move to next accident (reject means skip this one)
       _moveToNextAccident();

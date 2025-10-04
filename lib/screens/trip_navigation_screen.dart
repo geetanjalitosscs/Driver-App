@@ -378,10 +378,13 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
           if (success) {
             // Add notification for trip completion
             final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final driverId = authProvider.currentUser?.driverId ?? 'unknown';
             notificationProvider.addTripCompletedNotification(
               location: widget.trip.location,
               amount: widget.trip.amount,
               tripId: widget.trip.historyId,
+              driverId: driverId,
             );
 
             // Show system notification for trip completion
@@ -391,6 +394,10 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               location: widget.trip.endLocation,
               earnings: widget.trip.amount,
             );
+
+            // Refresh trip data to get updated amount and details
+            final tripProvider = Provider.of<TripProvider>(context, listen: false);
+            await tripProvider.loadCompletedTrips(widget.trip.driverId);
 
             Navigator.of(context).pop(true);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -707,10 +714,22 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                         ),
                       ),
                       IconButton(
-                        onPressed: _initializeTrip,
+                        onPressed: () async {
+                          // Refresh trip data from database
+                          final tripProvider = Provider.of<TripProvider>(context, listen: false);
+                          await tripProvider.loadCompletedTrips(widget.trip.driverId);
+                          
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Trip data refreshed'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.refresh),
                         color: AppTheme.primaryBlue,
-                        tooltip: 'Reload',
+                        tooltip: 'Reload Trip Data',
                       ),
                       Text(
                         '₹${widget.trip.amount}',

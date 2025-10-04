@@ -8,6 +8,7 @@ import '../providers/trip_provider.dart';
 import '../providers/earnings_provider.dart';
 import '../providers/wallet_provider.dart';
 import 'help_screen.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -716,6 +717,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 tripProvider.clearAllData();
                 earningsProvider.clearAllData();
                 walletProvider.clearAllData();
+                
+                // Reset home screen online state
+                HomeScreen.resetOnlineState();
                 
                 // Logout user
                 authProvider.logout();
