@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/wallet_provider.dart';
@@ -98,11 +99,27 @@ class _WalletScreenState extends State<WalletScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, color: AppTheme.accentRed, size: 48),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
                   const SizedBox(height: 16),
                   Text(
-                    walletProvider.errorMessage!,
-                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.accentRed),
+                    'Unable to load wallet',
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please check your internet connection and try again',
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),

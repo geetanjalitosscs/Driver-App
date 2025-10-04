@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
@@ -35,6 +36,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Static variable to persist state across widget recreations
+  static bool _persistentIsOnDuty = false;
+  static bool _hasLoadedPersistentState = false;
+  
   bool _isOnDuty = false;
   final String _nextShift = 'Tomorrow, 07:00 AM';
   
@@ -54,10 +59,21 @@ class _HomeScreenState extends State<HomeScreen> {
   
   // Timer for refreshing accident count
   Timer? _refreshTimer;
+  
+  // Flag to track if we've loaded the saved state
+  bool _hasLoadedState = false;
 
   @override
   void initState() {
     super.initState();
+    
+    // Use persistent state if available, otherwise load from storage
+    if (_hasLoadedPersistentState) {
+      _isOnDuty = _persistentIsOnDuty;
+    } else {
+      _loadOnDutyStateSync(); // Load saved online/offline state synchronously
+    }
+    
     _getCurrentLocation();
     _startRefreshTimer();
     _loadInitialAccidentCount();
@@ -85,6 +101,61 @@ class _HomeScreenState extends State<HomeScreen> {
         accidentProvider.refreshPendingCount();
       }
     });
+  }
+
+  // Load saved online/offline state from storage synchronously
+  void _loadOnDutyStateSync() {
+    try {
+      // Use SharedPreferences.getInstance() synchronously
+      SharedPreferences.getInstance().then((prefs) {
+        final savedState = prefs.getBool('is_on_duty') ?? false;
+        
+        // Update both persistent and local state
+        _persistentIsOnDuty = savedState;
+        _hasLoadedPersistentState = true;
+        
+        if (mounted) {
+          setState(() {
+            _isOnDuty = savedState;
+            _hasLoadedState = true;
+          });
+        }
+        
+        print('Loaded online/offline state: $_isOnDuty');
+      }).catchError((e) {
+        print('Error loading online/offline state: $e');
+        _hasLoadedPersistentState = true;
+        if (mounted) {
+          setState(() {
+            _hasLoadedState = true;
+          });
+        }
+      });
+    } catch (e) {
+      print('Error loading online/offline state: $e');
+      _hasLoadedPersistentState = true;
+      if (mounted) {
+        setState(() {
+          _hasLoadedState = true;
+        });
+      }
+    }
+  }
+
+  // Save online/offline state to storage
+  Future<void> _saveOnDutyState(bool isOnDuty) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_on_duty', isOnDuty);
+      
+      // Update persistent state
+      _persistentIsOnDuty = isOnDuty;
+      _hasLoadedPersistentState = true;
+      
+      print('Saved online/offline state: $isOnDuty');
+    } catch (e) {
+      print('Error saving online/offline state: $e');
+    }
   }
 
 
@@ -613,6 +684,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() {
                             _isOnDuty = true;
                           });
+                          _persistentIsOnDuty = true; // Update persistent state immediately
+                          _hasLoadedPersistentState = true;
+                          _saveOnDutyState(true); // Save state
                           // Refresh accident count when going online
                           final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
                           accidentProvider.refreshPendingCount();
@@ -631,6 +705,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() {
                             _isOnDuty = false;
                           });
+                          _persistentIsOnDuty = false; // Update persistent state immediately
+                          _hasLoadedPersistentState = true;
+                          _saveOnDutyState(false); // Save state
                         },
                       ),
                     ),
@@ -650,6 +727,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() {
                             _isOnDuty = true;
                           });
+                          _persistentIsOnDuty = true; // Update persistent state immediately
+                          _hasLoadedPersistentState = true;
+                          _saveOnDutyState(true); // Save state
                           // Refresh accident count when going online
                           final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
                           accidentProvider.refreshPendingCount();
@@ -667,6 +747,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() {
                             _isOnDuty = false;
                           });
+                          _persistentIsOnDuty = false; // Update persistent state immediately
+                          _hasLoadedPersistentState = true;
+                          _saveOnDutyState(false); // Save state
                         },
                       ),
                     ),
