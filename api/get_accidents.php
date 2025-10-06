@@ -215,35 +215,65 @@ try {
     $columnExists = $checkColumn->fetch();
     
     if ($columnExists) {
-        // Column exists - use the full query with case-insensitive client filtering and collation fix
+        // Column exists - use simple query without complex joins
         $stmt = $pdo->prepare("
-            SELECT a.* FROM accidents a 
-            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
-            WHERE a.status = 'pending' 
-            AND (a.driver_status IS NULL OR a.driver_status = 'available')
-            ORDER BY a.created_at DESC
+            SELECT * FROM accidents 
+            WHERE status = 'pending' 
+            AND (driver_status IS NULL OR driver_status = 'available')
+            ORDER BY created_at DESC
         ");
-        error_log("Using driver_status filter with case-insensitive client matching (collation fixed)");
+        error_log("Using simple query with driver_status filter");
     } else {
-        // Column doesn't exist - use simple query with case-insensitive client filtering and collation fix
+        // Column doesn't exist - use simple query
         $stmt = $pdo->prepare("
-            SELECT a.* FROM accidents a 
-            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
-            WHERE a.status = 'pending' 
-            ORDER BY a.created_at DESC
+            SELECT * FROM accidents 
+            WHERE status = 'pending' 
+            ORDER BY created_at DESC
         ");
-        error_log("Driver_status column not found, using simple query with case-insensitive client matching (collation fixed)");
+        error_log("Using simple query without driver_status filter");
     }
     
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // AGGRESSIVE duplicate removal by ID
+    $originalCount = count($accidents);
+    error_log("BEFORE duplicate removal: $originalCount accidents");
+    
+    // Create a new array with unique IDs only
+    $uniqueAccidents = [];
+    $seenIds = [];
+    
+    foreach ($accidents as $accident) {
+        $id = intval($accident['id']);
+        if (!isset($seenIds[$id])) {
+            $seenIds[$id] = true;
+            $uniqueAccidents[] = $accident;
+        } else {
+            error_log("REMOVING DUPLICATE: ID=$id, Name=" . ($accident['fullname'] ?? 'unknown'));
+        }
+    }
+    
+    $accidents = $uniqueAccidents;
+    $finalCount = count($accidents);
+    error_log("AFTER duplicate removal: $originalCount -> $finalCount accidents");
     
     // Fetch photos for each accident
     foreach ($accidents as &$accident) {
         $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ?");
         $photoStmt->execute([$accident['id']]);
         $photos = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        
+        // Convert photo filenames to full URLs
+        $photoUrls = [];
+        foreach ($photos as $photo) {
+            if (!empty($photo)) {
+                // Construct the full URL path for the photo
+                $photoUrls[] = '../uploads/' . $photo;
+            }
+        }
+        
+        $accident['photos'] = $photoUrls;
     }
     
     // Debug logging for coordinates and IDs

@@ -319,16 +319,22 @@ class NotificationService {
     );
   }
 
-  /// Show notification for earnings
+  /// Show notification for earnings - Only for new earnings
   static Future<void> showEarningsNotification({
     required double amount,
     required String period,
     required int tripCount,
+    bool isNewEarning = true, // Only show for new earnings
   }) async {
+    if (!isNewEarning) {
+      print('Skipping earnings notification - not a new earning');
+      return;
+    }
+    
     final title = "💰 Earnings Update";
     final message = "₹$amount earned in $period from $tripCount trips";
     
-    print('🔔 Creating notification for earnings: ₹$amount');
+    print('🔔 Creating notification for new earnings: ₹$amount');
     
     await showNotification(
       id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Use timestamp as ID

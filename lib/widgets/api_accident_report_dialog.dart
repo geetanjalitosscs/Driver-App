@@ -11,6 +11,7 @@ import '../models/accident_report.dart';
 import '../models/trip.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
+import '../widgets/accident_photo_widget.dart';
 import '../screens/trip_navigation_screen.dart';
 import '../theme/app_theme.dart';
 
@@ -248,44 +249,11 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                   ],
                   if (accident.photos.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    Text(
-                      'Photos',
-                      style: AppTheme.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
+                    AccidentPhotoWidget(
+                      photoUrls: accident.photos,
                       height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: accident.photos.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                accident.photos[index],
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 100,
-                                    height: 100,
-                                    color: AppTheme.backgroundLight,
-                                    child: const Icon(
-                                      Icons.image_not_supported,
-                                      color: AppTheme.textSecondary,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      width: 100,
+                      showTitle: true,
                     ),
                   ],
                   const SizedBox(height: 24),

@@ -98,26 +98,14 @@ class EarningsProvider extends ChangeNotifier {
       // Use earnings as recent earnings for now
       _recentEarnings = _earnings.take(10).toList();
 
-      // Add earnings notification if there are new earnings
-      if (_earnings.isNotEmpty) {
-        _addEarningsNotification();
-      }
-
       // Clear weekly data for now
       _weeklyData = [];
 
       print('Summary: $_summary');
       print('All-time Summary: $_allTimeSummary');
       
-      // Show push notification for new earnings
-      if (_earnings.isNotEmpty) {
-        final totalEarnings = _summary['total_earnings'] ?? 0.0;
-        await NotificationService.showEarningsNotification(
-          amount: totalEarnings,
-          period: getPeriodDisplayName(),
-          tripCount: earnings.length,
-        );
-      }
+      // Note: Earnings notifications should only be triggered when new earnings are actually added,
+      // not when loading existing data. This prevents persistent notifications on page visits.
       
       notifyListeners();
     } catch (e) {
@@ -241,10 +229,19 @@ class EarningsProvider extends ChangeNotifier {
     }
   }
 
-  // Add earnings notification
-  void _addEarningsNotification() {
-    // This will be called from the UI context where NotificationProvider is available
-    print('Earnings notification should be added for ${_earnings.length} earnings');
+  // Add earnings notification only when new earnings are actually added
+  void addNewEarningsNotification({
+    required double amount,
+    required String period,
+    required int totalTrips,
+    required String driverId,
+  }) {
+    // This method should be called only when new earnings are actually added,
+    // not when loading existing data
+    print('Adding new earnings notification: ₹$amount for $totalTrips trips');
+    
+    // Get NotificationProvider from context and add notification
+    // Note: This should be called from UI context where NotificationProvider is available
   }
 
   // Get formatted period name

@@ -7,6 +7,7 @@ import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../widgets/common/loading_widget.dart';
 import '../widgets/accident_filter_widget.dart';
+import '../widgets/accident_photo_widget.dart';
 import '../theme/app_theme.dart';
 
 class AccidentListScreen extends StatefulWidget {
@@ -315,6 +316,14 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
                 _buildDetailRow('Location', accident.location),
                 _buildDetailRow('Status', accident.status),
                 if (accident.description.isNotEmpty) _buildDetailRow('Description', accident.description),
+                if (accident.photos.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  AccidentPhotoGrid(
+                    photoUrls: accident.photos,
+                    crossAxisCount: 2,
+                    showTitle: true,
+                  ),
+                ],
                 const SizedBox(height: 20),
                 AppButton(text: 'Close', onPressed: () => Navigator.of(context).pop(), variant: AppButtonVariant.primary, isFullWidth: true),
               ],

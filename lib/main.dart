@@ -82,7 +82,11 @@ class AmbulanceDriverApp extends StatelessWidget {
           // Set up notification callback after providers are available
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+            final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
             final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            
+            // Set up the notification provider reference in navigation provider
+            navigationProvider.setNotificationProvider(notificationProvider);
             
             NotificationService.setSaveToProviderCallback((title, body, type, actionData) {
               // Get current driver ID

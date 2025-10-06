@@ -29,15 +29,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    // Load notifications when screen initializes
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Load notifications when screen becomes visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
-      // Get driver ID and initialize notifications
       final driverId = authProvider.currentUser?.driverId ?? 'unknown';
+      
+      // Initialize notifications
       notificationProvider.initializeNotifications(driverId);
       notificationProvider.initializeWithSampleNotifications(driverId);
     });
@@ -236,8 +236,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ),
                           if (!notification.isRead)
                             Container(
-                              width: 8,
-                              height: 8,
+                              width: 10,
+                              height: 10,
                               decoration: const BoxDecoration(
                                 color: AppTheme.accentRed,
                                 shape: BoxShape.circle,
@@ -318,6 +318,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final action = notification.actionData['action'] as String?;
     final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
 
+    print('Notification tapped: ${notification.title}, Action: $action');
+
     switch (action) {
       case 'view_accident':
         // Navigate to home screen (where accidents are shown)
@@ -345,6 +347,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         break;
       default:
         // Default: navigate to home screen
+        print('Unknown action: $action, navigating to home');
         navigationProvider.navigateToHome();
         break;
     }

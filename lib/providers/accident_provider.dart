@@ -14,6 +14,7 @@ class AccidentProvider extends ChangeNotifier {
   String? _errorMessage;
   int _pendingCount = 0;
   AccidentFilter _currentFilter = AccidentFilter();
+  bool _isLoadingAccidents = false; // Prevent concurrent loading
 
   // Getters
   List<AccidentReport> get accidentList => _accidentList;
@@ -30,6 +31,13 @@ class AccidentProvider extends ChangeNotifier {
 
   /// Load all accidents from API
   Future<void> loadAccidents({int? driverId}) async {
+    // Prevent concurrent loading
+    if (_isLoadingAccidents) {
+      print('Accidents already loading, skipping duplicate call');
+      return;
+    }
+    
+    _isLoadingAccidents = true;
     _setLoading(true);
     _clearError();
 
@@ -39,11 +47,35 @@ class AccidentProvider extends ChangeNotifier {
       // Store previous accident IDs to detect new ones
       final previousAccidentIds = _allAccidents.map((a) => a.id).toSet();
       
-      _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
+      final fetchedAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
+      
+      // Remove duplicates based on accident ID and content
+      final uniqueAccidents = <AccidentReport>[];
+      final seenIds = <int>{};
+      final seenContent = <String>{}; // Track content-based duplicates
+      
+      for (final accident in fetchedAccidents) {
+        // Create a content signature for duplicate detection
+        final contentSignature = '${accident.fullname}_${accident.vehicle}_${accident.location}_${accident.description}';
+        
+        if (!seenIds.contains(accident.id) && !seenContent.contains(contentSignature)) {
+          seenIds.add(accident.id);
+          seenContent.add(contentSignature);
+          uniqueAccidents.add(accident);
+        } else {
+          if (seenIds.contains(accident.id)) {
+            print('Duplicate accident detected by ID: ${accident.id}, Name: ${accident.fullname}');
+          } else {
+            print('Duplicate accident detected by content: ${accident.fullname}, Vehicle: ${accident.vehicle}');
+          }
+        }
+      }
+      
+      _allAccidents = uniqueAccidents;
       
       // Debug logging for accident IDs
       print('=== ACCIDENT PROVIDER DEBUG ===');
-      print('Loaded ${_allAccidents.length} accidents');
+      print('Fetched ${fetchedAccidents.length} accidents, ${uniqueAccidents.length} unique');
       for (final accident in _allAccidents) {
         print('Accident ID: ${accident.id}, Name: ${accident.fullname}, Vehicle: ${accident.vehicle}');
       }
@@ -83,11 +115,50 @@ class AccidentProvider extends ChangeNotifier {
       _setError('Failed to load accidents: $e');
     } finally {
       _setLoading(false);
+      _isLoadingAccidents = false; // Reset concurrent loading flag
+    }
+  }
+
+  /// Manually remove duplicates (public method)
+  void removeDuplicates() {
+    _removeDuplicates();
+    _applyFilter();
+    notifyListeners();
+  }
+
+  /// Refresh accidents and remove duplicates
+  Future<void> refreshAccidents({int? driverId}) async {
+    await loadAccidents(driverId: driverId);
+  }
+
+  /// Remove duplicates from accident list
+  void _removeDuplicates() {
+    final uniqueAccidents = <AccidentReport>[];
+    final seenIds = <int>{};
+    final seenContent = <String>{};
+    
+    for (final accident in _allAccidents) {
+      // Create a content signature for duplicate detection
+      final contentSignature = '${accident.fullname}_${accident.vehicle}_${accident.location}_${accident.description}';
+      
+      if (!seenIds.contains(accident.id) && !seenContent.contains(contentSignature)) {
+        seenIds.add(accident.id);
+        seenContent.add(contentSignature);
+        uniqueAccidents.add(accident);
+      }
+    }
+    
+    if (uniqueAccidents.length != _allAccidents.length) {
+      print('Removed ${_allAccidents.length - uniqueAccidents.length} duplicate accidents');
+      _allAccidents = uniqueAccidents;
     }
   }
 
   /// Apply current filter to accidents
   void _applyFilter() {
+    // Remove duplicates before filtering
+    _removeDuplicates();
+    
     List<AccidentReport> filteredAccidents = List.from(_allAccidents);
     
     // Apply city filter
@@ -352,20 +423,8 @@ class AccidentProvider extends ChangeNotifier {
         _acceptedAccident = null;
         notifyListeners();
         
-        // Add notification for trip completion
-        _addTripCompletedNotification();
-        
-        // Show push notification (with error handling)
-        try {
-          await NotificationService.showNotification(
-            id: DateTime.now().millisecondsSinceEpoch,
-            title: 'Trip Completed',
-            body: 'You have successfully completed accident report. Great job!',
-            type: 'trip_completed',
-          );
-        } catch (notificationError) {
-          print('Notification error (continuing anyway): $notificationError');
-        }
+        // Note: Trip completion notifications are handled in the UI layer (trip_navigation_screen.dart)
+        // where NotificationProvider is available. This prevents duplicate notifications.
         
         print('=== TRIP COMPLETION SUCCESS ===');
         print('Trip completed successfully, returning true');
@@ -424,24 +483,8 @@ class AccidentProvider extends ChangeNotifier {
     }
   }
 
-  void _addTripCompletedNotification() {
-    if (_acceptedAccident != null) {
-      try {
-        // In-app notifications are handled in UI layer where NotificationProvider is available
-        // System notification is handled by NotificationService
-        
-        // Show system notification
-        NotificationService.showTripCompletedNotification(
-          tripId: _acceptedAccident!.id,
-          vehicle: _acceptedAccident!.fullname,
-          location: _acceptedAccident!.location,
-          earnings: 1500.0,
-        );
-      } catch (e) {
-        print('Error adding trip completed notification: $e');
-      }
-    }
-  }
+  // Trip completion notifications are now handled in the UI layer (trip_navigation_screen.dart)
+  // to prevent duplicate notifications and ensure proper NotificationProvider access
 
   void _addNewAccidentNotification() {
     if (_currentAccident != null) {
@@ -581,10 +624,6 @@ class AccidentProvider extends ChangeNotifier {
     }
   }
 
-  /// Refresh accident list
-  Future<void> refreshAccidents() async {
-    await loadAccidents();
-  }
 
   /// Clear current accident (when all are processed)
   void clearCurrentAccident() {

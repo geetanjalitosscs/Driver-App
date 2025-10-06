@@ -385,6 +385,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               amount: widget.trip.amount,
               tripId: widget.trip.historyId,
               driverId: driverId,
+              vehicleNumber: widget.trip.clientName, // Use clientName as vehicle identifier
             );
 
             // Show system notification for trip completion

@@ -8,13 +8,16 @@ class NotificationProvider extends ChangeNotifier {
   Set<String> _notificationIds = {}; // Track unique notification IDs
   bool _isLoading = false;
   String? _errorMessage;
+  bool _hasSeenNotifications = false; // Track if user has seen notifications (clears main indicator)
 
   // Getters
   List<NotificationItem> get notifications => _notifications;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get hasSeenNotifications => _hasSeenNotifications;
   
-  int get unreadCount => _notifications.where((n) => !n.isRead).length;
+  // Main indicator shows unread count only if user hasn't seen notifications yet
+  int get unreadCount => _hasSeenNotifications ? 0 : _notifications.where((n) => !n.isRead).length;
   
   List<NotificationItem> get filteredNotifications {
     return _notifications;
@@ -115,6 +118,27 @@ class NotificationProvider extends ChangeNotifier {
     }
     notifyListeners();
     _saveNotifications(driverId); // Save to persistent storage
+  }
+
+  // Mark all notifications as read immediately (for navigation)
+  void markAllAsReadImmediately() {
+    for (var notification in _notifications) {
+      notification.isRead = true;
+    }
+    notifyListeners();
+  }
+
+  // Mark notifications as "seen" (clears main indicator but keeps individual dots)
+  void markNotificationsAsSeen() {
+    _hasSeenNotifications = true;
+    notifyListeners();
+  }
+
+  // Clear main notification indicator (for bottom navigation) without affecting individual dots
+  void clearMainIndicator() {
+    // This method can be used to clear the main red indicator in bottom navigation
+    // without affecting the individual notification dots
+    markNotificationsAsSeen();
   }
 
   // Remove notification
@@ -266,39 +290,47 @@ class NotificationProvider extends ChangeNotifier {
     );
   }
 
-  // Trip Completion Notifications
+  // Trip Completion Notifications - Only for newly completed trips
   void addTripCompletedNotification({
     required String location,
     required double amount,
     required int tripId,
     required String driverId,
+    String? vehicleNumber,
   }) {
     addNotification(
       id: 'trip_completed_$tripId',
-      title: 'Trip #$tripId Completed',
-      message: 'Trip #$tripId completed successfully! Earned ₹${amount.toStringAsFixed(0)}.',
+      title: 'Trip Completed',
+      message: 'Trip #$tripId completed for vehicle ${vehicleNumber ?? 'unknown'}. Earnings: ₹${amount.toStringAsFixed(0)}',
       type: NotificationType.trip,
       actionData: {
         'trip_id': tripId,
         'amount': amount,
         'location': location,
+        'vehicle_number': vehicleNumber,
         'action': 'view_trips',
       },
       driverId: driverId,
     );
   }
 
-  // Earnings Notifications
+  // Earnings Notifications - Only for new earnings, not existing ones
   void addEarningsNotification({
     required double amount,
     required String period,
     required int totalTrips,
     required String driverId,
+    bool isNewEarning = true, // Only add notification for new earnings
   }) {
+    if (!isNewEarning) {
+      print('Skipping earnings notification - not a new earning');
+      return;
+    }
+    
     addNotification(
       id: 'earnings_${DateTime.now().millisecondsSinceEpoch}',
       title: 'Earnings Update',
-      message: 'Trip #${totalTrips} earned ₹${amount.toStringAsFixed(0)}.',
+      message: '₹${amount.toStringAsFixed(0)} earned in $period from $totalTrips trips',
       type: NotificationType.earning,
       actionData: {
         'amount': amount,
@@ -350,12 +382,18 @@ class NotificationProvider extends ChangeNotifier {
     );
   }
 
-  // Wallet Balance Notifications
+  // Wallet Balance Notifications - Only for significant changes
   void addWalletBalanceNotification({
     required double balance,
     required double previousBalance,
     required String driverId,
+    bool isSignificantChange = true, // Only notify for significant changes
   }) {
+    if (!isSignificantChange) {
+      print('Skipping wallet balance notification - not a significant change');
+      return;
+    }
+    
     final difference = balance - previousBalance;
     String message;
     

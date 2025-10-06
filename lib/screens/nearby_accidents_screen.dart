@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/location_accident_provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/nearby_accidents_widget.dart';
+import '../widgets/accident_photo_widget.dart';
 import '../theme/app_theme.dart';
 
 class NearbyAccidentsScreen extends StatefulWidget {
@@ -182,9 +183,12 @@ class _NearbyAccidentsScreenState extends State<NearbyAccidentsScreen> {
               ],
               if (accident['photos'] != null && (accident['photos'] as List).isNotEmpty) ...[
                 const SizedBox(height: 8),
-                const Text('Photos:', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text('${(accident['photos'] as List).length} photo(s) available'),
+                AccidentPhotoWidget(
+                  photoUrls: List<String>.from(accident['photos']),
+                  height: 80,
+                  width: 80,
+                  showTitle: true,
+                ),
               ],
             ],
           ),
