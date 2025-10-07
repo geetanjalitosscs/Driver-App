@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/profile_data.dart';
 import '../services/api_service.dart';
+import '../services/kyc_notification_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   ProfileData? _currentUser;
@@ -35,6 +36,10 @@ class AuthProvider extends ChangeNotifier {
         _currentUser = ProfileData.fromJson(userJson);
         print('Restored user name: ${_currentUser?.driverName}'); // Debug log
         print('Restored driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
+        
+        // Check for any stored KYC status changes
+        await checkStoredKycStatusChange();
+        
         notifyListeners();
       }
     } catch (e) {
@@ -105,8 +110,9 @@ class AuthProvider extends ChangeNotifier {
     try {
       final data = await CentralizedApiService.login(email, password);
       
+      print('Login response data: $data'); // Debug log
+      
       if (data['success'] == true) {
-        print('Login response data: $data'); // Debug log
         print('Driver data from API: ${data['driver']}'); // Debug log
         print('Driver ID from API: ${data['driver']['driver_id']} (type: ${data['driver']['driver_id'].runtimeType})'); // Debug log
         _currentUser = ProfileData.fromJson(data['driver']);
@@ -114,14 +120,31 @@ class AuthProvider extends ChangeNotifier {
         print('Parsed driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
         await _saveUserData(); // Save user data to storage
         await _setDefaultOfflineState(); // Set default offline state on login
+        
+        // Check for any stored KYC status changes
+        await checkStoredKycStatusChange();
+        
+        // Start KYC monitoring for the logged-in user
+        if (_currentUser?.driverId != null) {
+          await KycNotificationService().startMonitoring(_currentUser!.driverId);
+        }
+        
         _setLoading(false);
         return true;
+      } else if (data['kyc_pending'] == true) {
+        // Handle KYC pending/rejected status
+        print('KYC status issue: ${data['kyc_status']}'); // Debug log
+        _setError('KYC verification ${data['kyc_status']}');
+        _setLoading(false);
+        return false;
       } else {
+        print('Login failed: ${data['message']}'); // Debug log
         _setError(data['message'] ?? 'Login failed');
         _setLoading(false);
         return false;
       }
     } catch (e) {
+      print('Login error: $e'); // Debug log
       // Check if it's a login error (400 status) and show appropriate message
       if (e.toString().contains('400') || e.toString().contains('login failed')) {
         _setError('Invalid credentials');
@@ -157,10 +180,13 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         vehicleNumber: vehicleNumber,
         vehicleType: vehicleType,
-        licenseNumber: licencePhoto, // Using photo as license number for now
-        aadharNumber: aadharPhoto, // Using photo as aadhar number for now
+        aadharPhoto: aadharPhoto,
+        licencePhoto: licencePhoto,
+        rcPhoto: rcPhoto,
         address: address,
       );
+      
+      print('Signup API response: $data'); // Debug log
       
       if (data['success'] == true) {
         _currentUser = ProfileData.fromJson(data['driver']);
@@ -169,11 +195,13 @@ class AuthProvider extends ChangeNotifier {
         _setLoading(false);
         return true;
       } else {
+        print('Signup failed: ${data['message']}'); // Debug log
         _setError(data['message'] ?? 'Signup failed');
         _setLoading(false);
         return false;
       }
     } catch (e) {
+      print('Signup error: $e'); // Debug log
       // Check if it's a signup error (400 status) and show appropriate message
       if (e.toString().contains('400') || e.toString().contains('signup failed')) {
         _setError('Invalid credentials');
@@ -187,6 +215,9 @@ class AuthProvider extends ChangeNotifier {
 
   // Logout method
   Future<void> logout() async {
+    // Stop KYC monitoring
+    KycNotificationService().stopMonitoring();
+    
     _currentUser = null;
     _errorMessage = null;
     await _clearUserData(); // Clear stored user data
@@ -352,4 +383,104 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  // Check KYC status
+  Future<void> checkKycStatus() async {
+    if (_currentUser == null) return;
+    
+    try {
+      final response = await CentralizedApiService.checkKycStatus(
+        driverId: _currentUser!.driverIdAsInt,
+      );
+      
+      print('KYC status check response: $response'); // Debug log
+      
+      if (response['success'] == true) {
+        final driverData = response['driver'];
+        _currentUser = ProfileData.fromJson(driverData);
+        await _saveUserData();
+        notifyListeners();
+        print('KYC status updated to: ${_currentUser?.kycStatus}'); // Debug log
+      } else {
+        print('KYC status check failed: ${response['message']}'); // Debug log
+      }
+    } catch (e) {
+      print('Error checking KYC status: $e');
+    }
+  }
+
+  // Force immediate KYC status check
+  Future<void> forceKycStatusCheck() async {
+    if (_currentUser?.driverId == null) {
+      print('❌ Cannot check KYC status: No current user or driver ID');
+      return;
+    }
+    
+    print('🔄 Starting force KYC status check for driver: ${_currentUser!.driverId}');
+    
+    try {
+      // Directly check KYC status from database
+      final response = await CentralizedApiService.checkKycStatus(
+        driverId: _currentUser!.driverIdAsInt,
+      );
+      
+      print('🔄 API Response: $response');
+      
+      if (response['success'] == true) {
+        final driverData = response['driver'];
+        print('🔄 Driver data from API: $driverData');
+        
+        _currentUser = ProfileData.fromJson(driverData);
+        await _saveUserData();
+        notifyListeners();
+        
+        print('🔄 Forced immediate KYC status check completed: ${_currentUser?.kycStatus}');
+      } else {
+        print('❌ Forced KYC status check failed: ${response['message']}');
+      }
+      
+      // Also check stored changes
+      await checkStoredKycStatusChange();
+      
+    } catch (e) {
+      print('❌ Error forcing KYC status check: $e');
+    }
+  }
+
+  // Check for stored KYC status changes
+  Future<void> checkStoredKycStatusChange() async {
+    if (_currentUser == null) return;
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final driverId = _currentUser!.driverId;
+      final storedChange = prefs.getString('kyc_status_change_$driverId');
+      
+      if (storedChange != null) {
+        final changeData = json.decode(storedChange);
+        final newStatus = changeData['status'] as String;
+        
+        // Update the current user's KYC status
+        if (_currentUser != null) {
+          _currentUser = ProfileData.fromJson({
+            ..._currentUser!.toJson(),
+            'kyc_status': newStatus,
+          });
+          await _saveUserData();
+          notifyListeners();
+          
+          print('🔄 Updated KYC status from stored change: $newStatus');
+        }
+        
+        // Clear the stored change
+        await prefs.remove('kyc_status_change_$driverId');
+      }
+    } catch (e) {
+      print('Error checking stored KYC status change: $e');
+    }
+  }
+
+  // Getter for KYC status
+  String get kycStatus => _currentUser?.kycStatus ?? 'pending';
+  bool get isKycApproved => kycStatus == 'approved';
 }

@@ -12,7 +12,7 @@ try {
 // Get parameters from query string
 $latitude = isset($_GET['latitude']) ? (float)$_GET['latitude'] : null;
 $longitude = isset($_GET['longitude']) ? (float)$_GET['longitude'] : null;
-$radius_km = 10.0; // Fixed 10km radius
+$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
 $status = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
 if ($latitude === null || $longitude === null) {
@@ -64,7 +64,17 @@ try {
         ");
         $photo_stmt->execute([$accident['id']]);
         $photos = $photo_stmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        
+        // Convert photo filenames to full URLs
+        $photoUrls = [];
+        foreach ($photos as $photo) {
+            if (!empty($photo)) {
+                // Construct the full URL path for the photo using server URL
+                $photoUrls[] = 'https://yourserver.com/uploads/' . $photo;
+            }
+        }
+        
+        $accident['photos'] = $photoUrls;
     }
     
     echo json_encode([

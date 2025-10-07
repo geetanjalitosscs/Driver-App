@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../config/database_config.dart';
+import 'kyc_verification_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
@@ -24,7 +29,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _addressController = TextEditingController();
-  final _vehicleTypeController = TextEditingController();
+  String _selectedVehicleType = 'Ambulance';
   final _vehicleNumberController = TextEditingController();
   
   bool _isPasswordVisible = false;
@@ -32,9 +37,9 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isLoading = false;
   
   // File upload fields
-  String? _aadharPhotoPath;
-  String? _licencePhotoPath;
-  String? _rcPhotoPath;
+  String? _aadharPhotoPath; // full file path
+  String? _licencePhotoPath; // full file path
+  String? _rcPhotoPath; // full file path
 
   @override
   void dispose() {
@@ -44,7 +49,6 @@ class _SignupScreenState extends State<SignupScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _addressController.dispose();
-    _vehicleTypeController.dispose();
     _vehicleNumberController.dispose();
     super.dispose();
   }
@@ -58,22 +62,29 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      // Convert selected photos to base64 data URIs so backend can save files
+      final uploadedAadhar = await _encodePhotoAsBase64(_aadharPhotoPath);
+      final uploadedLicence = await _encodePhotoAsBase64(_licencePhotoPath);
+      final uploadedRc = await _encodePhotoAsBase64(_rcPhotoPath);
+
       final success = await authProvider.signup(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
         address: _addressController.text.trim(),
-        vehicleType: _vehicleTypeController.text.trim(),
+        vehicleType: _selectedVehicleType,
         vehicleNumber: _vehicleNumberController.text.trim(),
-        aadharPhoto: _aadharPhotoPath ?? 'default_aadhar.jpg',
-        licencePhoto: _licencePhotoPath ?? 'default_licence.jpg',
-        rcPhoto: _rcPhotoPath ?? 'default_rc.jpg',
+        aadharPhoto: uploadedAadhar ?? '',
+        licencePhoto: uploadedLicence ?? '',
+        rcPhoto: uploadedRc ?? '',
       );
 
       if (success && mounted) {
+        // After signup, force KYC verification screen until approved
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const KycVerificationScreen()),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -296,14 +307,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       
                       const SizedBox(height: 12),
                       
-                      // Vehicle Type Field
-                      TextFormField(
-                        controller: _vehicleTypeController,
-                        enableInteractiveSelection: true,
-                        enableSuggestions: true,
-                        autocorrect: true,
+                      // Vehicle Type Field (Dropdown)
+                      DropdownButtonFormField<String>(
+                        value: _selectedVehicleType,
                         decoration: InputDecoration(
-                          labelText: 'Vehicle Type (e.g., Sedan, SUV)',
+                          labelText: 'Vehicle Type',
                           prefixIcon: const Icon(Icons.directions_car_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -316,11 +324,26 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your vehicle type';
-                          }
-                          return null;
+                        items: const [
+                          'Ambulance',
+                          'Sedan',
+                          'SUV',
+                          'Hatchback',
+                          'Van',
+                          'Pickup',
+                          'Motorbike',
+                          'Auto Rickshaw',
+                          'Truck',
+                        ].map(
+                          (t) => DropdownMenuItem<String>(
+                            value: t,
+                            child: Text(t),
+                          ),
+                        ).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedVehicleType = val ?? _selectedVehicleType;
+                          });
                         },
                       ),
                       
@@ -575,7 +598,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      filePath ?? 'Tap to select file',
+                      (filePath != null)
+                          ? (filePath.split('\\').last.split('/').last)
+                          : 'Tap to select file',
                       style: GoogleFonts.roboto(
                         fontSize: 12,
                         color: filePath != null ? AppTheme.primaryBlue : Colors.grey[500],
@@ -605,13 +630,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
-        final fileName = result.files.single.name;
         
-        onFileSelected(fileName);
+        onFileSelected(filePath);
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$label selected: $fileName'),
+            content: Text('$label selected'),
             backgroundColor: AppTheme.accentGreen,
           ),
         );
@@ -626,3 +650,38 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 }
+
+  Future<String?> _uploadPhotoIfAny(String? filePath, String photoType) async {
+    try {
+      if (filePath == null) return null;
+      final uri = Uri.parse('${DatabaseConfig.accidentBaseUrl}/upload_photo.php');
+      final request = http.MultipartRequest('POST', uri);
+      // driver_id unknown before signup; use 0, server will still save and later profile update can fix.
+      request.fields['driver_id'] = '0';
+      request.fields['photo_type'] = photoType;
+      request.files.add(await http.MultipartFile.fromPath('photo', filePath));
+      final streamed = await request.send();
+      final resp = await http.Response.fromStream(streamed);
+      if (resp.statusCode == 200) {
+        final data = json.decode(resp.body);
+        if (data['success'] == true) {
+          return data['data']['filename'];
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<String?> _encodePhotoAsBase64(String? filePath) async {
+    try {
+      if (filePath == null) return null;
+      final bytes = await File(filePath).readAsBytes();
+      final mime = filePath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+      final b64 = base64Encode(bytes);
+      return 'data:$mime;base64,$b64';
+    } catch (_) {
+      return null;
+    }
+  }

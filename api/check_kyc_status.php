@@ -12,21 +12,24 @@ try {
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!$input || !isset($input['email']) || !isset($input['password'])) {
-    sendErrorResponse('Email and password are required');
+if (!$input) {
+    sendErrorResponse('Invalid input data');
 }
 
-$email = $input['email'];
-$password = $input['password'];
+// Validate required fields
+if (!isset($input['driver_id']) || empty($input['driver_id'])) {
+    sendErrorResponse('Driver ID is required');
+}
+
+$driverId = $input['driver_id'];
 
 try {
-    // Check if driver exists
+    // Get driver data with current KYC status
     $stmt = $pdo->prepare("
         SELECT 
             id,
             driver_name,
             email,
-            password,
             number,
             address,
             vehicle_type,
@@ -38,33 +41,14 @@ try {
             kyc_status,
             created_at
         FROM drivers 
-        WHERE email = ?
+        WHERE id = ?
     ");
-    $stmt->execute([$email]);
+    $stmt->execute([$driverId]);
     $driver = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$driver) {
-        sendErrorResponse('Invalid email or password');
+        sendErrorResponse('Driver not found');
     }
-
-    // Verify password using password_verify (for hashed passwords)
-    if (!password_verify($password, $driver['password'])) {
-        sendErrorResponse('Invalid email or password');
-    }
-
-    // Check KYC status
-    if ($driver['kyc_status'] !== 'approved') {
-        echo json_encode([
-            'success' => false,
-            'kyc_pending' => true,
-            'message' => 'KYC verification pending',
-            'kyc_status' => $driver['kyc_status']
-        ]);
-        exit;
-    }
-
-    // Remove password from response
-    unset($driver['password']);
 
     // Format driver data for response (matching ProfileData.fromJson expectations)
     $driverData = [
@@ -85,7 +69,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Login successful',
+        'message' => 'KYC status retrieved successfully',
         'driver' => $driverData
     ]);
 

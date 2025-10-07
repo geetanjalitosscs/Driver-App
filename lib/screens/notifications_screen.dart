@@ -7,6 +7,7 @@ import '../providers/notification_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/notification_item.dart' as notification_model;
+import 'login_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -340,6 +341,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'view_trips':
         // Navigate to trip history screen
         navigationProvider.navigateToTrips();
+        break;
+      case 'navigate_to_login':
+        // Navigate to login screen for KYC approval
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (Route<dynamic> route) => false,
+        );
         break;
       case 'view_system':
         // Navigate to help screen for system notifications

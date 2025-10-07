@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/services.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/kyc_verification_screen.dart';
 import 'screens/trip_history_screen.dart';
 import 'screens/earnings_screen.dart';
 import 'screens/wallet_screen.dart';
@@ -21,6 +23,7 @@ import 'providers/settings_provider.dart';
 import 'providers/notification_provider.dart';
 import 'widgets/notification_banner.dart';
 import 'services/notification_service.dart';
+import 'services/kyc_notification_service.dart';
 import 'models/notification_item.dart' as notification_model;
 
 void main() async {
@@ -30,7 +33,8 @@ void main() async {
     // Initialize notification service with error handling
     try {
       await NotificationService.initialize();
-      print('✅ NotificationService initialized successfully');
+      await KycNotificationService().initialize();
+      print('✅ NotificationService and KycNotificationService initialized successfully');
     } catch (e) {
       print('⚠️ Warning: Notification initialization failed: $e');
       // Continue app startup even if notifications fail
@@ -268,19 +272,44 @@ class AuthWrapper extends StatefulWidget {
   State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AuthWrapperState extends State<AuthWrapper> with WidgetsBindingObserver {
   bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeAuth();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    if (state == AppLifecycleState.resumed) {
+      // App came to foreground - force immediate KYC check
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.isAuthenticated) {
+        authProvider.forceKycStatusCheck();
+      }
+    }
   }
 
   Future<void> _initializeAuth() async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.initializeAuth();
+      
+      // Start KYC monitoring if user is authenticated
+      if (authProvider.isAuthenticated && authProvider.currentUser?.driverId != null) {
+        await KycNotificationService().startMonitoring(authProvider.currentUser!.driverId);
+      }
     } catch (e) {
       print('Error initializing auth: $e');
     } finally {
@@ -305,7 +334,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         if (authProvider.isAuthenticated) {
-          return const MainScreen();
+          // Check KYC status
+          if (authProvider.isKycApproved) {
+            return const MainScreen();
+          } else {
+            return const KycVerificationScreen();
+          }
         } else {
           return const LoginScreen();
         }

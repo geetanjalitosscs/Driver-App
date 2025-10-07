@@ -10,6 +10,7 @@ class ProfileData {
   final String aadharPhoto;
   final String licencePhoto;
   final String rcPhoto;
+  final String kycStatus;
   final String createdAt;
 
   ProfileData({
@@ -24,6 +25,7 @@ class ProfileData {
     required this.aadharPhoto,
     required this.licencePhoto,
     required this.rcPhoto,
+    required this.kycStatus,
     required this.createdAt,
   });
 
@@ -55,6 +57,7 @@ class ProfileData {
       aadharPhoto: 'placeholder_aadhar.jpg',
       licencePhoto: 'placeholder_licence.jpg',
       rcPhoto: 'placeholder_rc.jpg',
+      kycStatus: 'approved',
       createdAt: DateTime.now().toIso8601String(),
     );
   }
@@ -72,6 +75,7 @@ class ProfileData {
     String? aadharPhoto,
     String? licencePhoto,
     String? rcPhoto,
+    String? kycStatus,
     String? createdAt,
   }) {
     return ProfileData(
@@ -86,6 +90,7 @@ class ProfileData {
       aadharPhoto: aadharPhoto ?? this.aadharPhoto,
       licencePhoto: licencePhoto ?? this.licencePhoto,
       rcPhoto: rcPhoto ?? this.rcPhoto,
+      kycStatus: kycStatus ?? this.kycStatus,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -104,6 +109,7 @@ class ProfileData {
       'aadharPhoto': aadharPhoto,
       'licencePhoto': licencePhoto,
       'rcPhoto': rcPhoto,
+      'kycStatus': kycStatus,
       'createdAt': createdAt,
     };
   }
@@ -125,6 +131,7 @@ class ProfileData {
       aadharPhoto: json['aadhar_photo'] ?? json['aadharPhoto'] ?? '',
       licencePhoto: json['licence_photo'] ?? json['licencePhoto'] ?? '',
       rcPhoto: json['rc_photo'] ?? json['rcPhoto'] ?? '',
+      kycStatus: json['kyc_status'] ?? json['kycStatus'] ?? 'pending',
       createdAt: json['created_at'] ?? json['createdAt'] ?? '',
     );
   }

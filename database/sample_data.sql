@@ -171,3 +171,40 @@ SELECT
     (w.total_earned - w.total_withdrawn) as calculated_balance
 FROM wallet w
 WHERE w.driver_id = 1;
+
+
+
+-- Add KYC status column to drivers table
+ALTER TABLE drivers ADD COLUMN kyc_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending';
+
+-- Update existing drivers to have 'approved' status (assuming they were already verified)
+UPDATE drivers SET kyc_status = 'approved' WHERE kyc_status IS NULL;
+
+-- Add index for better performance
+CREATE INDEX idx_drivers_kyc_status ON drivers(kyc_status);
+
+
+
+
+-- Fix drivers table AUTO_INCREMENT issue
+-- This will resolve the "Duplicate entry '0' for key 'PRIMARY'" error
+
+-- First, check if there are any records with id = 0 and delete them
+DELETE FROM drivers WHERE id = 0;
+
+-- Add AUTO_INCREMENT to the id field
+ALTER TABLE drivers MODIFY COLUMN id int(11) NOT NULL AUTO_INCREMENT;
+
+-- Add kyc_status column if it doesn't exist
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS kyc_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending';
+
+-- Set the AUTO_INCREMENT to start from 1 (in case there are existing records)
+-- Get the maximum id and set AUTO_INCREMENT to max + 1
+SET @max_id = (SELECT COALESCE(MAX(id), 0) FROM drivers);
+SET @sql = CONCAT('ALTER TABLE drivers AUTO_INCREMENT = ', @max_id + 1);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Verify the fix
+SHOW CREATE TABLE drivers;

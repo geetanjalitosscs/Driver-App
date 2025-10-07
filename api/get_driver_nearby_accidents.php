@@ -11,7 +11,7 @@ try {
 
 // Get driver ID from query parameter
 $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
-$radius_km = 10.0; // Fixed 10km radius
+$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
 
 if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');
@@ -81,7 +81,17 @@ try {
         ");
         $photo_stmt->execute([$accident['id']]);
         $photos = $photo_stmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        
+        // Convert photo filenames to full URLs
+        $photoUrls = [];
+        foreach ($photos as $photo) {
+            if (!empty($photo)) {
+                // Construct the full URL path for the photo using server URL
+                $photoUrls[] = 'https://yourserver.com/uploads/' . $photo;
+            }
+        }
+        
+        $accident['photos'] = $photoUrls;
     }
     
     echo json_encode([

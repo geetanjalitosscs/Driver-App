@@ -497,6 +497,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String type,
     required IconData icon,
   }) {
+    // Convert photo path to URL
+    String photoUrl = '';
+    if (photoPath.isNotEmpty) {
+      if (photoPath.startsWith('http')) {
+        photoUrl = photoPath;
+      } else {
+        photoUrl = 'http://localhost/Driver-App/uploads/$photoPath';
+      }
+    }
+
     return Row(
       children: [
         Icon(
@@ -516,20 +526,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                photoPath,
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.neutralGreyLight,
+              // Show photo thumbnail if available
+              if (photoUrl.isNotEmpty) ...[
+                Container(
+                  height: 60,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppTheme.primaryBlue.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: Image.network(
+                      photoUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: AppTheme.backgroundLight,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: AppTheme.backgroundLight,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                color: AppTheme.textSecondary,
+                                size: 20,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'No image',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              ] else ...[
+                Text(
+                  'No photo uploaded',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.neutralGreyLight,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
         const SizedBox(width: 8),
         IconButton(
-          onPressed: () => _viewPhoto(driverId, type, title),
+          onPressed: () => _viewPhoto(driverId, type, title, photoUrl),
           icon: Icon(
             Icons.visibility,
             color: AppTheme.primaryBlue,
@@ -541,46 +609,123 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _viewPhoto(String driverId, String type, String title) {
-    // For now, show a dialog with photo info
-    // In a real app, you would open the photo in a viewer
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.image,
-              size: 64,
-              color: AppTheme.primaryBlue,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Photo: $type',
-              style: AppTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Driver ID: $driverId',
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.neutralGreyLight,
+  void _viewPhoto(String driverId, String type, String title, String photoUrl) {
+    if (photoUrl.isEmpty) {
+      // Show error dialog if no photo
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(title),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.image_not_supported,
+                size: 64,
+                color: AppTheme.textSecondary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No photo available',
+                style: AppTheme.bodyMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Driver ID: $driverId',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.neutralGreyLight,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Close',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.primaryBlue,
+                ),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Close',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.primaryBlue,
+      );
+      return;
+    }
+
+    // Show full screen photo viewer
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.network(
+                  photoUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            color: Colors.white,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Failed to load image',
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              left: 20,
+              child: Text(
+                title,
+                style: AppTheme.heading3.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

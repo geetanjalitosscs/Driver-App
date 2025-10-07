@@ -6,6 +6,7 @@ import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/auth_provider.dart';
 import 'signup_screen.dart';
+import 'kyc_verification_screen.dart';
 import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,16 +45,34 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
+        // Check if KYC is approved before navigating
+        if (authProvider.isKycApproved) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        } else {
+          // Show KYC status popup instead of bottom banner
+          _showKycStatusDialog(authProvider.kycStatus);
+        }
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? 'Login failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Check if it's a KYC-related error
+        if (authProvider.errorMessage?.contains('KYC verification') == true) {
+          // Extract the KYC status from the error message
+          String kycStatus = 'pending';
+          if (authProvider.errorMessage!.contains('rejected')) {
+            kycStatus = 'rejected';
+          } else if (authProvider.errorMessage!.contains('pending')) {
+            kycStatus = 'pending';
+          }
+          _showKycStatusDialog(kycStatus);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'Login failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -71,6 +90,71 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     }
+  }
+
+  void _showKycStatusDialog(String status) {
+    String title;
+    String message;
+    Color backgroundColor;
+    Color textColor;
+    IconData icon;
+
+    if (status == 'rejected') {
+      title = 'KYC Verification Rejected';
+      message = 'Your KYC verification has been rejected. Please contact support for assistance.';
+      backgroundColor = Colors.red.shade50;
+      textColor = Colors.red.shade700;
+      icon = Icons.cancel_outlined;
+    } else {
+      title = 'KYC Verification Pending';
+      message = 'Your KYC verification is still pending. Please wait for admin approval.';
+      backgroundColor = Colors.orange.shade50;
+      textColor = Colors.orange.shade700;
+      icon = Icons.pending_outlined;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: backgroundColor,
+        title: Row(
+          children: [
+            Icon(icon, color: textColor, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: TextStyle(color: textColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // For rejected users, stay on login screen
+              // For pending users, go to KYC screen
+              if (status == 'rejected') {
+                // Stay on login screen - do nothing
+              } else {
+                // Navigate to KYC verification screen for pending
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const KycVerificationScreen()),
+                );
+              }
+            },
+            child: Text(
+              'OK',
+              style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

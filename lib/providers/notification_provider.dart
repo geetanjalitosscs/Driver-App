@@ -342,6 +342,47 @@ class NotificationProvider extends ChangeNotifier {
     );
   }
 
+  // KYC Approval Notifications
+  void addKycApprovalNotification({
+    required String status,
+    required String driverId,
+    String? customMessage,
+  }) {
+    String title;
+    String message;
+    String action;
+    
+    switch (status.toLowerCase()) {
+      case 'approved':
+        title = 'KYC Verification Approved';
+        message = customMessage ?? 'Your KYC Verification is approved! You can now use your profile and access all app features.';
+        action = 'navigate_to_login';
+        break;
+      case 'rejected':
+        title = 'KYC Verification Rejected';
+        message = customMessage ?? 'Your KYC Verification has been rejected. Please contact support for more information.';
+        action = 'navigate_to_help';
+        break;
+      default:
+        title = 'KYC Verification Update';
+        message = customMessage ?? 'Your KYC Verification status has been updated to: $status';
+        action = 'navigate_to_help';
+    }
+    
+    addNotification(
+      id: 'kyc_${status}_${DateTime.now().millisecondsSinceEpoch}',
+      title: title,
+      message: message,
+      type: NotificationType.system,
+      actionData: {
+        'kyc_status': status,
+        'action': action,
+        'type': 'kyc_$status',
+      },
+      driverId: driverId,
+    );
+  }
+
   // Withdrawal Notifications
   void addWithdrawalNotification({
     required double amount,

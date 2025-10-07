@@ -35,6 +35,36 @@ $aadharPhoto = $input['aadhar_photo'];
 $licencePhoto = $input['licence_photo'];
 $rcPhoto = $input['rc_photo'];
 
+// Function to save base64 image to file
+function saveBase64Image($base64Data, $driverId, $photoType, $uploadsDir) {
+    if (empty($base64Data) || !preg_match('/^data:image\/(jpeg|jpg|png|gif);base64,/', $base64Data)) {
+        return null;
+    }
+    
+    // Extract image data and type
+    $image_data = explode(',', $base64Data);
+    $image_info = explode(';', $image_data[0]);
+    $image_type = explode('/', $image_info[0])[1];
+    $base64_content = $image_data[1];
+    
+    // Decode base64 data
+    $decoded_data = base64_decode($base64_content);
+    if ($decoded_data === false) {
+        return null;
+    }
+    
+    // Generate unique filename
+    $unique_filename = $driverId . '_' . $photoType . '_' . time() . '_' . uniqid() . '.' . $image_type;
+    $file_path = $uploadsDir . $unique_filename;
+    
+    // Save file
+    if (file_put_contents($file_path, $decoded_data) !== false) {
+        return $unique_filename;
+    }
+    
+    return null;
+}
+
 // Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     sendErrorResponse('Invalid email format');
@@ -72,8 +102,9 @@ try {
             vehicle_number,
             aadhar_photo,
             licence_photo,
-            rc_photo
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            rc_photo,
+            kyc_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
     
     // Hash the password before storing
@@ -93,6 +124,44 @@ try {
     ]);
 
     $driverId = $pdo->lastInsertId();
+
+    // Create uploads directory if it doesn't exist
+    $uploads_dir = __DIR__ . '/uploads/';
+    if (!is_dir($uploads_dir)) {
+        if (!mkdir($uploads_dir, 0755, true)) {
+            error_log('Warning: Failed to create uploads directory');
+        }
+    }
+
+    // Save photos to files and update database with filenames
+    $saved_aadhar = saveBase64Image($aadharPhoto, $driverId, 'aadhar', $uploads_dir);
+    $saved_licence = saveBase64Image($licencePhoto, $driverId, 'licence', $uploads_dir);
+    $saved_rc = saveBase64Image($rcPhoto, $driverId, 'rc', $uploads_dir);
+
+    // Update database with saved photo filenames
+    if ($saved_aadhar || $saved_licence || $saved_rc) {
+        $update_fields = [];
+        $update_values = [];
+        
+        if ($saved_aadhar) {
+            $update_fields[] = 'aadhar_photo = ?';
+            $update_values[] = $saved_aadhar;
+        }
+        if ($saved_licence) {
+            $update_fields[] = 'licence_photo = ?';
+            $update_values[] = $saved_licence;
+        }
+        if ($saved_rc) {
+            $update_fields[] = 'rc_photo = ?';
+            $update_values[] = $saved_rc;
+        }
+        
+        if (!empty($update_fields)) {
+            $update_values[] = $driverId;
+            $stmt = $pdo->prepare("UPDATE drivers SET " . implode(', ', $update_fields) . " WHERE id = ?");
+            $stmt->execute($update_values);
+        }
+    }
 
     // Create wallet entry for new driver
     $stmt = $pdo->prepare("
@@ -115,6 +184,7 @@ try {
             aadhar_photo,
             licence_photo,
             rc_photo,
+            kyc_status,
             created_at
         FROM drivers 
         WHERE id = ?
@@ -135,6 +205,7 @@ try {
         'aadhar_photo' => $driver['aadhar_photo'],
         'licence_photo' => $driver['licence_photo'],
         'rc_photo' => $driver['rc_photo'],
+        'kyc_status' => $driver['kyc_status'],
         'created_at' => $driver['created_at'],
     ];
 

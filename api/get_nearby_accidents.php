@@ -19,7 +19,7 @@ if (!$input || !isset($input['driver_id']) || !isset($input['latitude']) || !iss
 $driver_id = (int)$input['driver_id'];
 $driver_latitude = (float)$input['latitude'];
 $driver_longitude = (float)$input['longitude'];
-$radius_km = 10.0; // Fixed 10km radius
+$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
 
 if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');
@@ -72,7 +72,17 @@ try {
         ");
         $photo_stmt->execute([$accident['id']]);
         $photos = $photo_stmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        
+        // Convert photo filenames to full URLs
+        $photoUrls = [];
+        foreach ($photos as $photo) {
+            if (!empty($photo)) {
+                // Construct the full URL path for the photo using server URL
+                $photoUrls[] = 'https://yourserver.com/uploads/' . $photo;
+            }
+        }
+        
+        $accident['photos'] = $photoUrls;
     }
     
     echo json_encode([

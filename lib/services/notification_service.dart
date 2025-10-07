@@ -350,6 +350,44 @@ class NotificationService {
     );
   }
 
+  /// Show notification for KYC approval
+  static Future<void> showKycApprovalNotification({
+    required String status,
+    String? message,
+  }) async {
+    String title;
+    String body;
+    String type;
+    
+    if (status == 'approved') {
+      title = "✅ KYC Verification Approved";
+      body = message ?? "Your KYC Verification is approved! You can now use your profile and access all app features.";
+      type = 'kyc_approved';
+    } else if (status == 'rejected') {
+      title = "❌ KYC Verification Rejected";
+      body = message ?? "Your KYC Verification has been rejected. Please contact support for more information.";
+      type = 'kyc_rejected';
+    } else {
+      title = "⏳ KYC Verification Update";
+      body = message ?? "Your KYC Verification status has been updated to: $status";
+      type = 'kyc_update';
+    }
+    
+    print('🔔 Creating KYC notification: $status');
+    
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // Use timestamp as ID
+      title: title,
+      body: body,
+      payload: json.encode({
+        'type': type,
+        'kyc_status': status,
+        'action': status == 'approved' ? 'navigate_to_login' : 'navigate_to_help',
+      }),
+      type: type,
+    );
+  }
+
   /// Show notification for withdrawal
   static Future<void> showWithdrawalNotification({
     required double amount,

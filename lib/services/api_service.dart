@@ -54,28 +54,38 @@ class CentralizedApiService {
     required String password,
     required String vehicleNumber,
     required String vehicleType,
-    required String licenseNumber,
-    required String aadharNumber,
+    required String aadharPhoto,
+    required String licencePhoto,
+    required String rcPhoto,
     String address = 'Default Address',
-    String rcPhoto = 'default_rc.jpg',
   }) async {
     try {
+      final requestBody = {
+        'driver_name': name,
+        'email': email,
+        'number': phone,
+        'password': password,
+        'vehicle_number': vehicleNumber,
+        'vehicle_type': vehicleType,
+        'aadhar_photo': aadharPhoto,
+        'licence_photo': licencePhoto,
+        'rc_photo': rcPhoto,
+        'address': address,
+      };
+      
+      print('Signup request body keys: ${requestBody.keys.toList()}');
+      print('Aadhar photo length: ${aadharPhoto.length}');
+      print('Licence photo length: ${licencePhoto.length}');
+      print('RC photo length: ${rcPhoto.length}');
+      
       final response = await http.post(
         Uri.parse('$_accidentBaseUrl/signup.php'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'driver_name': name,
-          'email': email,
-          'number': phone,
-          'password': password,
-          'vehicle_number': vehicleNumber,
-          'vehicle_type': vehicleType,
-          'licence_photo': licenseNumber,
-          'aadhar_photo': aadharNumber,
-          'address': address,
-          'rc_photo': rcPhoto,
-        }),
+        body: json.encode(requestBody),
       );
+
+      print('Signup response status: ${response.statusCode}');
+      print('Signup response body: ${response.body}');
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
@@ -83,7 +93,35 @@ class CentralizedApiService {
         throw Exception('Signup failed: ${response.statusCode}');
       }
     } catch (e) {
+      print('Signup API error: $e');
       throw Exception('Signup error: $e');
+    }
+  }
+
+  /// Check KYC Status API
+  static Future<Map<String, dynamic>> checkKycStatus({
+    required int driverId,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/check_kyc_status.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'driver_id': driverId,
+        }),
+      );
+
+      print('KYC status response: ${response.statusCode}');
+      print('KYC status body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('KYC status check failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('KYC status API error: $e');
+      throw Exception('KYC status error: $e');
     }
   }
 

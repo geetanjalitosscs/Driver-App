@@ -17,7 +17,13 @@ try {
                 $driver_id = intval($input['driver_id']);
                 $vehicle_number = trim($input['vehicle_number']);
                 
-                $driver_details = "Driver ID: " . $driver_id . " | Vehicle: " . $vehicle_number;
+                // Fetch driver name from drivers table
+                $driverStmt = $pdo->prepare("SELECT driver_name FROM drivers WHERE id = ?");
+                $driverStmt->execute([$driver_id]);
+                $driver = $driverStmt->fetch(PDO::FETCH_ASSOC);
+                
+                $driver_name = $driver ? $driver['driver_name'] : 'Unknown Driver';
+                $driver_details = "Driver: " . $driver_name . " | Vehicle: " . $vehicle_number;
                 
                 // Update accident - driver_status starts as NULL, so we check for NULL or 'available'
                 $updateStmt = $pdo->prepare("UPDATE accidents SET 
@@ -215,65 +221,35 @@ try {
     $columnExists = $checkColumn->fetch();
     
     if ($columnExists) {
-        // Column exists - use simple query without complex joins
+        // Column exists - use the full query with case-insensitive client filtering and collation fix
         $stmt = $pdo->prepare("
-            SELECT * FROM accidents 
-            WHERE status = 'pending' 
-            AND (driver_status IS NULL OR driver_status = 'available')
-            ORDER BY created_at DESC
+            SELECT a.* FROM accidents a 
+            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
+            WHERE a.status = 'pending' 
+            AND (a.driver_status IS NULL OR a.driver_status = 'available')
+            ORDER BY a.created_at DESC
         ");
-        error_log("Using simple query with driver_status filter");
+        error_log("Using driver_status filter with case-insensitive client matching (collation fixed)");
     } else {
-        // Column doesn't exist - use simple query
+        // Column doesn't exist - use simple query with case-insensitive client filtering and collation fix
         $stmt = $pdo->prepare("
-            SELECT * FROM accidents 
-            WHERE status = 'pending' 
-            ORDER BY created_at DESC
+            SELECT a.* FROM accidents a 
+            INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
+            WHERE a.status = 'pending' 
+            ORDER BY a.created_at DESC
         ");
-        error_log("Using simple query without driver_status filter");
+        error_log("Driver_status column not found, using simple query with case-insensitive client matching (collation fixed)");
     }
     
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // AGGRESSIVE duplicate removal by ID
-    $originalCount = count($accidents);
-    error_log("BEFORE duplicate removal: $originalCount accidents");
-    
-    // Create a new array with unique IDs only
-    $uniqueAccidents = [];
-    $seenIds = [];
-    
-    foreach ($accidents as $accident) {
-        $id = intval($accident['id']);
-        if (!isset($seenIds[$id])) {
-            $seenIds[$id] = true;
-            $uniqueAccidents[] = $accident;
-        } else {
-            error_log("REMOVING DUPLICATE: ID=$id, Name=" . ($accident['fullname'] ?? 'unknown'));
-        }
-    }
-    
-    $accidents = $uniqueAccidents;
-    $finalCount = count($accidents);
-    error_log("AFTER duplicate removal: $originalCount -> $finalCount accidents");
     
     // Fetch photos for each accident
     foreach ($accidents as &$accident) {
         $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ?");
         $photoStmt->execute([$accident['id']]);
         $photos = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
-        
-        // Convert photo filenames to full URLs
-        $photoUrls = [];
-        foreach ($photos as $photo) {
-            if (!empty($photo)) {
-                // Construct the full URL path for the photo
-                $photoUrls[] = '../uploads/' . $photo;
-            }
-        }
-        
-        $accident['photos'] = $photoUrls;
+        $accident['photos'] = $photos;
     }
     
     // Debug logging for coordinates and IDs
