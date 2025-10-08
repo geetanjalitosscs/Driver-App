@@ -19,8 +19,8 @@ if ($driver_id <= 0) {
 }
 
 try {
-    // Get wallet transactions (earnings, payments, etc.)
-    // This combines data from earnings table and any other transaction sources
+    // Get wallet transactions (earnings, payments, withdrawals, etc.)
+    // This combines data from earnings, payments, and withdrawals tables
     $stmt = $pdo->prepare("
         SELECT 
             'earning' as transaction_type,
@@ -48,10 +48,24 @@ try {
         FROM payments 
         WHERE driver_id = ?
         
+        UNION ALL
+        
+        SELECT 
+            'withdrawal' as transaction_type,
+            withdrawal_id as transaction_id,
+            driver_id,
+            amount,
+            requested_at as transaction_date,
+            CONCAT('Withdrawal - ', bank_name, ' (', status, ')') as description,
+            'debit' as type,
+            created_at
+        FROM withdrawals 
+        WHERE driver_id = ?
+        
         ORDER BY transaction_date DESC, created_at DESC
         LIMIT 50
     ");
-    $stmt->execute([$driver_id, $driver_id]);
+    $stmt->execute([$driver_id, $driver_id, $driver_id]);
     $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Format the transactions data

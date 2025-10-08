@@ -60,8 +60,7 @@ try {
             account_holder_name,
             status,
             requested_at,
-            processed_at,
-            notes
+            processed_at
         FROM withdrawals 
         WHERE driver_id = ? AND $dateCondition $statusCondition
         ORDER BY requested_at DESC
@@ -82,8 +81,7 @@ try {
             'account_holder_name' => $withdrawal['account_holder_name'],
             'status' => $withdrawal['status'],
             'requested_at' => $withdrawal['requested_at'],
-            'processed_at' => $withdrawal['processed_at'],
-            'notes' => $withdrawal['notes']
+            'processed_at' => $withdrawal['processed_at']
         ];
     }
 

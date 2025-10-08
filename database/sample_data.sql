@@ -66,17 +66,12 @@ INSERT INTO withdrawals (
     account_holder_name, 
     status, 
     requested_at, 
-    processed_at,
-    notes
-) VALUES
--- Withdrawal after September 20 trip
-(1, 1000.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-21 10:30:00', '2025-09-22 14:20:00', 'Withdrawal after Sep 20 trip'),
-
--- Withdrawal after September 27 trip  
-(1, 1500.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-28 11:15:00', '2025-09-29 16:30:00', 'Withdrawal after Sep 27 trip'),
-
--- Pending withdrawal after October 1 trip
-(1, 1200.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'pending', '2025-10-02 09:45:00', NULL, 'Withdrawal after Oct 1 trip');
+    processed_at
+)
+VALUES
+(1, 1000.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-21 10:30:00', '2025-09-22 14:20:00'),
+(1, 1500.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-09-28 11:15:00', '2025-09-29 16:30:00'),
+(1, 1200.00, '1234567890123456', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma', 'completed', '2025-10-02 09:45:00', '2025-10-02 09:45:00');
 
 -- ============================================
 -- 5. VERIFICATION QUERIES
