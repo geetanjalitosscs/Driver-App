@@ -115,9 +115,9 @@ try {
         'vehicle_type' => $driver['vehicle_type'],
         'vehicle_number' => $driver['vehicle_number'],
         'model_rating' => (float)($driver['model_rating'] ?? 0.0),
-        'aadhar_photo' => $driver['aadhar_photo'],
-        'licence_photo' => $driver['licence_photo'],
-        'rc_photo' => $driver['rc_photo'],
+        'aadhar_photo' => 'https://tossconsultancyservices.com/apatkal/api/uploads/' . $driver['aadhar_photo'],
+        'licence_photo' => 'https://tossconsultancyservices.com/apatkal/api/uploads/' . $driver['licence_photo'],
+        'rc_photo' => 'https://tossconsultancyservices.com/apatkal/api/uploads/' . $driver['rc_photo'],
         'kyc_status' => $driver['kyc_status'],
         'created_at' => $driver['created_at'],
     ];

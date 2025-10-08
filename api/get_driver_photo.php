@@ -55,7 +55,7 @@ try {
     sendSuccessResponse([
         'driver_name' => $driver_name,
         'photo_type' => $photo_type,
-        'photo_url' => 'http://localhost/Driver-App/uploads/' . $photo_path,
+        'photo_url' => 'https://tossconsultancyservices.com/apatkal/api/uploads/' . $photo_path,
         'file_size' => filesize($full_path),
         'mime_type' => $mime_type,
         'file_name' => $photo_path

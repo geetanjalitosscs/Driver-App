@@ -12,7 +12,7 @@ try {
 // Get parameters from query string
 $latitude = isset($_GET['latitude']) ? (float)$_GET['latitude'] : null;
 $longitude = isset($_GET['longitude']) ? (float)$_GET['longitude'] : null;
-$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
+$radius_km = 0.005; // Fixed 5 meters radius (0.005 km)
 $status = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
 if ($latitude === null || $longitude === null) {

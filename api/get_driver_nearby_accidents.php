@@ -11,7 +11,7 @@ try {
 
 // Get driver ID from query parameter
 $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
-$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
+$radius_km = 0.005; // Fixed 5 meters radius (0.005 km)
 
 if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');

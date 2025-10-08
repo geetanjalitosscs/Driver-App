@@ -506,114 +506,143 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String type,
     required IconData icon,
   }) {
-    // Convert photo path to URL
+    // Convert photo path to URL and validate
     String photoUrl = '';
-    if (photoPath.isNotEmpty) {
+    bool hasValidPhoto = false;
+    
+    if (photoPath.isNotEmpty && !photoPath.contains('default_')) {
       if (photoPath.startsWith('http')) {
         photoUrl = photoPath;
+        hasValidPhoto = true;
       } else {
-        photoUrl = 'http://localhost/Driver-App/uploads/$photoPath';
+        photoUrl = 'https://tossconsultancyservices.com/apatkal/api/uploads/$photoPath';
+        hasValidPhoto = true;
       }
     }
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          color: AppTheme.primaryBlue,
-          size: 20,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+        // Title row with icon
+        Row(
+          children: [
+            Icon(
+              icon,
+              color: AppTheme.primaryBlue,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
                 title,
                 style: AppTheme.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 4),
-              // Show photo thumbnail if available
-              if (photoUrl.isNotEmpty) ...[
-                Container(
-                  height: 60,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppTheme.primaryBlue.withOpacity(0.3),
-                      width: 1,
+            ),
+            IconButton(
+              onPressed: () => _viewPhoto(driverId, type, title, photoUrl),
+              icon: Icon(
+                Icons.visibility,
+                color: AppTheme.primaryBlue,
+                size: 20,
+              ),
+              tooltip: 'View Photo',
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Photo thumbnail below the title
+        if (hasValidPhoto) ...[
+          Container(
+            height: 80,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppTheme.primaryBlue.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: Image.network(
+                photoUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: AppTheme.backgroundLight,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        strokeWidth: 2,
+                      ),
                     ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(7),
-                    child: Image.network(
-                      photoUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: AppTheme.backgroundLight,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                              strokeWidth: 2,
-                            ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: AppTheme.backgroundLight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_not_supported,
+                          color: AppTheme.textSecondary,
+                          size: 20,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Image not available',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.textSecondary,
                           ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: AppTheme.backgroundLight,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image_not_supported,
-                                color: AppTheme.textSecondary,
-                                size: 20,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'No image',
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ] else ...[
-                Text(
-                  'No photo uploaded',
-                  style: AppTheme.bodySmall.copyWith(
+                  );
+                },
+              ),
+            ),
+          ),
+        ] else ...[
+          Container(
+            height: 60,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppTheme.neutralGreyLight.withOpacity(0.3),
+                width: 1,
+              ),
+              color: AppTheme.backgroundLight,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_photo_alternate_outlined,
                     color: AppTheme.neutralGreyLight,
-                    fontStyle: FontStyle.italic,
+                    size: 24,
                   ),
-                ),
-              ],
-            ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'No photo uploaded',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.neutralGreyLight,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          onPressed: () => _viewPhoto(driverId, type, title, photoUrl),
-          icon: Icon(
-            Icons.visibility,
-            color: AppTheme.primaryBlue,
-            size: 20,
-          ),
-          tooltip: 'View Photo',
-        ),
+        ],
       ],
     );
   }
@@ -726,11 +755,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Positioned(
               top: 40,
               left: 20,
+              right: 80, // Add right margin to prevent clashing with close button
               child: Text(
                 title,
                 style: AppTheme.heading3.copyWith(
                   color: Colors.white,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
           ],

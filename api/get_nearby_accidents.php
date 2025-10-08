@@ -19,7 +19,7 @@ if (!$input || !isset($input['driver_id']) || !isset($input['latitude']) || !iss
 $driver_id = (int)$input['driver_id'];
 $driver_latitude = (float)$input['latitude'];
 $driver_longitude = (float)$input['longitude'];
-$radius_km = 0.01; // Fixed 10 meters radius (0.01 km)
+$radius_km = 0.005; // Fixed 5 meters radius (0.005 km)
 
 if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');
