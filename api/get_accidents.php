@@ -244,12 +244,23 @@ try {
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Fetch photos for each accident
+    // Fetch photos for each accident and convert to full URLs (only first photo)
     foreach ($accidents as &$accident) {
-        $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ?");
+        $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ? LIMIT 1");
         $photoStmt->execute([$accident['id']]);
-        $photos = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        $photoFilename = $photoStmt->fetchColumn();
+        
+        // Convert filename to full URL (only if photo exists)
+        if (!empty($photoFilename)) {
+            $baseUrl = 'https://tossconsultancyservices.com/apatkal/uploads/';
+            $accident['photos'] = [$baseUrl . $photoFilename];
+        } else {
+            $accident['photos'] = [];
+        }
+        
+        // Debug logging for photos
+        error_log("Accident ID: " . $accident['id'] . " - Found photo filename: " . ($photoFilename ?: 'none'));
+        error_log("Accident ID: " . $accident['id'] . " - Generated photo URL: " . (isset($accident['photos'][0]) ? $accident['photos'][0] : 'none'));
     }
     
     // Debug logging for coordinates and IDs

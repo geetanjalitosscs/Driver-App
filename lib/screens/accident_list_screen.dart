@@ -259,12 +259,26 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 80, child: Text('$label:', style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary, fontWeight: FontWeight.w500))),
-          Expanded(child: Text(value, style: AppTheme.bodySmall.copyWith(fontWeight: FontWeight.w500))),
+          Text(
+            '$label:',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: AppTheme.bodySmall.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: null, // Allow unlimited lines
+            overflow: TextOverflow.visible,
+          ),
         ],
       ),
     );
@@ -299,34 +313,42 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        child: AppCard(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Accident Report Details', style: AppTheme.heading3),
-                const SizedBox(height: 16),
-                _buildDetailRow('ID', accident.id.toString()),
-                _buildDetailRow('Name', accident.fullname),
-                _buildDetailRow('Phone', accident.phone),
-                _buildDetailRow('Vehicle', accident.vehicle),
-                _buildDetailRow('Date', accident.accidentDate),
-                _buildDetailRow('Location', accident.location),
-                _buildDetailRow('Status', accident.status),
-                if (accident.description.isNotEmpty) _buildDetailRow('Description', accident.description),
-                if (accident.photos.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  AccidentPhotoGrid(
-                    photoUrls: accident.photos,
-                    crossAxisCount: 2,
-                    showTitle: true,
-                  ),
-                ],
-                const SizedBox(height: 20),
-                AppButton(text: 'Close', onPressed: () => Navigator.of(context).pop(), variant: AppButtonVariant.primary, isFullWidth: true),
-              ],
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.95,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: AppCard(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Accident Report Details', style: AppTheme.heading3),
+                    const SizedBox(height: 16),
+                    _buildDetailRow('ID', accident.id.toString()),
+                    _buildDetailRow('Name', accident.fullname),
+                    _buildDetailRow('Phone', accident.phone),
+                    _buildDetailRow('Vehicle', accident.vehicle),
+                    _buildDetailRow('Date', accident.accidentDate),
+                    _buildDetailRow('Location', accident.location),
+                    _buildDetailRow('Status', accident.status),
+                    if (accident.description.isNotEmpty) _buildDetailRow('Description', accident.description),
+                    if (accident.photos.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      AccidentPhotoGrid(
+                        photoUrls: accident.photos,
+                        crossAxisCount: 2,
+                        showTitle: true,
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    AppButton(text: 'Close', onPressed: () => Navigator.of(context).pop(), variant: AppButtonVariant.primary, isFullWidth: true),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

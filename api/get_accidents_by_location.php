@@ -57,14 +57,23 @@ try {
         $accident['distance_km'] = round((float)$accident['distance_km'], 2);
         
         // Get photos
+        // Get photos and convert to full URLs (only first photo)
         $photo_stmt = $pdo->prepare("
             SELECT photo 
             FROM accident_photos 
             WHERE accident_id = ?
+            LIMIT 1
         ");
         $photo_stmt->execute([$accident['id']]);
-        $photos = $photo_stmt->fetchAll(PDO::FETCH_COLUMN);
-        $accident['photos'] = $photos;
+        $photoFilename = $photo_stmt->fetchColumn();
+        
+        // Convert filename to full URL (only if photo exists)
+        if (!empty($photoFilename)) {
+            $baseUrl = 'https://tossconsultancyservices.com/apatkal/uploads/';
+            $accident['photos'] = [$baseUrl . $photoFilename];
+        } else {
+            $accident['photos'] = [];
+        }
     }
     
     echo json_encode([
