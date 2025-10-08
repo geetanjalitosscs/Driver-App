@@ -273,12 +273,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Refresh button method
   Future<void> _refreshData() async {
+    // Check if user is still authenticated before proceeding
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isAuthenticated || authProvider.currentUser == null) {
+      print('User not authenticated, skipping data refresh');
+      return;
+    }
+    
     await _loadStatisticsData();
     await _loadOngoingTrips();
   }
 
   // Refresh all data including reports
   Future<void> _refreshAllData() async {
+    // Check if user is still authenticated before proceeding
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isAuthenticated || authProvider.currentUser == null) {
+      print('User not authenticated, skipping data refresh');
+      return;
+    }
+    
     try {
       // Show loading indicator
       showDialog(

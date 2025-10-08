@@ -354,15 +354,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   Future<void> _finalizeTrip() async {
-    // Show confirmation popup
-    final confirmed = await _showCompletionConfirmation();
-    
-    if (!confirmed) {
-      // User clicked "No" - just close popup, don't remove km validation
-      return;
-    }
-    
-    // User clicked "Yes" - proceed with completion
+    // Proceed directly with completion (no confirmation dialog)
     try {
       // Get driver information
       final authProvider = Provider.of<AuthProvider>(context, listen: false);

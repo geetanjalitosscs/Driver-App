@@ -134,6 +134,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, authProvider, child) {
         final profile = authProvider.currentUser;
         
+        // If user is not authenticated, show loading or redirect
+        if (profile == null) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
         return Scaffold(
           backgroundColor: AppTheme.backgroundLight,
           appBar: AppBar(
@@ -286,12 +295,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             )
           else
             Text(
-              profile.driverName,
+              profile?.driverName ?? 'Unknown Driver',
               style: AppTheme.heading2,
             ),
           const SizedBox(height: 8),
           Text(
-            'Driver ID: ${profile.driverId}',
+            'Driver ID: ${profile?.driverId ?? 'N/A'}',
             style: AppTheme.bodyMedium.copyWith(
               color: AppTheme.neutralGreyLight,
             ),
@@ -387,22 +396,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ] else ...[
             _buildInfoRow(
               icon: Icons.person,
-              text: 'Name: ${profile.driverName}',
+              text: 'Name: ${profile?.driverName ?? 'N/A'}',
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.email,
-              text: 'Email: ${profile.email}',
+              text: 'Email: ${profile?.email ?? 'N/A'}',
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.phone,
-              text: 'Contact: +91 ${profile.contact}',
+              text: 'Contact: +91 ${profile?.contact ?? 'N/A'}',
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.location_on,
-              text: 'Address: ${profile.address}',
+              text: 'Address: ${profile?.address ?? 'N/A'}',
             ),
           ],
         ],
@@ -425,13 +434,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: _buildInfoRow(
                   icon: Icons.directions_car,
-                  text: 'Type: ${profile.vehicleType}',
+                  text: 'Type: ${profile?.vehicleType ?? 'N/A'}',
                 ),
               ),
               Expanded(
                 child: _buildInfoRow(
                   icon: Icons.confirmation_number,
-                  text: 'Number: ${profile.vehicleNumber}',
+                  text: 'Number: ${profile?.vehicleNumber ?? 'N/A'}',
                 ),
               ),
             ],
@@ -439,7 +448,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 12),
           _buildInfoRow(
             icon: Icons.star,
-            text: 'Model Average Rating ${profile.averageRating}',
+            text: 'Model Average Rating ${profile?.averageRating ?? 'N/A'}',
           ),
         ],
       ),
@@ -460,8 +469,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Aadhar Card Photo
           _buildPhotoRow(
             title: 'Aadhar Card',
-            photoPath: profile.aadharPhoto,
-            driverId: profile.driverId,
+            photoPath: profile?.aadharPhoto,
+            driverId: profile?.driverId ?? 'N/A',
             type: 'aadhar',
             icon: Icons.credit_card,
           ),
@@ -470,8 +479,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Driving Licence Photo
           _buildPhotoRow(
             title: 'Driving Licence',
-            photoPath: profile.licencePhoto,
-            driverId: profile.driverId,
+            photoPath: profile?.licencePhoto,
+            driverId: profile?.driverId ?? 'N/A',
             type: 'licence',
             icon: Icons.card_membership,
           ),
@@ -480,8 +489,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // RC Photo
           _buildPhotoRow(
             title: 'RC (Registration Certificate)',
-            photoPath: profile.rcPhoto,
-            driverId: profile.driverId,
+            photoPath: profile?.rcPhoto,
+            driverId: profile?.driverId ?? 'N/A',
             type: 'rc',
             icon: Icons.description,
           ),
