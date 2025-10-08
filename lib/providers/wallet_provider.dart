@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import '../models/wallet.dart';
 import '../models/withdrawal.dart';
 import '../services/api_service.dart';
 import '../services/notification_service.dart';
+import 'notification_provider.dart';
 
 class WalletProvider extends ChangeNotifier {
   Wallet? _wallet;
@@ -92,6 +94,8 @@ class WalletProvider extends ChangeNotifier {
         _addWalletBalanceNotification();
       }
 
+      // Clear any previous errors since wallet loaded successfully
+      _clearError();
       notifyListeners();
     } catch (e) {
       _setError('Failed to load wallet data: $e');
@@ -117,6 +121,7 @@ class WalletProvider extends ChangeNotifier {
     required String bankName,
     required String ifscCode,
     required String accountHolderName,
+    NotificationProvider? notificationProvider,
   }) async {
     if (_wallet == null) {
       _setError('Wallet not loaded');
@@ -137,28 +142,58 @@ class WalletProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      // Note: Using placeholder bank account ID since centralized service expects it
       final result = await CentralizedApiService.requestWithdrawal(
         driverId: _wallet!.driverId,
         amount: amount,
-        bankAccountId: '1', // Placeholder - should be proper bank account ID
+        bankAccountNumber: bankAccountNumber,
+        bankName: bankName,
+        ifscCode: ifscCode,
+        accountHolderName: accountHolderName,
       );
+      
       final success = result['success'] == true;
 
       if (success) {
         // Reload wallet data to get updated balance and new withdrawal
         await loadWalletData(_wallet!.driverId);
         
-        // Show push notification for withdrawal request
+        // Add withdrawal completion notification to notifications page
+        if (notificationProvider != null) {
+          try {
+            final withdrawalId = result['withdrawal_id']?.toString() ?? 'unknown';
+            notificationProvider.addWithdrawalNotification(
+              amount: amount,
+              status: 'completed',
+              withdrawalId: withdrawalId,
+              driverId: _wallet!.driverId.toString(),
+            );
+            
+            // Add wallet amount update notification with proper type conversion
+            final balanceValue = result['new_balance'];
+            final newBalance = balanceValue != null 
+                ? (balanceValue is int ? balanceValue.toDouble() : balanceValue as double)
+                : (_wallet?.balance ?? 0) - amount;
+            
+            notificationProvider.addWalletBalanceNotification(
+              balance: newBalance,
+              previousBalance: _wallet?.balance ?? 0,
+              driverId: _wallet!.driverId.toString(),
+            );
+          } catch (e) {
+            print('⚠️ Error adding withdrawal notifications: $e');
+          }
+        }
+        
+        // Show system notification for withdrawal completion
         await NotificationService.showWithdrawalNotification(
           amount: amount,
-          status: 'requested',
+          status: 'completed',
           method: 'Bank Transfer',
         );
         
         return true;
       } else {
-        _setError('Failed to submit withdrawal request');
+        _setError('Failed to submit withdrawal request: ${result['message'] ?? 'Unknown error'}');
         return false;
       }
     } catch (e) {

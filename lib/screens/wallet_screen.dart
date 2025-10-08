@@ -6,6 +6,7 @@ import '../widgets/common/app_card.dart';
 import '../providers/wallet_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/notification_provider.dart';
 import '../models/withdrawal.dart';
 import '../widgets/withdrawal_dialog.dart';
 
@@ -403,34 +404,40 @@ class _WalletScreenState extends State<WalletScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => WithdrawalDialog(
+      builder: (dialogContext) => WithdrawalDialog(
         walletBalance: walletProvider.wallet!.balance,
         onWithdraw: (amount, bankDetails) async {
-          Navigator.of(context).pop();
+          Navigator.of(dialogContext).pop();
           
-      final success = await walletProvider.requestWithdrawal(
-        amount: amount,
-        bankAccountNumber: bankDetails['accountNumber']!,
-        bankName: bankDetails['bankName']!,
-        ifscCode: bankDetails['ifscCode']!,
-        accountHolderName: bankDetails['accountHolderName']!,
-      );
+          final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+          final success = await walletProvider.requestWithdrawal(
+            amount: amount,
+            bankAccountNumber: bankDetails['accountNumber']!,
+            bankName: bankDetails['bankName']!,
+            ifscCode: bankDetails['ifscCode']!,
+            accountHolderName: bankDetails['accountHolderName']!,
+            notificationProvider: notificationProvider,
+          );
           
           if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Withdrawal request submitted successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Withdrawal is done!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
             _loadWalletData(); // Refresh data
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(walletProvider.errorMessage ?? 'Failed to submit withdrawal request'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(walletProvider.errorMessage ?? 'Failed to submit withdrawal request'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         },
       ),

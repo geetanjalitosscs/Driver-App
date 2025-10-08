@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'theme/app_theme.dart';
@@ -176,9 +177,21 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Consumer<NavigationProvider>(
       builder: (context, navigationProvider, child) {
-        return Scaffold(
-          body: _screens[navigationProvider.currentIndex],
-          bottomNavigationBar: Theme(
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) async {
+            if (!didPop) {
+              // Handle back button press using navigation history
+              bool hasHistory = navigationProvider.navigateBack();
+              if (!hasHistory) {
+                // No more history, exit the app
+                SystemNavigator.pop();
+              }
+            }
+          },
+          child: Scaffold(
+            body: _screens[navigationProvider.currentIndex],
+            bottomNavigationBar: Theme(
             data: Theme.of(context).copyWith(
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.transparent,
@@ -256,7 +269,8 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
           ),
-        );
+        ),
+      );
       },
     );
   }

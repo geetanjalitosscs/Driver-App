@@ -17,7 +17,11 @@ class NotificationProvider extends ChangeNotifier {
   bool get hasSeenNotifications => _hasSeenNotifications;
   
   // Main indicator shows unread count only if user hasn't seen notifications yet
-  int get unreadCount => _hasSeenNotifications ? 0 : _notifications.where((n) => !n.isRead).length;
+  int get unreadCount {
+    // Show count if there are unread notifications and user hasn't seen the notifications page recently
+    final unreadNotifications = _notifications.where((n) => !n.isRead).length;
+    return unreadNotifications > 0 && !_hasSeenNotifications ? unreadNotifications : 0;
+  }
   
   List<NotificationItem> get filteredNotifications {
     return _notifications;
@@ -95,6 +99,12 @@ class NotificationProvider extends ChangeNotifier {
 
     _notifications.insert(0, notification); // Add to beginning
     _notificationIds.add(notificationId); // Track ID
+    
+    // Mark that there are unseen notifications (show red indicator)
+    _hasSeenNotifications = false;
+    
+    print('🔔 Added notification: $title - Unread count: ${unreadCount}');
+    
     notifyListeners();
     
     // Save to persistent storage

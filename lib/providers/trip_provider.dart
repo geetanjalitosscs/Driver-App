@@ -300,11 +300,14 @@ class TripProvider extends ChangeNotifier {
     _clearError();
     
     try {
-      // Note: Request withdrawal needs bank account ID - using placeholder for now
+      // Note: Request withdrawal needs bank account details - using placeholder for now
       final result = await CentralizedApiService.requestWithdrawal(
         driverId: driverId,
         amount: amount,
-        bankAccountId: '1', // Placeholder - should be selected by user
+        bankAccountNumber: '1234567890', // Placeholder - should be selected by user
+        bankName: 'Sample Bank', // Placeholder - should be selected by user
+        ifscCode: 'SBIN0001234', // Placeholder - should be selected by user
+        accountHolderName: 'Driver Name', // Placeholder - should be selected by user
       );
       final success = result['success'] == true;
       if (success) {

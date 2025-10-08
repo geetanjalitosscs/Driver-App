@@ -394,8 +394,16 @@ class NotificationService {
     required String status,
     required String method,
   }) async {
-    final title = "💳 Withdrawal $status";
-    final message = "₹$amount withdrawal via $method is $status";
+    String title;
+    String message;
+    
+    if (status == 'completed') {
+      title = "✅ Withdrawal Completed";
+      message = "₹${amount.toStringAsFixed(0)} has been successfully withdrawn to your bank account";
+    } else {
+      title = "💳 Withdrawal $status";
+      message = "₹$amount withdrawal via $method is $status";
+    }
     
     print('🔔 Creating notification for withdrawal: ₹$amount');
     
@@ -408,6 +416,7 @@ class NotificationService {
         'amount': amount,
         'status': status,
         'method': method,
+        'action': 'view_wallet',
       }),
       type: 'withdrawal',
     );

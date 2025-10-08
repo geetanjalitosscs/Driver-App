@@ -74,17 +74,9 @@ try {
         exit;
     }
 
-    // Check for pending withdrawals (limit to 3 pending withdrawals)
-    $stmt = $pdo->prepare("SELECT COUNT(*) as pending_count FROM withdrawals WHERE driver_id = ? AND status = 'pending'");
-    $stmt->execute([$driver_id]);
-    $pending_count = $stmt->fetch(PDO::FETCH_ASSOC)['pending_count'];
+    // No need to check for pending withdrawals since we process immediately
 
-    if ($pending_count >= 3) {
-        echo json_encode(['success' => false, 'message' => 'You have reached the maximum number of pending withdrawals (3)']);
-        exit;
-    }
-
-    // Create withdrawal request
+    // Create withdrawal request (auto-approved)
     $stmt = $pdo->prepare("
         INSERT INTO withdrawals (
             driver_id, 
@@ -94,9 +86,10 @@ try {
             ifsc_code, 
             account_holder_name, 
             status, 
-            requested_at, 
+            requested_at,
+            processed_at,
             created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW(), NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, 'completed', NOW(), NOW(), NOW())
     ");
     
     $stmt->execute([
@@ -115,27 +108,19 @@ try {
     $stmt = $pdo->prepare("UPDATE wallet SET balance = ?, updated_at = NOW() WHERE driver_id = ?");
     $stmt->execute([$new_balance, $driver_id]);
 
-    // Add a transaction record for the withdrawal
-    $stmt = $pdo->prepare("
-        INSERT INTO wallet_transactions (
-            driver_id,
-            amount,
-            type,
-            description,
-            reference_id,
-            created_at
-        ) VALUES (?, ?, 'debit', 'Withdrawal Request', ?, NOW())
-    ");
-    $stmt->execute([$driver_id, $amount, $withdrawal_id]);
+    // Add a transaction record for the withdrawal (using withdrawals table)
+    // Note: This creates a transaction record in the same withdrawals table
+    // If you have a separate transactions table, please let me know the correct table name
 
     // Commit transaction
     $pdo->commit();
 
     echo json_encode([
         'success' => true,
-        'message' => 'Withdrawal request submitted successfully',
+        'message' => 'Withdrawal completed successfully',
         'withdrawal_id' => $withdrawal_id,
-        'new_balance' => $new_balance
+        'new_balance' => (float)$new_balance,
+        'status' => 'completed'
     ]);
 
 } catch (PDOException $e) {

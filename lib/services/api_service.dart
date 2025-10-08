@@ -480,7 +480,7 @@ class CentralizedApiService {
   static Future<Wallet?> getWallet(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_accidentBaseUrl/get_wallet.php?driver_id=$driverId'),
+        Uri.parse('${_accidentBaseUrl}get_wallet.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -501,7 +501,7 @@ class CentralizedApiService {
   static Future<List<Payment>> getWalletTransactions(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_accidentBaseUrl/get_wallet_transactions.php?driver_id=$driverId'),
+        Uri.parse('${_accidentBaseUrl}get_wallet_transactions.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -524,7 +524,7 @@ class CentralizedApiService {
   static Future<List<Withdrawal>> getWithdrawals(int driverId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_accidentBaseUrl/get_withdrawals.php?driver_id=$driverId'),
+        Uri.parse('${_accidentBaseUrl}get_withdrawals.php?driver_id=$driverId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -547,16 +547,22 @@ class CentralizedApiService {
   static Future<Map<String, dynamic>> requestWithdrawal({
     required int driverId,
     required double amount,
-    required String bankAccountId,
+    required String bankAccountNumber,
+    required String bankName,
+    required String ifscCode,
+    required String accountHolderName,
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_accidentBaseUrl/request_withdrawal.php'),
+        Uri.parse('${_accidentBaseUrl}request_withdrawal.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
           'amount': amount,
-          'bank_account_id': bankAccountId,
+          'bank_account_number': bankAccountNumber,
+          'bank_name': bankName,
+          'ifsc_code': ifscCode,
+          'account_holder_name': accountHolderName,
         }),
       );
 
