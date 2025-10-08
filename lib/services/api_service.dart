@@ -103,24 +103,39 @@ class CentralizedApiService {
     required int driverId,
   }) async {
     try {
+      print('🌐 Making KYC status API call for driver ID: $driverId');
+      print('🔗 API URL: $_accidentBaseUrl/check_kyc_status.php');
+      
+      final requestBody = {'driver_id': driverId};
+      print('📤 Request body: $requestBody');
+      
       final response = await http.post(
-        Uri.parse('$_baseUrl/check_kyc_status.php'),
+        Uri.parse('$_accidentBaseUrl/check_kyc_status.php'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'driver_id': driverId,
-        }),
+        body: json.encode(requestBody),
       );
 
-      print('KYC status response: ${response.statusCode}');
-      print('KYC status body: ${response.body}');
+      print('📡 KYC status response code: ${response.statusCode}');
+      print('📄 KYC status response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        try {
+          final decodedResponse = json.decode(response.body);
+          print('✅ Successfully decoded response: $decodedResponse');
+          return decodedResponse;
+        } catch (jsonError) {
+          print('❌ JSON decode error: $jsonError');
+          print('📄 Raw response body: ${response.body}');
+          throw Exception('Invalid JSON response: $jsonError');
+        }
       } else {
-        throw Exception('KYC status check failed: ${response.statusCode}');
+        print('❌ HTTP error: ${response.statusCode}');
+        print('📄 Error response: ${response.body}');
+        throw Exception('KYC status check failed: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('KYC status API error: $e');
+      print('💥 KYC status API error: $e');
+      print('🔍 Error type: ${e.runtimeType}');
       throw Exception('KYC status error: $e');
     }
   }

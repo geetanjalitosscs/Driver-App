@@ -3,6 +3,10 @@ require_once './db_config.php';
 
 setApiHeaders();
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 try {
     $pdo = getDatabaseConnection();
 } catch (PDOException $e) {
@@ -11,6 +15,9 @@ try {
 
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
+
+// Debug logging
+error_log("KYC Status Check - Input received: " . json_encode($input));
 
 if (!$input) {
     sendErrorResponse('Invalid input data');
@@ -22,6 +29,9 @@ if (!isset($input['driver_id']) || empty($input['driver_id'])) {
 }
 
 $driverId = $input['driver_id'];
+
+// Debug logging
+error_log("KYC Status Check - Driver ID: " . $driverId);
 
 try {
     // Get driver data with current KYC status
@@ -46,6 +56,9 @@ try {
     $stmt->execute([$driverId]);
     $driver = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Debug logging
+    error_log("KYC Status Check - Driver found: " . json_encode($driver));
+
     if (!$driver) {
         sendErrorResponse('Driver not found');
     }
@@ -67,6 +80,9 @@ try {
         'created_at' => $driver['created_at'],
     ];
 
+    // Debug logging
+    error_log("KYC Status Check - Response data: " . json_encode($driverData));
+
     echo json_encode([
         'success' => true,
         'message' => 'KYC status retrieved successfully',
@@ -74,6 +90,7 @@ try {
     ]);
 
 } catch (PDOException $e) {
+    error_log("KYC Status Check - Database error: " . $e->getMessage());
     sendErrorResponse('Database operation failed: ' . $e->getMessage());
 }
 ?>

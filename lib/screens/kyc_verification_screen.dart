@@ -16,25 +16,67 @@ class _KycVerificationScreenState extends State<KycVerificationScreen> {
   @override
   void initState() {
     super.initState();
-    // Check KYC status periodically but don't show popup automatically
-    _checkKycStatus();
+    _initializeAndCheckStatus();
+  }
+
+  Future<void> _initializeAndCheckStatus() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    print('🔄 Initializing KYC screen...');
+    
+    // Wait for auth to be initialized
+    await authProvider.initializeAuth();
+    
+    // Check if user data is available
+    if (authProvider.currentUser != null) {
+      print('✅ User data available, checking KYC status');
+      _checkKycStatus();
+    } else {
+      print('❌ No user data available, showing error');
+      _showErrorDialog();
+    }
   }
 
   Future<void> _checkKycStatus({bool showDialog = false}) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    print('🔍 Starting KYC status check...');
-    print('🔍 Current status before check: ${authProvider.kycStatus}');
+    print('🔄 Starting KYC status check from UI...');
+    print('👤 Current user: ${authProvider.currentUser?.driverName}');
+    print('🆔 Driver ID: ${authProvider.currentUser?.driverIdAsInt}');
+    print('📊 Current KYC status: ${authProvider.kycStatus}');
     
-    // Force immediate KYC status check from database
-    await authProvider.forceKycStatusCheck();
-    
-    print('🔍 Status after check: ${authProvider.kycStatus}');
-    
-    if (showDialog) {
-      print('🔍 Showing dialog with status: ${authProvider.kycStatus}');
-      _maybeShowStatusDialog(authProvider.kycStatus);
+    try {
+      await authProvider.checkKycStatus();
+      
+      print('✅ KYC status check completed');
+      print('📊 New KYC status: ${authProvider.kycStatus}');
+      
+      if (showDialog) {
+        _maybeShowStatusDialog(authProvider.kycStatus);
+      }
+    } catch (e) {
+      print('❌ Error in KYC status check: $e');
+      // Show error dialog without mounted check
+      _showErrorDialog();
     }
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text('Error', style: AppTheme.heading1),
+        content: Text('Failed to check KYC status. Please try again.', style: AppTheme.bodyLarge),
+        backgroundColor: Colors.red.shade50,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('OK', style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _maybeShowStatusDialog(String status) {
@@ -339,8 +381,18 @@ class _KycVerificationScreenState extends State<KycVerificationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        await _checkKycStatus(showDialog: true);
-                        // No automatic redirect here - let the dialog handle it
+                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                        
+                        // Ensure user data is available
+                        if (authProvider.currentUser == null) {
+                          await authProvider.initializeAuth();
+                        }
+                        
+                        if (authProvider.currentUser != null) {
+                          await _checkKycStatus(showDialog: true);
+                        } else {
+                          _showErrorDialog();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,

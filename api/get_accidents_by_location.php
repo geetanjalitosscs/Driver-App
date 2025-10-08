@@ -64,17 +64,7 @@ try {
         ");
         $photo_stmt->execute([$accident['id']]);
         $photos = $photo_stmt->fetchAll(PDO::FETCH_COLUMN);
-        
-        // Convert photo filenames to full URLs
-        $photoUrls = [];
-        foreach ($photos as $photo) {
-            if (!empty($photo)) {
-                // Construct the full URL path for the photo using server URL
-                $photoUrls[] = 'https://yourserver.com/uploads/' . $photo;
-            }
-        }
-        
-        $accident['photos'] = $photoUrls;
+        $accident['photos'] = $photos;
     }
     
     echo json_encode([
