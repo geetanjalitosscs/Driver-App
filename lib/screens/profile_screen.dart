@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
@@ -83,12 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveChanges() async {
     // Validate phone number
     if (!_isValidPhoneNumber(_contactController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid 10-digit phone number'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppErrorDialog.show(context, 'Please enter a valid 10-digit phone number');
       return;
     }
     
@@ -118,12 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? 'Failed to update profile'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, authProvider.errorMessage ?? 'Failed to update profile');
       }
     }
   }

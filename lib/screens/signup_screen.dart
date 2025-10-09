@@ -13,6 +13,7 @@ import '../widgets/common/app_card.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import '../main.dart';
+import '../widgets/common/app_error_dialog.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -87,21 +88,11 @@ class _SignupScreenState extends State<SignupScreen> {
           MaterialPageRoute(builder: (context) => const KycVerificationScreen()),
         );
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? 'Signup failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, authProvider.errorMessage ?? 'Signup failed');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Signup failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, 'Signup failed: $e');
       }
     } finally {
       if (mounted) {
@@ -111,6 +102,8 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     }
   }
+
+  
 
   @override
   Widget build(BuildContext context) {

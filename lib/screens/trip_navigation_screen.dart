@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -431,12 +432,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppTheme.errorRed,
-      ),
-    );
+    AppErrorDialog.show(context, message);
   }
 
   Future<void> _openInGoogleMaps() async {

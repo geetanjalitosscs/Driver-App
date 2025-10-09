@@ -5,6 +5,7 @@ import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'signup_screen.dart';
 import 'kyc_verification_screen.dart';
 import '../main.dart';
@@ -66,22 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           _showKycStatusDialog(kycStatus);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(authProvider.errorMessage ?? 'Login failed'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          AppErrorDialog.show(context, authProvider.errorMessage ?? 'Login failed');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, 'Login failed: $e');
       }
     } finally {
       if (mounted) {
@@ -91,6 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
+  
 
   void _showKycStatusDialog(String status) {
     String title;

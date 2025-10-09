@@ -7,6 +7,7 @@ import '../providers/wallet_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/notification_provider.dart';
+import '../widgets/common/app_error_dialog.dart';
 import '../models/withdrawal.dart';
 import '../widgets/withdrawal_dialog.dart';
 
@@ -431,12 +432,7 @@ class _WalletScreenState extends State<WalletScreen> {
             _loadWalletData(); // Refresh data
           } else {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(walletProvider.errorMessage ?? 'Failed to submit withdrawal request'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              AppErrorDialog.show(context, walletProvider.errorMessage ?? 'Failed to submit withdrawal request');
             }
           }
         },

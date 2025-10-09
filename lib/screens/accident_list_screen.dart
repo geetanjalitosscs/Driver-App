@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
 import '../models/accident_report.dart';
@@ -357,8 +358,6 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
   }
 
   Future<void> _acceptAccident(AccidentReport accident) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Accident #${accident.id} accepted'), backgroundColor: AppTheme.accentGreen),
-    );
+    // keep success snackbar; use dialog for errors when added
   }
 }

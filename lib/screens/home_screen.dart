@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -354,14 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       // Show success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data refreshed successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      // keep success snackbar
     } catch (e) {
       // Close loading dialog if still open
       if (mounted) {
@@ -370,12 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
       
       // Show error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to refresh data: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, 'Failed to refresh data: $e');
       }
     }
   }
@@ -463,12 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
         print("=== EMERGENCY NAVIGATION DEBUG END ===");
       } catch (e) {
         print("Navigation error: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to open navigation: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, 'Failed to open navigation: $e');
       }
     }
   }

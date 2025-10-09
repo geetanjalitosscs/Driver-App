@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
+import '../widgets/common/app_error_dialog.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/navigation_provider.dart';
 
@@ -188,10 +189,10 @@ class _HelpScreenState extends State<HelpScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not open WhatsApp');
+      AppErrorDialog.show(context, 'Could not open WhatsApp');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to open WhatsApp: $e');
+      AppErrorDialog.show(context, 'Failed to open WhatsApp: $e');
     }
   }
 
@@ -203,10 +204,10 @@ class _HelpScreenState extends State<HelpScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not make phone call');
+        AppErrorDialog.show(context, 'Could not make phone call');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to make phone call: $e');
+      AppErrorDialog.show(context, 'Failed to make phone call: $e');
     }
   }
 
@@ -218,10 +219,10 @@ class _HelpScreenState extends State<HelpScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not open email client');
+        AppErrorDialog.show(context, 'Could not open email client');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to open email: $e');
+      AppErrorDialog.show(context, 'Failed to open email: $e');
     }
   }
 
@@ -233,10 +234,10 @@ class _HelpScreenState extends State<HelpScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not open messaging app');
+        AppErrorDialog.show(context, 'Could not open messaging app');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to open messaging: $e');
+      AppErrorDialog.show(context, 'Failed to open messaging: $e');
     }
   }
 
@@ -248,21 +249,14 @@ class _HelpScreenState extends State<HelpScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showErrorSnackBar('Could not make emergency call');
+        AppErrorDialog.show(context, 'Could not make emergency call');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to make emergency call: $e');
+      AppErrorDialog.show(context, 'Failed to make emergency call: $e');
     }
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
+  void _showErrorSnackBar(String message) { AppErrorDialog.show(context, message); }
 
   // Custom WhatsApp Icon Widget with speech bubble and tail
   Widget _buildWhatsAppIcon({double size = 24, Color color = Colors.white}) {
