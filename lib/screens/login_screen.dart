@@ -168,19 +168,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     width: 80,
                     height: 80,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.local_taxi,
-                      color: Colors.white,
-                      size: 40,
+                    child: Image.asset(
+                      'assets/APATKAL_LOGO.jpeg',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Driver App',
+                    'APATKAL',
                     style: GoogleFonts.roboto(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
