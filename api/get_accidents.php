@@ -244,23 +244,53 @@ try {
     $stmt->execute();
     $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Check if accident_photos table exists and has data
+    try {
+        $tableCheck = $pdo->prepare("SHOW TABLES LIKE 'accident_photos'");
+        $tableCheck->execute();
+        $tableExists = $tableCheck->fetch();
+        
+        if ($tableExists) {
+            $countStmt = $pdo->prepare("SELECT COUNT(*) as total FROM accident_photos");
+            $countStmt->execute();
+            $photoCount = $countStmt->fetch(PDO::FETCH_ASSOC);
+            error_log("📊 PHOTO TABLE INFO - accident_photos table exists with " . $photoCount['total'] . " photos");
+        } else {
+            error_log("❌ PHOTO TABLE ERROR - accident_photos table does not exist!");
+        }
+    } catch (Exception $e) {
+        error_log("❌ PHOTO TABLE CHECK ERROR - " . $e->getMessage());
+    }
+    
     // Fetch photos for each accident and convert to full URLs (only first photo)
     foreach ($accidents as &$accident) {
-        $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ? LIMIT 1");
-        $photoStmt->execute([$accident['id']]);
-        $photoFilename = $photoStmt->fetchColumn();
-        
-        // Convert filename to full URL (only if photo exists)
-        if (!empty($photoFilename)) {
-            $baseUrl = 'https://tossconsultancyservices.com/apatkal/uploads/';
-            $accident['photos'] = [$baseUrl . $photoFilename];
-        } else {
+        // Enhanced photo fetching with better error handling
+        try {
+            $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ? LIMIT 1");
+            $photoStmt->execute([$accident['id']]);
+            $photoFilename = $photoStmt->fetchColumn();
+            
+            // Debug logging for photo query
+            error_log("🔍 PHOTO DEBUG - Accident ID: " . $accident['id'] . " - Query executed successfully");
+            error_log("🔍 PHOTO DEBUG - Accident ID: " . $accident['id'] . " - Raw photo filename: " . var_export($photoFilename, true));
+            
+            // Convert filename to full URL (only if photo exists)
+            if (!empty($photoFilename) && $photoFilename !== false) {
+                $baseUrl = 'https://tossconsultancyservices.com/apatkal/uploads/';
+                $fullPhotoUrl = $baseUrl . $photoFilename;
+                $accident['photos'] = [$fullPhotoUrl];
+                
+                error_log("✅ PHOTO FOUND - Accident ID: " . $accident['id'] . " - Photo filename: " . $photoFilename);
+                error_log("✅ PHOTO FOUND - Accident ID: " . $accident['id'] . " - Full URL: " . $fullPhotoUrl);
+            } else {
+                $accident['photos'] = [];
+                error_log("❌ NO PHOTO - Accident ID: " . $accident['id'] . " - No photo found in database");
+            }
+            
+        } catch (Exception $e) {
+            error_log("❌ PHOTO ERROR - Accident ID: " . $accident['id'] . " - Error: " . $e->getMessage());
             $accident['photos'] = [];
         }
-        
-        // Debug logging for photos
-        error_log("Accident ID: " . $accident['id'] . " - Found photo filename: " . ($photoFilename ?: 'none'));
-        error_log("Accident ID: " . $accident['id'] . " - Generated photo URL: " . (isset($accident['photos'][0]) ? $accident['photos'][0] : 'none'));
     }
     
     // Debug logging for coordinates and IDs
