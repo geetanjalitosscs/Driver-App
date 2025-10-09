@@ -235,34 +235,34 @@ class NotificationService {
     }
   }
 
-  /// Cancel notification
+  // Cancel notification
   static Future<void> cancelNotification(int id) async {
     await _localNotifications.cancel(id);
   }
 
-  /// Cancel all notifications
+  // Cancel all notifications
   static Future<void> cancelAllNotifications() async {
     await _localNotifications.cancelAll();
   }
 
-  /// Get notification history
+  // Get notification history
   static List<NotificationData> getNotificationHistory() {
     return List.from(_notificationHistory);
   }
 
-  /// Clear notification history
+  // Clear notification history
   static void clearNotificationHistory() {
     _notificationHistory.clear();
   }
 
-  /// Set app badge count (Android and iOS)
+  // Set app badge count (Android and iOS)
   static Future<void> setAppBadgeCount(int count) async {
     if (!_isInitialized) return;
     
     try {
       // For Android, we use a persistent notification with badge count
       if (count > 0) {
-        const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+        final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
           'driver_app_channel',
           'Driver App Notifications',
           channelDescription: 'Notifications for the Driver App',
@@ -276,18 +276,16 @@ class NotificationService {
           silent: true,
           visibility: NotificationVisibility.private,
           channelShowBadge: true,
-          number: count, // This sets the badge count
           icon: '@mipmap/ic_launcher',
         );
 
-        const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+        final DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
           presentAlert: false,
           presentBadge: true,
           presentSound: false,
-          badgeNumber: count,
         );
 
-        const NotificationDetails notificationDetails = NotificationDetails(
+        final NotificationDetails notificationDetails = NotificationDetails(
           android: androidDetails,
           iOS: iosDetails,
         );
@@ -310,12 +308,12 @@ class NotificationService {
     }
   }
 
-  /// Clear app badge
+  // Clear app badge
   static Future<void> clearAppBadge() async {
     await setAppBadgeCount(0);
   }
 
-  /// Check if notifications are enabled
+  // Check if notifications are enabled
   static Future<bool> areNotificationsEnabled() async {
     // For local notifications, we assume they're enabled if initialized
     return _isInitialized;
@@ -323,7 +321,7 @@ class NotificationService {
 
   // ===== NOTIFICATION METHODS FOR DIFFERENT EVENTS =====
 
-  /// Show notification for new accident reports
+  // Show notification for new accident reports
   static Future<void> showNewAccidentNotification({
     required int accidentId,
     required String vehicle,
@@ -352,7 +350,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for trip completion
+  // Show notification for trip completion
   static Future<void> showTripCompletedNotification({
     required int tripId,
     required String vehicle,
@@ -410,7 +408,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for KYC approval
+  // Show notification for KYC approval
   static Future<void> showKycApprovalNotification({
     required String status,
     String? message,
@@ -448,7 +446,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for withdrawal
+  // Show notification for withdrawal
   static Future<void> showWithdrawalNotification({
     required double amount,
     required String status,
@@ -482,7 +480,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for accident accepted
+  // Show notification for accident accepted
   static Future<void> showAccidentAcceptedNotification({
     required int accidentId,
     required String location,
@@ -496,7 +494,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for accident rejected
+  // Show notification for accident rejected
   static Future<void> showAccidentRejectedNotification({
     required int accidentId,
     required String location,
@@ -510,7 +508,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for accident cancelled
+  // Show notification for accident cancelled
   static Future<void> showAccidentCancelledNotification({
     required int accidentId,
     required String location,
@@ -538,7 +536,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for withdrawal requested
+  // Show notification for withdrawal requested
   static Future<void> showWithdrawalRequestedNotification({
     required int withdrawalId,
     required double amount,
@@ -551,7 +549,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for withdrawal completed
+  // Show notification for withdrawal completed
   static Future<void> showWithdrawalCompletedNotification({
     required int withdrawalId,
     required double amount,
@@ -564,7 +562,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for wallet balance updated
+  // Show notification for wallet balance updated
   static Future<void> showWalletBalanceNotification({
     required double newBalance,
     required double amount,
@@ -579,7 +577,7 @@ class NotificationService {
   }
 }
 
-/// Notification data model
+// Notification data model
 class NotificationData {
   final int id;
   final String title;

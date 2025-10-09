@@ -38,7 +38,7 @@ void main() async {
       // Continue app startup even if notifications fail
     }
 
-    runApp(const AmbulanceDriverApp());
+    runApp(const ApatkalApp());
   } catch (e) {
     print('❌ Critical error during app initialization: $e');
     // Show error screen or fallback
@@ -61,8 +61,8 @@ void main() async {
   }
 }
 
-class AmbulanceDriverApp extends StatelessWidget {
-  const AmbulanceDriverApp({super.key});
+class ApatkalApp extends StatelessWidget {
+  const ApatkalApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +127,7 @@ class AmbulanceDriverApp extends StatelessWidget {
           });
           
           return MaterialApp(
-            title: 'Driver App',
+            title: 'APATKAL',
             theme: AppTheme.lightTheme,
             home: const NotificationBannerOverlay(
               child: AuthWrapper(),

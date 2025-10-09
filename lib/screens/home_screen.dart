@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello Driver!',
+                      'Hello!',
                       style: AppTheme.bodySmall.copyWith(
                         color: AppTheme.neutralGreyLight,
                       ),
