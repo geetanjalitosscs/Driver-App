@@ -255,6 +255,66 @@ class NotificationService {
     _notificationHistory.clear();
   }
 
+  /// Set app badge count (Android and iOS)
+  static Future<void> setAppBadgeCount(int count) async {
+    if (!_isInitialized) return;
+    
+    try {
+      // For Android, we use a persistent notification with badge count
+      if (count > 0) {
+        const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+          'driver_app_channel',
+          'Driver App Notifications',
+          channelDescription: 'Notifications for the Driver App',
+          importance: Importance.low,
+          priority: Priority.low,
+          showWhen: false,
+          enableVibration: false,
+          playSound: false,
+          autoCancel: false,
+          ongoing: true,
+          silent: true,
+          visibility: NotificationVisibility.private,
+          channelShowBadge: true,
+          number: count, // This sets the badge count
+          icon: '@mipmap/ic_launcher',
+        );
+
+        const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+          presentAlert: false,
+          presentBadge: true,
+          presentSound: false,
+          badgeNumber: count,
+        );
+
+        const NotificationDetails notificationDetails = NotificationDetails(
+          android: androidDetails,
+          iOS: iosDetails,
+        );
+
+        await _localNotifications.show(
+          999999, // Special ID for badge notification
+          '', // Empty title
+          '', // Empty body
+          notificationDetails,
+        );
+        
+        print('📱 App badge count set to: $count');
+      } else {
+        // Clear badge by canceling the special notification
+        await _localNotifications.cancel(999999);
+        print('📱 App badge cleared');
+      }
+    } catch (e) {
+      print('❌ Failed to set app badge count: $e');
+    }
+  }
+
+  /// Clear app badge
+  static Future<void> clearAppBadge() async {
+    await setAppBadgeCount(0);
+  }
+
   /// Check if notifications are enabled
   static Future<bool> areNotificationsEnabled() async {
     // For local notifications, we assume they're enabled if initialized
@@ -319,7 +379,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for earnings - Only for new earnings
+  // Show notification for earnings - Only for new earnings
   static Future<void> showEarningsNotification({
     required double amount,
     required String period,
@@ -464,7 +524,7 @@ class NotificationService {
     );
   }
 
-  /// Show notification for earning added
+  // Show notification for earning added
   static Future<void> showEarningAddedNotification({
     required int tripId,
     required double amount,

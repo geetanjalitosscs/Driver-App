@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notification_item.dart';
+import '../services/notification_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
   List<NotificationItem> _notifications = [];
@@ -21,6 +22,22 @@ class NotificationProvider extends ChangeNotifier {
     // Show count if there are unread notifications and user hasn't seen the notifications page recently
     final unreadNotifications = _notifications.where((n) => !n.isRead).length;
     return unreadNotifications > 0 && !_hasSeenNotifications ? unreadNotifications : 0;
+  }
+
+  /// Update app badge count based on unread notifications
+  Future<void> _updateAppBadge() async {
+    try {
+      final count = unreadCount;
+      await NotificationService.setAppBadgeCount(count);
+      print('📱 App badge updated: $count unread notifications');
+    } catch (e) {
+      print('❌ Failed to update app badge: $e');
+    }
+  }
+
+  /// Manually update app badge (for testing or external calls)
+  Future<void> updateAppBadge() async {
+    await _updateAppBadge();
   }
   
   List<NotificationItem> get filteredNotifications {
@@ -47,9 +64,15 @@ class NotificationProvider extends ChangeNotifier {
         _notificationIds = _notifications.map((n) => n.id).toSet();
         
         notifyListeners();
+        
+        // Update app badge count after loading notifications
+        _updateAppBadge();
+        
         print('Loaded ${_notifications.length} notifications for driver $driverId from storage');
       } else {
         print('No notifications found for driver $driverId');
+        // Update app badge count even if no notifications
+        _updateAppBadge();
       }
     } catch (e) {
       print('Error loading notifications for driver $driverId: $e');
@@ -107,6 +130,9 @@ class NotificationProvider extends ChangeNotifier {
     
     notifyListeners();
     
+    // Update app badge count
+    _updateAppBadge();
+    
     // Save to persistent storage
     _saveNotifications(driverId);
   }
@@ -117,6 +143,10 @@ class NotificationProvider extends ChangeNotifier {
     if (index != -1) {
       _notifications[index].isRead = true;
       notifyListeners();
+      
+      // Update app badge count
+      _updateAppBadge();
+      
       _saveNotifications(driverId); // Save to persistent storage
     }
   }
@@ -127,6 +157,10 @@ class NotificationProvider extends ChangeNotifier {
       notification.isRead = true;
     }
     notifyListeners();
+    
+    // Update app badge count
+    _updateAppBadge();
+    
     _saveNotifications(driverId); // Save to persistent storage
   }
 
@@ -136,12 +170,18 @@ class NotificationProvider extends ChangeNotifier {
       notification.isRead = true;
     }
     notifyListeners();
+    
+    // Update app badge count
+    _updateAppBadge();
   }
 
   // Mark notifications as "seen" (clears main indicator but keeps individual dots)
   void markNotificationsAsSeen() {
     _hasSeenNotifications = true;
     notifyListeners();
+    
+    // Update app badge count
+    _updateAppBadge();
   }
 
   // Clear main notification indicator (for bottom navigation) without affecting individual dots
@@ -162,6 +202,9 @@ class NotificationProvider extends ChangeNotifier {
     _notifications.clear();
     _notificationIds.clear();
     notifyListeners();
+    
+    // Update app badge count
+    _updateAppBadge();
   }
 
   // Clear old notifications (older than 30 days) - but keep them longer for account persistence
@@ -180,6 +223,10 @@ class NotificationProvider extends ChangeNotifier {
       _notifications.clear();
       _notificationIds.clear();
       notifyListeners();
+      
+      // Update app badge count
+      _updateAppBadge();
+      
       print('Cleared all notifications for driver $driverId');
     } catch (e) {
       print('Error clearing notifications for driver $driverId: $e');

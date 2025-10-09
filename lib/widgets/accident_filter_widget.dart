@@ -25,23 +25,6 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
   final TextEditingController _vehicleController = TextEditingController();
 
   // Predefined options
-  final List<String> _statusOptions = [
-    'All',
-    'pending',
-    'accepted',
-    'rejected',
-    'completed',
-    'cancelled',
-  ];
-
-  final List<String> _severityOptions = [
-    'All',
-    'low',
-    'medium',
-    'high',
-    'critical',
-  ];
-
   final List<String> _cityOptions = [
     'All',
     'Mumbai',
@@ -54,6 +37,10 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
     'Ahmedabad',
     'Jaipur',
     'Surat',
+    'Jabalpur',
+    'Indore',
+    'Bhopal',
+    'Gwalior',
   ];
 
   @override
@@ -158,28 +145,16 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
           _buildCityFilter(),
           const SizedBox(height: 16),
 
-          // Status Filter
-          _buildSectionTitle('Status'),
-          const SizedBox(height: 8),
-          _buildStatusFilter(),
-          const SizedBox(height: 16),
-
           // Description Filter
           _buildSectionTitle('Description Keywords'),
           const SizedBox(height: 8),
           _buildDescriptionFilter(),
           const SizedBox(height: 16),
 
-          // Vehicle Filter
-          _buildSectionTitle('Vehicle Type'),
+          // Vehicle Number Filter
+          _buildSectionTitle('Vehicle Number'),
           const SizedBox(height: 8),
           _buildVehicleFilter(),
-          const SizedBox(height: 16),
-
-          // Severity Filter
-          _buildSectionTitle('Severity'),
-          const SizedBox(height: 8),
-          _buildSeverityFilter(),
           const SizedBox(height: 20),
 
           // Apply Button
@@ -258,50 +233,49 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
   }
 
   Widget _buildCityFilter() {
-    return DropdownButtonFormField<String>(
-      value: _filter.city ?? 'All',
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      items: _cityOptions.map((String city) {
-        return DropdownMenuItem<String>(
-          value: city,
-          child: Text(city),
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return _cityOptions.where((String option) => option != 'All');
+        }
+        return _cityOptions.where((String option) {
+          return option.toLowerCase().contains(textEditingValue.text.toLowerCase()) && option != 'All';
+        });
+      },
+      fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            hintText: 'Enter city name or select from dropdown',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            prefixIcon: const Icon(Icons.location_city, size: 20),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.arrow_drop_down),
+              onPressed: () {
+                // This will trigger the dropdown
+                focusNode.requestFocus();
+              },
+            ),
+          ),
+          onChanged: (String value) {
+            setState(() {
+              _filter = _filter.copyWith(city: value.isEmpty ? null : value);
+            });
+          },
         );
-      }).toList(),
-      onChanged: (String? value) {
+      },
+      onSelected: (String selection) {
         setState(() {
-          _filter = _filter.copyWith(city: value == 'All' ? null : value);
+          _filter = _filter.copyWith(city: selection == 'All' ? null : selection);
         });
       },
     );
   }
 
-  Widget _buildStatusFilter() {
-    return DropdownButtonFormField<String>(
-      value: _filter.status ?? 'All',
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      items: _statusOptions.map((String status) {
-        return DropdownMenuItem<String>(
-          value: status,
-          child: Text(status.toUpperCase()),
-        );
-      }).toList(),
-      onChanged: (String? value) {
-        setState(() {
-          _filter = _filter.copyWith(status: value == 'All' ? null : value);
-        });
-      },
-    );
-  }
 
   Widget _buildDescriptionFilter() {
     return TextFormField(
@@ -326,12 +300,12 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
     return TextFormField(
       controller: _vehicleController,
       decoration: InputDecoration(
-        hintText: 'Enter vehicle type (e.g., car, bike, truck)',
+        hintText: 'Enter vehicle number (e.g., MP20AB1234, DL01AB1234)',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        prefixIcon: const Icon(Icons.directions_car, size: 20),
+        prefixIcon: const Icon(Icons.confirmation_number, size: 20),
       ),
       onChanged: (String value) {
         setState(() {
@@ -341,57 +315,6 @@ class _AccidentFilterWidgetState extends State<AccidentFilterWidget> {
     );
   }
 
-  Widget _buildSeverityFilter() {
-    return DropdownButtonFormField<String>(
-      value: _filter.severity ?? 'All',
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      items: _severityOptions.map((String severity) {
-        Color severityColor = _getSeverityColor(severity);
-        return DropdownMenuItem<String>(
-          value: severity,
-          child: Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: severityColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(severity.toUpperCase()),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: (String? value) {
-        setState(() {
-          _filter = _filter.copyWith(severity: value == 'All' ? null : value);
-        });
-      },
-    );
-  }
-
-  Color _getSeverityColor(String severity) {
-    switch (severity.toLowerCase()) {
-      case 'low':
-        return Colors.green;
-      case 'medium':
-        return Colors.orange;
-      case 'high':
-        return Colors.red;
-      case 'critical':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
-  }
 }
 
 /// Filter Bottom Sheet

@@ -40,7 +40,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Check email for verification link',
           'Use clear, well-lit photos under 5MB'
         ],
-        'contact_info': 'For account issues, contact support at +91-7834920469'
+        'contact_info': 'For account issues, contact support at +18005709696'
       }
     },
     {
@@ -63,7 +63,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Complete trip within valid area',
           'Use recommended routes for better efficiency'
         ],
-        'contact_info': 'Trip support available 24/7 at +91-7834920469'
+        'contact_info': 'Trip support available 24/7 at 18005709696'
       }
     },
     {
@@ -86,7 +86,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Update payment method in wallet settings',
           'Contact support for transaction disputes'
         ],
-        'contact_info': 'Payment support: apatkal.admin@gmail.com'
+        'contact_info': 'Payment support: apatkalindia@gmail.com'
       }
     },
     {
@@ -132,7 +132,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Download tax documents from earnings section',
           'Check bonus eligibility in app notifications'
         ],
-        'contact_info': 'Earnings support: +91-7834920469'
+        'contact_info': 'Earnings support: 18005709696'
       }
     },
     {
@@ -155,7 +155,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Calibrate GPS and check signal strength',
           'Restart device and clear cache'
         ],
-        'contact_info': 'Technical support: apatkal.admin@gmail.com'
+        'contact_info': 'Technical support: apatkalindia@gmail.com'
       }
     },
   ];
@@ -181,7 +181,7 @@ class _HelpScreenState extends State<HelpScreen> {
 
   // Contact methods
   Future<void> _openWhatsApp() async {
-    const phoneNumber = '+917834920469'; // Remove spaces and add country code
+    const phoneNumber = '+18005709696'; // Remove spaces and add country code
     final url = 'https://wa.me/$phoneNumber';
     try {
       final uri = Uri.parse(url);
@@ -196,7 +196,7 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Future<void> _makePhoneCall() async {
-    const phoneNumber = '+917834920469';
+    const phoneNumber = '+18005709696';
     final url = 'tel:$phoneNumber';
     try {
       final uri = Uri.parse(url);
@@ -211,7 +211,7 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Future<void> _sendEmail() async {
-    const email = 'apatkal.admin@gmail.com';
+    const email = 'apatkalindia@gmail.com';
     final url = 'mailto:$email?subject=Driver App Support';
     try {
       final uri = Uri.parse(url);
@@ -226,7 +226,7 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Future<void> _openMessageApp() async {
-    const phoneNumber = '+917834920469';
+    const phoneNumber = '+18005709696';
     final url = 'sms:$phoneNumber';
     try {
       final uri = Uri.parse(url);

@@ -168,12 +168,6 @@ class AccidentProvider extends ChangeNotifier {
       }).toList();
     }
     
-    // Apply status filter
-    if (_currentFilter.status != null && _currentFilter.status!.isNotEmpty) {
-      filteredAccidents = filteredAccidents.where((accident) {
-        return accident.status.toLowerCase() == _currentFilter.status!.toLowerCase();
-      }).toList();
-    }
     
     // Apply description filter
     if (_currentFilter.description != null && _currentFilter.description!.isNotEmpty) {
@@ -189,12 +183,6 @@ class AccidentProvider extends ChangeNotifier {
       }).toList();
     }
     
-    // Apply severity filter (based on description keywords)
-    if (_currentFilter.severity != null && _currentFilter.severity!.isNotEmpty) {
-      filteredAccidents = filteredAccidents.where((accident) {
-        return _matchesSeverity(accident.description, _currentFilter.severity!);
-      }).toList();
-    }
     
     // Apply date filters
     if (_currentFilter.dateFrom != null) {
@@ -245,24 +233,6 @@ class AccidentProvider extends ChangeNotifier {
     }
   }
 
-  /// Check if accident description matches severity level
-  bool _matchesSeverity(String description, String severity) {
-    final desc = description.toLowerCase();
-    
-    switch (severity.toLowerCase()) {
-      case 'low':
-        return desc.contains('minor') || desc.contains('small') || desc.contains('light');
-      case 'medium':
-        return desc.contains('moderate') || desc.contains('medium') || desc.contains('some');
-      case 'high':
-        return desc.contains('serious') || desc.contains('major') || desc.contains('severe');
-      case 'critical':
-        return desc.contains('critical') || desc.contains('emergency') || desc.contains('urgent') || 
-               desc.contains('life') || desc.contains('death') || desc.contains('fatal');
-      default:
-        return true;
-    }
-  }
 
   /// Accept current accident report
   Future<bool> acceptCurrentAccident({
