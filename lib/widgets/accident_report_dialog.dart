@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../providers/accident_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/accident_report.dart';
+import '../widgets/common/app_error_dialog.dart';
 
 class AccidentReportDialog extends StatefulWidget {
   const AccidentReportDialog({super.key});
@@ -235,15 +238,17 @@ class _AccidentReportDialogState extends State<AccidentReportDialog> {
           bottomRight: Radius.circular(16),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
+          // Call Client Button
+          SizedBox(
+            width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => _handleReject(accidentProvider),
-              icon: const Icon(Icons.close, size: 18),
-              label: const Text('Reject'),
+              onPressed: () => _callClient(accidentProvider.currentAccident!),
+              icon: const Icon(Icons.phone, size: 18),
+              label: const Text('Call Client'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[600],
+                backgroundColor: Colors.blue[600],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -252,25 +257,127 @@ class _AccidentReportDialogState extends State<AccidentReportDialog> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _handleAccept(accidentProvider),
-              icon: const Icon(Icons.check, size: 18),
-              label: const Text('Accept'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[600],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 12),
+          // Accept/Reject Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _handleReject(accidentProvider),
+                  icon: const Icon(Icons.close, size: 18),
+                  label: const Text('Reject'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _handleAccept(accidentProvider),
+                  icon: const Icon(Icons.check, size: 18),
+                  label: const Text('Accept'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  void _callClient(AccidentReport accident) async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Fetch client mobile number from API
+      final response = await http.get(
+        Uri.parse('https://tossconsultancyservices.com/apatkal/api/get_client_mobile.php?accident_id=${accident.id}'),
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['success'] == true && data['mobile_no'] != null) {
+          final mobileNo = data['mobile_no'];
+          final clientName = data['client_name'] ?? 'Client';
+          
+          // Show confirmation dialog
+          final shouldCall = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                'Call Client',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+              ),
+              content: Text(
+                'Call $clientName at $mobileNo?',
+                style: GoogleFonts.roboto(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.roboto(color: Colors.grey[600]),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(
+                    'Call',
+                    style: GoogleFonts.roboto(color: Colors.blue[600]),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldCall == true) {
+            // Initiate phone call
+            final phoneUrl = 'tel:$mobileNo';
+            if (await canLaunchUrl(Uri.parse(phoneUrl))) {
+              await launchUrl(Uri.parse(phoneUrl));
+            } else {
+              AppErrorDialog.show(context, 'Could not initiate phone call');
+            }
+          }
+        } else {
+          AppErrorDialog.show(context, data['message'] ?? 'Client mobile number not found');
+        }
+      } else {
+        AppErrorDialog.show(context, 'Failed to fetch client information');
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      AppErrorDialog.show(context, 'Error calling client: $e');
+    }
   }
 
   void _openLocationInMaps(AccidentReport accident) async {
@@ -283,12 +390,7 @@ class _AccidentReportDialogState extends State<AccidentReportDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to open maps: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppErrorDialog.show(context, 'Failed to open maps: $e');
       }
     }
   }

@@ -7,6 +7,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../providers/trip_provider.dart';
 import '../providers/accident_provider.dart';
 import '../providers/auth_provider.dart';
@@ -465,6 +467,87 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
     }
   }
 
+  Future<void> _callClient() async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Fetch client mobile number from API using trip ID to get vehicle number from accidents table
+      final response = await http.get(
+        Uri.parse('https://tossconsultancyservices.com/apatkal/api/get_client_mobile_by_vehicle_from_trip.php?trip_id=${widget.trip.historyId}'),
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['success'] == true && data['mobile_no'] != null) {
+          final mobileNo = data['mobile_no'];
+          final clientName = data['client_name'] ?? widget.trip.clientName;
+          
+          // Show confirmation dialog
+          final shouldCall = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                'Call Client',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+              ),
+              content: Text(
+                'Call $clientName at $mobileNo?',
+                style: GoogleFonts.roboto(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.roboto(color: Colors.grey[600]),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(
+                    'Call',
+                    style: GoogleFonts.roboto(color: Colors.blue[600]),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldCall == true) {
+            // Initiate phone call
+            final phoneUrl = 'tel:$mobileNo';
+            if (await canLaunchUrl(Uri.parse(phoneUrl))) {
+              await launchUrl(Uri.parse(phoneUrl));
+            } else {
+              AppErrorDialog.show(context, 'Could not initiate phone call');
+            }
+          }
+        } else {
+          AppErrorDialog.show(context, data['message'] ?? 'Client mobile number not found');
+        }
+      } else {
+        AppErrorDialog.show(context, 'Failed to fetch client information');
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      AppErrorDialog.show(context, 'Error calling client: $e');
+    }
+  }
+
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
@@ -547,6 +630,33 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                   _buildTripDetailRow('Duration', _formatDuration(_tripDuration)),
                   _buildTripDetailRow('Distance', '${_tripDistance.toStringAsFixed(1)} km'),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Call Client Button
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 32),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _callClient,
+                  icon: const Icon(Icons.phone, color: Colors.white),
+                  label: Text(
+                    'Call Client',
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[600],
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),

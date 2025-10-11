@@ -266,7 +266,7 @@ try {
     foreach ($accidents as &$accident) {
         // Enhanced photo fetching with better error handling
         try {
-            $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ? LIMIT 1");
+            $photoStmt = $pdo->prepare("SELECT photo FROM accident_photos WHERE accident_id = ? ORDER BY id DESC LIMIT 1");
             $photoStmt->execute([$accident['id']]);
             $photoFilename = $photoStmt->fetchColumn();
             
