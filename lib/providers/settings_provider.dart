@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../services/notification_service.dart';
 
 class SettingsProvider extends ChangeNotifier {
   // Profile Settings
@@ -36,6 +38,7 @@ class SettingsProvider extends ChangeNotifier {
 
   SettingsProvider() {
     _loadSettings();
+    _syncWithSystemPermissions();
   }
 
   Future<void> _loadSettings() async {
@@ -63,6 +66,30 @@ class SettingsProvider extends ChangeNotifier {
     } catch (e) {
       if (kDebugMode) {
         print('Error loading settings: $e');
+      }
+    }
+  }
+
+  Future<void> _syncWithSystemPermissions() async {
+    try {
+      // Sync notification permission status
+      final notificationStatus = await Permission.notification.status;
+      if (notificationStatus.isDenied || notificationStatus.isPermanentlyDenied) {
+        _pushNotificationsEnabled = false;
+      }
+      
+      // Sync location permission status
+      final locationStatus = await Permission.location.status;
+      if (locationStatus.isDenied || locationStatus.isPermanentlyDenied) {
+        _locationServicesEnabled = false;
+      }
+      
+      // Save the synced state
+      await _saveSettings();
+      notifyListeners();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error syncing permissions: $e');
       }
     }
   }
@@ -122,12 +149,38 @@ class SettingsProvider extends ChangeNotifier {
   // App settings update methods
   Future<void> updatePushNotifications(bool enabled) async {
     _pushNotificationsEnabled = enabled;
+    
+    // Actually control the notification service
+    if (enabled) {
+      // Request notification permission and initialize
+      await NotificationService.initialize();
+    } else {
+      // Disable system notifications but keep in-app notifications
+      // We don't cancel notifications, just disable system notifications
+      if (kDebugMode) {
+        print('Push notifications disabled - system notifications turned off');
+      }
+    }
+    
     await _saveSettings();
     notifyListeners();
   }
 
   Future<void> updateLocationServices(bool enabled) async {
     _locationServicesEnabled = enabled;
+    
+    // Actually control location permissions
+    if (enabled) {
+      // Request location permission
+      await Permission.location.request();
+      await Permission.locationWhenInUse.request();
+    } else {
+      // Show popup asking user to turn on location permission in settings
+      if (kDebugMode) {
+        print('Location services disabled - showing popup to user');
+      }
+    }
+    
     await _saveSettings();
     notifyListeners();
   }

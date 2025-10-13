@@ -29,19 +29,18 @@ class _HelpScreenState extends State<HelpScreen> {
       'content': {
         'common_issues': [
           'How to update my profile information?',
-          'What if I forgot my password?',
+          'What if I want to change my password?',
           'How to change my phone number?',
           'Account verification problems',
           'Profile photo upload issues'
         ],
         'solutions': [
           'Go to Profile → Edit Profile → Update information',
-          'Use "Forgot Password" on login screen',
-          'Contact support for phone number changes',
-          'Check email for verification link',
-          'Use clear, well-lit photos under 5MB'
+          'Use "change Password" on settings screen',
+          'Use "edit" on profile screen',
+          'Wait for verification and KYC approval',
+          'Use clear, well-lit photos'
         ],
-        'contact_info': 'For account issues, contact support at +18005709696'
       }
     },
     {
@@ -61,7 +60,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Ensure GPS is enabled and location permissions granted',
           'Check internet connection and restart app',
           'Allow location access in device settings',
-          'Complete trip within valid area',
+          'Wait till the page completely loads',
           'Use recommended routes for better efficiency'
         ],
         'contact_info': 'Trip support available 24/7 at 18005709696'
@@ -75,67 +74,63 @@ class _HelpScreenState extends State<HelpScreen> {
       'content': {
         'common_issues': [
           'Payment not received',
-          'Wallet balance incorrect',
-          'Withdrawal pending',
-          'Payment method issues',
+          'Bank account details issues',
           'Transaction history problems'
         ],
         'solutions': [
-          'Check bank account for pending transfers',
-          'Refresh wallet and check transaction history',
-          'Withdrawals process within 2-3 business days',
-          'Update payment method in wallet settings',
-          'Contact support for transaction disputes'
+          'Check your registered bank account and wait, payment processes within 2-3 business days',
+          'Update bank account details in profile settings',
+          'Contact admin support for payment disputes'
         ],
         'contact_info': 'Payment support: apatkalindia@gmail.com'
       }
     },
-    {
-      'title': 'Trip History', 
-      'icon': Icons.description, 
-      'color': Colors.teal, 
-      'keywords': 'history past trips record',
-      'content': {
-        'common_issues': [
-          'Missing trip records',
-          'Incorrect trip details',
-          'History not loading',
-          'Trip status issues',
-          'Earnings calculation problems'
-        ],
-        'solutions': [
-          'Refresh trip history and check internet connection',
-          'Verify trip details with support team',
-          'Clear app cache and restart',
-          'Check trip completion status',
-          'Review earnings breakdown in earnings section'
-        ],
-        'contact_info': 'Trip history support available via WhatsApp'
-      }
-    },
-    {
-      'title': 'Earnings & Payouts', 
-      'icon': Icons.currency_rupee, 
-      'color': Colors.green, 
-      'keywords': 'earnings money payout income',
-      'content': {
-        'common_issues': [
-          'Earnings not showing',
-          'Payout delays',
-          'Incorrect earnings calculation',
-          'Tax document issues',
-          'Bonus payment problems'
-        ],
-        'solutions': [
-          'Check earnings section for latest updates',
-          'Payouts process within 2-3 business days',
-          'Review trip completion and fare calculation',
-          'Download tax documents from earnings section',
-          'Check bonus eligibility in app notifications'
-        ],
-        'contact_info': 'Earnings support: 18005709696'
-      }
-    },
+    // {
+    //   'title': 'Trip History', 
+    //   'icon': Icons.description, 
+    //   'color': Colors.teal, 
+    //   'keywords': 'history past trips record',
+    //   'content': {
+    //     'common_issues': [
+    //       'Missing trip records',
+    //       'Incorrect trip details',
+    //       'History not loading',
+    //       'Trip status issues',
+    //       // 'Earnings calculation problems'
+    //     ],
+    //     'solutions': [
+    //       'Refresh trip history and check internet connection',
+    //       'Verify trip details',
+    //       'Clear app cache and restart',
+    //       'Check trip completion status',
+    //       // 'Review earnings breakdown in earnings section'
+    //     ],
+    //     // 'contact_info': 'Trip history support available via WhatsApp'
+    //   }
+    // }, // Hidden from help screen
+    // {
+    //   'title': 'Earnings & Payouts', 
+    //   'icon': Icons.currency_rupee, 
+    //   'color': Colors.green, 
+    //   'keywords': 'earnings money payout income',
+    //   'content': {
+    //     'common_issues': [
+    //       'Earnings not showing',
+    //       'Payout delays',
+    //       'Incorrect earnings calculation',
+    //       'Tax document issues',
+    //       'Bonus payment problems'
+    //     ],
+    //     'solutions': [
+    //       'Check earnings section for latest updates',
+    //       'Payouts process within 2-3 business days',
+    //       'Review trip completion and fare calculation',
+    //       'Download tax documents from earnings section',
+    //       'Check bonus eligibility in app notifications'
+    //     ],
+    //     'contact_info': 'Earnings support: 18005709696'
+    //   }
+    // }, // Hidden from help screen
     {
       'title': 'Technical Support', 
       'icon': Icons.computer, 
@@ -156,7 +151,7 @@ class _HelpScreenState extends State<HelpScreen> {
           'Calibrate GPS and check signal strength',
           'Restart device and clear cache'
         ],
-        'contact_info': 'Technical support: apatkalindia@gmail.com'
+        // 'contact_info': 'Technical support: apatkalindia@gmail.com'
       }
     },
   ];
@@ -306,7 +301,7 @@ class _HelpScreenState extends State<HelpScreen> {
           padding: const EdgeInsets.all(16),
         ),
         title: Text(
-          'Help Center',
+          'Help & Support',
           style: AppTheme.heading3.copyWith(
             color: Colors.white,
           ),
@@ -631,11 +626,13 @@ class _HelpScreenState extends State<HelpScreen> {
       textStyle = AppTheme.bodySmall.copyWith(fontWeight: FontWeight.w600);
     }
     
-    return GestureDetector(
-      onTap: () {
-        _showFAQPopup(index);
-      },
-      child: AppCard(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          _showFAQPopup(index);
+        },
+        child: AppCard(
         padding: EdgeInsets.all(cardPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -663,8 +660,9 @@ class _HelpScreenState extends State<HelpScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showFAQPopup(int index) {
     final category = _getFilteredCategories()[index];
@@ -837,7 +835,7 @@ class _HelpScreenState extends State<HelpScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                content['contact_info'] as String,
+                                content['contact_info'] as String? ?? 'Contact support for assistance',
                                 style: AppTheme.bodyMedium.copyWith(
                                   fontWeight: FontWeight.w500,
                                   color: AppTheme.primaryBlue,
@@ -1003,9 +1001,11 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   Widget _buildWhatsAppButton(String text, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
           color: AppTheme.whatsappGreen,
@@ -1036,13 +1036,16 @@ class _HelpScreenState extends State<HelpScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildMessageButton(String text, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
           color: AppTheme.primaryBlue,
@@ -1074,8 +1077,9 @@ class _HelpScreenState extends State<HelpScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildEmergencySupportLine() {
     return LayoutBuilder(

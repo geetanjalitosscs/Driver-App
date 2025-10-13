@@ -156,14 +156,15 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 400,
-          minWidth: 280,
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+          minWidth: 250,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: AppCard(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width < 300 ? 12 : 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,6 +199,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                   const SizedBox(height: 16),
                   // Countdown Timer
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: _countdown <= 5 ? AppTheme.errorRed.withOpacity(0.1) : AppTheme.accentOrange.withOpacity(0.1),
@@ -208,7 +210,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                       ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.timer,
@@ -216,11 +218,14 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                           size: 16,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Auto-reject in ${_countdown}s',
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: _countdown <= 5 ? AppTheme.errorRed : AppTheme.accentOrange,
-                            fontWeight: FontWeight.w600,
+                        Flexible(
+                          child: Text(
+                            'Auto-reject in ${_countdown}s',
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: _countdown <= 5 ? AppTheme.errorRed : AppTheme.accentOrange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -260,7 +265,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                   // Action Buttons
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      if (constraints.maxWidth < 360) {
+                      if (constraints.maxWidth < 320) {
                         // For very small screens, stack buttons vertically
                         return Column(
                           children: [
@@ -344,6 +349,8 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
             child: Text(
               value,
               style: AppTheme.bodySmall,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

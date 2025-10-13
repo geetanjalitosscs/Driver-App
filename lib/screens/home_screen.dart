@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,12 @@ class HomeScreen extends StatefulWidget {
   static void resetOnlineState() {
     _HomeScreenState.resetOnlineState();
   }
+
+  // Static method to refresh profile photo (can be called from anywhere)
+  static void refreshProfilePhoto() {
+    // Trigger refresh for all active HomeScreen instances
+    _HomeScreenState.refreshAllInstances();
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -46,8 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
   static bool _persistentIsOnDuty = false;
   static bool _hasLoadedPersistentState = false;
   
+  // Static list to track all active instances for photo refresh
+  static final List<_HomeScreenState> _activeInstances = [];
+  
   bool _isOnDuty = false;
   final String _nextShift = 'Tomorrow, 07:00 AM';
+  File? _profilePhoto;
   
   // Location variables
   double? _currentLatitude;
@@ -73,6 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     
+    // Add this instance to the active instances list
+    _activeInstances.add(this);
+    
     // Use persistent state if available, otherwise load from storage
     if (_hasLoadedPersistentState) {
       _isOnDuty = _persistentIsOnDuty;
@@ -83,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _getCurrentLocation();
     _startRefreshTimer();
     _loadInitialAccidentCount();
+    _loadProfilePhoto();
     
     // Load data after the build is complete to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -94,8 +109,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload profile photo when returning to this screen
+    _loadProfilePhoto();
+  }
+
+  @override
+  void didUpdateWidget(HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload profile photo when widget updates
+    _loadProfilePhoto();
+  }
+
+  @override
   void dispose() {
     _refreshTimer?.cancel();
+    // Remove this instance from the active instances list
+    _activeInstances.remove(this);
     super.dispose();
   }
 
@@ -105,6 +136,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
         accidentProvider.refreshPendingCount();
+        // Also check for profile photo updates
+        _loadProfilePhoto();
       }
     });
   }
@@ -173,6 +206,87 @@ class _HomeScreenState extends State<HomeScreen> {
     print('Reset online state to offline');
   }
 
+  // Static method to refresh profile photo for all active instances
+  static void refreshAllInstances() {
+    print('Refreshing profile photo for ${_activeInstances.length} active instances');
+    for (final instance in _activeInstances) {
+      if (instance.mounted) {
+        instance._loadProfilePhoto();
+      }
+    }
+  }
+
+  // Load profile photo from local storage
+  Future<void> _loadProfilePhoto() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final photoPath = prefs.getString('profile_photo_path');
+      
+      if (photoPath != null && photoPath.isNotEmpty) {
+        final file = File(photoPath);
+        if (await file.exists()) {
+          // Only update if the photo has changed
+          if (_profilePhoto?.path != file.path) {
+            setState(() {
+              _profilePhoto = file;
+            });
+          }
+        } else {
+          // File doesn't exist, clear the photo
+          if (_profilePhoto != null) {
+            setState(() {
+              _profilePhoto = null;
+            });
+          }
+        }
+      } else {
+        // No photo path, clear the photo
+        if (_profilePhoto != null) {
+          setState(() {
+            _profilePhoto = null;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error loading profile photo: $e');
+    }
+  }
+
+  // Show full profile photo with cross button
+  void _showFullProfilePhoto() {
+    if (_profilePhoto == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.file(
+                  _profilePhoto!,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _loadInitialAccidentCount() {
     // Load accident count immediately when app starts
@@ -267,10 +381,10 @@ class _HomeScreenState extends State<HomeScreen> {
     navigationProvider.navigateToScreen(1); // Trips section index
   }
 
-  void _navigateToEarnings() {
-    final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
-    navigationProvider.navigateToScreen(2); // Earnings section index
-  }
+  // void _navigateToEarnings() {
+  //   final navigationProvider = Provider.of<NavigationProvider>(context, listen: false);
+  //   navigationProvider.navigateToScreen(2); // Earnings section index
+  // } // Hidden from navbar
 
   // Refresh button method
   Future<void> _refreshData() async {
@@ -564,11 +678,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: CircleAvatar(
                     radius: 24,
                     backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-                    child: Icon(
-                      Icons.person,
-                      size: 28,
-                      color: AppTheme.primaryBlue,
-                    ),
+                    backgroundImage: _profilePhoto != null 
+                        ? FileImage(_profilePhoto!) 
+                        : null,
+                    child: _profilePhoto == null
+                        ? Icon(
+                            Icons.person,
+                            size: 28,
+                            color: AppTheme.primaryBlue,
+                          )
+                        : null,
                   ),
                 ),
               ),
@@ -1270,16 +1389,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      'Earnings',
-                      '₹${todayEarnings.toStringAsFixed(2)}',
-                      Icons.currency_rupee,
-                      AppTheme.accentGreen,
-                      _getEarningsSubtitle(todayEarnings),
-                      onTap: () => _navigateToEarnings(),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: _buildStatCard(
+                  //     'Earnings',
+                  //     '₹${todayEarnings.toStringAsFixed(2)}',
+                  //     Icons.currency_rupee,
+                  //     AppTheme.accentGreen,
+                  //     _getEarningsSubtitle(todayEarnings),
+                  //     // onTap: () => _navigateToEarnings(), // Hidden from navbar
+                  //   ),
+                  // ), // Hidden Today Earnings card
                 ],
               ),
               const SizedBox(height: 12),

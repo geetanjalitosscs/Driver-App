@@ -7,6 +7,7 @@ import '../providers/earnings_provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
+import '../models/trip.dart';
 
 class TripHistoryScreen extends StatefulWidget {
   const TripHistoryScreen({super.key});
@@ -183,7 +184,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              // Define card data - show filtered trips data based on selected period
+              // Define card data - show trip counts instead of earnings
               final cards = [
                 {
                   'title': 'Total Trips',
@@ -192,20 +193,20 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   'color': AppTheme.primaryBlue,
                 },
                 {
-                  'title': 'Total Earnings',
-                  'value': '₹${earningsProvider.totalEarnings.toStringAsFixed(0)}',
-                  'icon': Icons.account_balance_wallet,
+                  'title': 'Last Month Trips',
+                  'value': '${_getLastMonthTripsCount(tripProvider.completedTrips)}',
+                  'icon': Icons.calendar_month,
                   'color': AppTheme.accentGreen,
                 },
                 {
-                  'title': 'Today',
-                  'value': '₹${earningsProvider.todayEarnings.toStringAsFixed(0)}',
+                  'title': 'Today Trips',
+                  'value': '${_getTodayTripsCount(tripProvider.completedTrips)}',
                   'icon': Icons.today,
                   'color': AppTheme.accentOrange,
                 },
                 {
-                      'title': 'Last 7 Days',
-                  'value': '₹${earningsProvider.weeklyTotal.toStringAsFixed(0)}',
+                  'title': 'Last 7 Days Trips',
+                  'value': '${_getLast7DaysTripsCount(tripProvider.completedTrips)}',
                   'icon': Icons.date_range,
                   'color': AppTheme.accentPurple,
                 },
@@ -575,5 +576,36 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
         ],
       ),
     );
+  }
+
+  // Helper methods to calculate trip counts
+  int _getTodayTripsCount(List<Trip> trips) {
+    final today = DateTime.now();
+    return trips.where((trip) {
+      final tripDate = trip.endTime ?? trip.createdAt;
+      return tripDate.year == today.year &&
+             tripDate.month == today.month &&
+             tripDate.day == today.day;
+    }).length;
+  }
+
+  int _getLast7DaysTripsCount(List<Trip> trips) {
+    final now = DateTime.now();
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
+    return trips.where((trip) {
+      final tripDate = trip.endTime ?? trip.createdAt;
+      return tripDate.isAfter(sevenDaysAgo) && tripDate.isBefore(now.add(const Duration(days: 1)));
+    }).length;
+  }
+
+  int _getLastMonthTripsCount(List<Trip> trips) {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1, 1);
+    final lastMonthEnd = DateTime(now.year, now.month, 1);
+    return trips.where((trip) {
+      final tripDate = trip.endTime ?? trip.createdAt;
+      return tripDate.isAfter(lastMonth.subtract(const Duration(days: 1))) && 
+             tripDate.isBefore(lastMonthEnd);
+    }).length;
   }
 }

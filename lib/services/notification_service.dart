@@ -137,6 +137,19 @@ class NotificationService {
       return;
     }
 
+    // Check if push notifications are enabled in settings
+    final prefs = await SharedPreferences.getInstance();
+    final pushNotificationsEnabled = prefs.getBool('push_notifications') ?? true;
+    
+    if (!pushNotificationsEnabled) {
+      print('📱 Push notifications disabled - saving to in-app notifications only');
+      // Still save to provider for in-app notifications
+      if (_saveToProviderCallback != null) {
+        _saveToProviderCallback!(title, body, type, {'payload': payload});
+      }
+      return;
+    }
+
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'driver_app_channel',
       'Driver App Notifications',

@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../widgets/common/app_card.dart';
 import '../providers/settings_provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/common/app_error_dialog.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -50,19 +51,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   'App Settings',
                   Icons.settings,
                   [
-                    _buildSwitchTile(
-                      'Push Notifications',
-                      'Receive notifications for new trips and updates',
-                      Icons.notifications,
-                      settingsProvider.pushNotificationsEnabled,
-                      (value) => settingsProvider.updatePushNotifications(value),
-                    ),
+                    // _buildSwitchTile(
+                    //   'Push Notifications',
+                    //   'Receive notifications for new trips and updates',
+                    //   Icons.notifications,
+                    //   settingsProvider.pushNotificationsEnabled,
+                    //   (value) async {
+                    //     await settingsProvider.updatePushNotifications(value);
+                    //   },
+                    // ), // Hidden push notifications toggle
                     _buildSwitchTile(
                       'Location Services',
                       'Allow app to access your location',
                       Icons.location_on,
                       settingsProvider.locationServicesEnabled,
-                      (value) => settingsProvider.updateLocationServices(value),
+                      (value) async {
+                        await settingsProvider.updateLocationServices(value);
+                        if (mounted && !value) {
+                          // Show popup when location services are turned off
+                          _showLocationPermissionDialog();
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -277,6 +286,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
             },
             child: const Text('Change Password'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLocationPermissionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.location_off,
+              color: AppTheme.primaryBlue,
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Location Services',
+              style: AppTheme.heading3.copyWith(
+                color: AppTheme.primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Please do not turn off the location permission',
+          style: AppTheme.bodyMedium.copyWith(
+            color: Colors.black87,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              // Automatically turn ON location permission
+              final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+              await settingsProvider.updateLocationServices(true);
+            },
+            child: Text(
+              'OK',
+              style: AppTheme.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primaryBlue,
+              ),
+            ),
           ),
         ],
       ),

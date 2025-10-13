@@ -203,3 +203,5 @@ DEALLOCATE PREPARE stmt;
 
 -- Verify the fix
 SHOW CREATE TABLE drivers;
+
+

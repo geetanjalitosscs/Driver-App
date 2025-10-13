@@ -22,8 +22,8 @@ class NavigationProvider extends ChangeNotifier {
       
       _currentIndex = index;
       
-      // If navigating to notifications screen (index 4), mark as seen (clears main indicator)
-      if (index == 4) {
+      // If navigating to notifications screen (index 2), mark as seen (clears main indicator)
+      if (index == 2) {
         _notificationProvider?.markNotificationsAsSeen();
       }
       
@@ -53,23 +53,23 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void navigateToEarnings() {
-    _currentIndex = 2;
-    notifyListeners();
-  }
+  // void navigateToEarnings() {
+  //   _currentIndex = 2;
+  //   notifyListeners();
+  // } // Hidden from navbar
 
-  void navigateToWallet() {
-    _currentIndex = 3;
-    notifyListeners();
-  }
+  // void navigateToWallet() {
+  //   _currentIndex = 3;
+  //   notifyListeners();
+  // } // Hidden from navbar
 
   void navigateToHelp() {
-    _currentIndex = 5;
+    _currentIndex = 3; // Updated index after removing earnings and wallet
     notifyListeners();
   }
 
   void navigateToNotifications() {
-    _currentIndex = 4;
+    _currentIndex = 2; // Updated index after removing earnings and wallet
     // Mark notifications as seen (clears main indicator but keeps individual dots)
     _notificationProvider?.markNotificationsAsSeen();
     notifyListeners();

@@ -330,14 +330,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         // Navigate to home screen and show ongoing trip
         navigationProvider.navigateToHome();
         break;
-      case 'view_earnings':
-        // Navigate to earnings screen
-        navigationProvider.navigateToEarnings();
-        break;
-      case 'view_wallet':
-        // Navigate to wallet screen
-        navigationProvider.navigateToWallet();
-        break;
+      // case 'view_earnings':
+      //   // Navigate to earnings screen
+      //   navigationProvider.navigateToEarnings();
+      //   break; // Hidden from navbar
+      // case 'view_wallet':
+      //   // Navigate to wallet screen
+      //   navigationProvider.navigateToWallet();
+      //   break; // Hidden from navbar
       case 'view_trips':
         // Navigate to trip history screen
         navigationProvider.navigateToTrips();

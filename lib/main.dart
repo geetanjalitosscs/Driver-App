@@ -151,8 +151,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const TripHistoryScreen(),
-    const EarningsScreen(),
-    const WalletScreen(),
+    // const EarningsScreen(), // Hidden from navbar
+    // const WalletScreen(), // Hidden from navbar
     const NotificationsScreen(),
     const HelpScreen(),
   ];
@@ -217,14 +217,14 @@ class _MainScreenState extends State<MainScreen> {
                   icon: Icon(Icons.directions_car),
                   label: 'Trips',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.currency_rupee),
-                  label: 'Earnings',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_balance_wallet),
-                  label: 'Wallet',
-                ),
+                // BottomNavigationBarItem(
+                //   icon: Icon(Icons.currency_rupee),
+                //   label: 'Earnings',
+                // ), // Hidden from navbar
+                // BottomNavigationBarItem(
+                //   icon: Icon(Icons.account_balance_wallet),
+                //   label: 'Wallet',
+                // ), // Hidden from navbar
                 BottomNavigationBarItem(
                   icon: Consumer<NotificationProvider>(
                     builder: (context, notificationProvider, child) {
