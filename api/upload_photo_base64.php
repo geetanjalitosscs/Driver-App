@@ -106,7 +106,7 @@ try {
     
     // Get file info
     $file_size = filesize($file_path);
-    $photo_url = 'http://localhost/Driver-App/uploads/' . $unique_filename;
+    $photo_url = getUploadsUrl($unique_filename);
     
     // Log successful upload
     error_log("Base64 photo uploaded successfully: Driver ID $driver_id, Type: $photo_type, File: $unique_filename, Size: $file_size bytes");

@@ -5,8 +5,8 @@ import '../models/trip.dart';
 import '../models/earning.dart';
 import '../models/wallet.dart';
 import '../models/withdrawal.dart';
-import '../services/api_service.dart';
-import '../config/database_config.dart';
+import '../services/api_service_endpoints.dart';
+import '../config/centered_api.dart';
 
 class TripProvider extends ChangeNotifier {
   List<Trip> _allTrips = [];

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/earning.dart';
-import '../config/database_config.dart';
+import '../config/centered_api.dart';
 import '../services/notification_service.dart';
 
 class EarningsProvider extends ChangeNotifier {

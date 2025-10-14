@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/emergency_request.dart';
 import '../providers/emergency_provider.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 import '../theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'location_picker_dialog.dart';

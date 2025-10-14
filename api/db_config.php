@@ -9,10 +9,18 @@
 // Database connection settings
 $db_config = [
     'host' => 'localhost',
-    'dbname' => 'edueyeco_apatkal',
-    'username' => 'root',
-    'password' => '',
+    'dbname' => 'edueyeco_apatkal2',
+    'username' => 'edueyeco_apatkal2',
+    'password' => 'edueyeco_apatkal2',
     'charset' => 'utf8mb4'
+];
+
+// API Configuration - Centralized URL settings
+$api_config = [
+    'base_url' => 'https://tossconsultancyservices.com/apatkal/api/',
+    'uploads_url' => 'https://tossconsultancyservices.com/apatkal/api/uploads/',
+    'uploads_base_url' => 'https://tossconsultancyservices.com/apatkal/uploads/',
+    'site_url' => 'https://tossconsultancyservices.com/apatkal/'
 ];
 
 /**
@@ -87,5 +95,56 @@ function sendSuccessResponse($data, $message = 'Success') {
         'data' => $data
     ]);
     exit;
+}
+
+/**
+ * Get API configuration
+ * 
+ * @return array API configuration array
+ */
+function getApiConfig() {
+    global $api_config;
+    return $api_config;
+}
+
+/**
+ * Get uploads URL for a file
+ * 
+ * @param string $filename The filename
+ * @return string Full URL to the uploaded file
+ */
+function getUploadsUrl($filename) {
+    global $api_config;
+    return $api_config['uploads_url'] . $filename;
+}
+
+/**
+ * Get uploads base URL (without filename)
+ * 
+ * @return string Base uploads URL
+ */
+function getUploadsBaseUrl() {
+    global $api_config;
+    return $api_config['uploads_base_url'];
+}
+
+/**
+ * Get API base URL
+ * 
+ * @return string API base URL
+ */
+function getApiBaseUrl() {
+    global $api_config;
+    return $api_config['base_url'];
+}
+
+/**
+ * Get site URL
+ * 
+ * @return string Site URL
+ */
+function getSiteUrl() {
+    global $api_config;
+    return $api_config['site_url'];
 }
 ?>

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 import '../theme/app_theme.dart';
 
 class LocationPickerDialog extends StatefulWidget {

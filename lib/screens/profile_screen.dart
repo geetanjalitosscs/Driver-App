@@ -15,7 +15,7 @@ import '../providers/earnings_provider.dart';
 import '../providers/wallet_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../widgets/account_details_dialog.dart';
-import '../config/database_config.dart';
+import '../config/centered_api.dart';
 import 'help_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';

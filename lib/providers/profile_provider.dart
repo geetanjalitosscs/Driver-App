@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/profile_data.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 
 class ProfileProvider with ChangeNotifier {
   ProfileData _profile = ProfileData.getDefault();

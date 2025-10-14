@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 
 class WithdrawalDialog extends StatefulWidget {
   final double walletBalance;

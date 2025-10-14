@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 import '../services/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 

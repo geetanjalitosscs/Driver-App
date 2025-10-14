@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/database_config.dart';
+import '../config/centered_api.dart';
 import 'kyc_verification_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';

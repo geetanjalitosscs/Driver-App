@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../models/wallet.dart';
 import '../models/withdrawal.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 import '../services/notification_service.dart';
 import 'notification_provider.dart';
 

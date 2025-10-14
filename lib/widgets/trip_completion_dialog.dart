@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
 import '../models/trip.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 
 class TripCompletionDialog extends StatefulWidget {
   final Trip trip;

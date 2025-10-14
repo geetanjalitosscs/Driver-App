@@ -77,7 +77,7 @@ try {
         
         // Convert filename to full URL (only if photo exists)
         if (!empty($photoFilename)) {
-            $baseUrl = 'https://tossconsultancyservices.com/apatkal/uploads/';
+            $baseUrl = getUploadsBaseUrl();
             $accident['photos'] = [$baseUrl . $photoFilename];
         } else {
             $accident['photos'] = [];

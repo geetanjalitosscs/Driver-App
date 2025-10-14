@@ -1,5 +1,5 @@
 import 'dart:math';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 import '../models/accident_report.dart';
 
 class LocationAccidentService {

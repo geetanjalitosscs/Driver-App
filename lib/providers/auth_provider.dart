@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/profile_data.dart';
-import '../services/api_service.dart';
+import '../services/api_service_endpoints.dart';
 
 class AuthProvider extends ChangeNotifier {
   ProfileData? _currentUser;

@@ -6,7 +6,7 @@ import 'dart:convert';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/common/app_error_dialog.dart';
-import '../config/database_config.dart';
+import '../config/centered_api.dart';
 
 class AccountDetailsDialog extends StatefulWidget {
   const AccountDetailsDialog({super.key});
