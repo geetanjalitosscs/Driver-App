@@ -29,6 +29,7 @@ try {
                 $updateStmt = $pdo->prepare("UPDATE accidents SET 
                     driver_details = ?, 
                     driver_status = 'assigned',
+                    status = 'investigating',
                     accepted_at = NOW()
                     WHERE id = ? AND status = 'pending' AND (driver_status IS NULL OR driver_status = 'available')");
                 
@@ -201,7 +202,8 @@ try {
                         driver_details = NULL,
                         accepted_at = NULL,
                         completed_at = NULL,
-                        completion_confirmed = FALSE
+                        completion_confirmed = FALSE,
+                        status = 'pending'
                         WHERE id = ?");
                     
                     if ($cancelStmt->execute([$accident_id])) {
