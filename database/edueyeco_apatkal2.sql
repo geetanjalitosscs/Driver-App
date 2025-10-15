@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 14, 2025 at 12:09 PM
+-- Generation Time: Oct 15, 2025 at 11:49 AM
 -- Server version: 10.6.23-MariaDB-cll-lve
 -- PHP Version: 8.4.11
 
@@ -59,31 +59,31 @@ INSERT INTO `accidents` (`id`, `fullname`, `phone`, `vehicle`, `accident_date`, 
 (5, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154839, Lng: 79.926032)', 23.15483918, 79.92603159, 'Ancle damaged', '', '2025-10-04 10:46:41', 'pending', NULL, NULL, NULL, NULL, 0),
 (6, 'Raj', '7771076100', 'mp20ac3893', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154839, Lng: 79.926032)', 23.15483918, 79.92603159, 'Testing no 2', '', '2025-10-04 10:47:27', 'pending', NULL, NULL, NULL, NULL, 0),
 (8, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154831, Lng: 79.926038)', 23.15483134, 79.92603816, 'Hand damaged', '', '2025-10-04 11:31:25', 'pending', NULL, NULL, NULL, NULL, 0),
-(9, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926024)', 23.15484042, 79.92602427, 'Testing 7', '', '2025-10-04 11:44:15', 'resolved', 'completed', 'Driver ID: 1 | Vehicle: DL01AB1234', '2025-10-06 04:46:16', '2025-10-06 04:46:37', 1),
+(9, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926024)', 23.15484042, 79.92602427, 'Testing 7', '', '2025-10-04 11:44:15', 'pending', NULL, NULL, NULL, NULL, 0),
 (10, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-06', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155037, Lng: 79.925987)', 23.15503750, 79.92598680, 'Full mental patient', '', '2025-10-06 08:37:50', 'pending', NULL, NULL, NULL, NULL, 0),
 (11, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155066, Lng: 79.926018)', 23.15506580, 79.92601770, 'No one want to touch it', '', '2025-10-06 08:38:51', 'pending', NULL, NULL, NULL, NULL, 0),
 (12, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155106, Lng: 79.926047)', 23.15510620, 79.92604700, 'Bone breaked', '', '2025-10-06 08:54:58', 'pending', NULL, NULL, NULL, NULL, 0),
-(13, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', 23.15508940, 79.92603490, 'Good one', '', '2025-10-06 08:55:22', 'pending', NULL, NULL, NULL, NULL, 0),
-(14, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', 23.15508940, 79.92603490, 'Keeping', '', '2025-10-06 08:55:50', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-08 05:35:02', '2025-10-08 05:35:09', 1),
+(13, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', 23.15508940, 79.92603490, 'Good one', '', '2025-10-06 08:55:22', 'resolved', 'completed', NULL, NULL, '2025-10-15 06:08:43', 1),
+(14, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', 23.15508940, 79.92603490, 'Keeping', '', '2025-10-06 08:55:50', 'pending', NULL, NULL, NULL, NULL, 0),
 (15, 'dhaneshwari', '7806062421', 'mp20ch8799', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926017)', 23.15507170, 79.92601740, 'Headache', '', '2025-10-06 08:56:28', 'pending', NULL, NULL, NULL, NULL, 0),
-(16, 'dhaneshwari', '7806062421', 'mp20ch8799', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926017)', 23.15507170, 79.92601740, 'Breake hand', '', '2025-10-06 08:57:26', 'resolved', 'completed', 'Driver ID: 1 | Vehicle: DL01AB1234', '2025-10-06 09:18:39', '2025-10-06 09:19:23', 1),
+(16, 'dhaneshwari', '7806062421', 'mp20ch8799', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926017)', 23.15507170, 79.92601740, 'Breake hand', '', '2025-10-06 08:57:26', 'pending', NULL, NULL, NULL, NULL, 0),
 (17, 'mehak', '8959176446', 'mp20ac3800', '2025-10-06', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155087, Lng: 79.926030)', 23.15508700, 79.92603040, 'testing', '', '2025-10-06 09:28:59', 'pending', NULL, NULL, NULL, NULL, 0),
-(19, 'siddharth', '7898140799', 'Mp20ZB6308', '2025-10-07', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', 22.70020000, 75.90780000, 'testing', '', '2025-10-07 09:57:17', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-07 10:10:22', '2025-10-07 10:10:41', 1),
+(19, 'siddharth', '7898140799', 'Mp20ZB6308', '2025-10-07', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', 22.70020000, 75.90780000, 'testing', '', '2025-10-07 09:57:17', 'pending', NULL, NULL, NULL, NULL, 0),
 (20, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-07', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', 22.70020000, 75.90780000, 'tets', '', '2025-10-07 10:12:57', 'pending', NULL, NULL, NULL, NULL, 0),
 (21, 'skkk', '8520369741', 'mp20ze3605', '2025-10-07', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', 22.70020000, 75.90780000, 'tessst', '', '2025-10-07 10:14:30', 'pending', NULL, NULL, NULL, NULL, 0),
 (23, 'com', '7645144212', 'mp20ze3605', '2025-10-07', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', 22.70020000, 75.90780000, 'ssssss', '', '2025-10-07 11:03:17', 'pending', NULL, NULL, NULL, NULL, 0),
 (24, 'Raj', '8959176446', 'mp20ac3893', '2025-10-07', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154824, Lng: 79.926056)', 23.15482381, 79.92605624, 'fdxgfvgh', '', '2025-10-07 11:15:52', 'pending', NULL, NULL, NULL, NULL, 0),
-(25, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-07', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154826, Lng: 79.926055)', 23.15482633, 79.92605475, 'ssss', '', '2025-10-07 11:17:18', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-07 11:19:08', '2025-10-07 11:19:56', 1),
-(26, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-08', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926044)', 23.15484017, 79.92604424, 'testing 18', '', '2025-10-08 06:45:10', 'pending', 'assigned', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-09 11:45:07', NULL, 0),
+(25, 'Shreyash', '9755833563', 'mp20ch8790', '2025-10-07', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154826, Lng: 79.926055)', 23.15482633, 79.92605475, 'ssss', '', '2025-10-07 11:17:18', 'pending', NULL, NULL, NULL, NULL, 0),
+(26, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-08', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926044)', 23.15484017, 79.92604424, 'testing 18', '', '2025-10-08 06:45:10', 'pending', NULL, NULL, NULL, NULL, 0),
 (27, 'kiran', '7546963214', 'mop546gdr5', '2025-10-08', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926025)', 23.15484023, 79.92602490, 'Nothing', '', '2025-10-08 11:20:41', 'pending', NULL, NULL, NULL, NULL, 0),
 (28, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-08', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926024)', 23.15484023, 79.92602399, 'Testing Purpose', '', '2025-10-08 11:21:16', 'pending', NULL, NULL, NULL, NULL, 0),
 (29, 'Yadav', '', 'Mp20zy8885', '2025-10-08', '5WQV+5WF, Thakkar Gram, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482002, India (Lat: 23.187864, Lng: 79.944690)', 23.18786370, 79.94468980, 'Accident ', '', '2025-10-08 20:06:17', 'pending', NULL, NULL, NULL, NULL, 0),
-(30, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926022)', 23.15484058, 79.92602221, 'no one here', '', '2025-10-09 04:32:24', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-09 04:41:52', '2025-10-09 04:42:43', 1),
+(30, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926022)', 23.15484058, 79.92602221, 'no one here', '', '2025-10-09 04:32:24', 'pending', NULL, NULL, NULL, NULL, 0),
 (31, 'Mehika', '7654891355', 'mp20ac3844', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154842, Lng: 79.926021)', 23.15484190, 79.92602082, 'Yono bank', '', '2025-10-09 04:34:19', 'pending', NULL, NULL, NULL, NULL, 0),
-(32, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154842, Lng: 79.926027)', 23.15484178, 79.92602680, 'Testing 1.5', '', '2025-10-09 04:39:52', 'pending', 'assigned', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-09 11:30:02', NULL, 0),
+(32, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154842, Lng: 79.926027)', 23.15484178, 79.92602680, 'Testing 1.5', '', '2025-10-09 04:39:52', 'pending', NULL, NULL, NULL, NULL, 0),
 (33, 'Komal', '8469571236', 'mp20ac3896', '2025-10-09', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926023)', 23.15484105, 79.92602271, 'Testing 1.7', '', '2025-10-09 04:41:09', 'pending', NULL, NULL, NULL, NULL, 0),
-(34, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-10', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926038)', 23.15484074, 79.92603774, 'Damaged', '', '2025-10-10 05:28:03', 'pending', NULL, NULL, NULL, NULL, 0),
-(35, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-11', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', 23.15484466, 79.92603483, 'Today test', '', '2025-10-11 07:10:48', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-11 07:11:22', '2025-10-11 07:12:26', 1),
+(34, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-10', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926038)', 23.15484074, 79.92603774, 'Damaged', '', '2025-10-10 05:28:03', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-15 06:16:25', '2025-10-15 06:17:22', 1),
+(35, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-11', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', 23.15484466, 79.92603483, 'Today test', '', '2025-10-11 07:10:48', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-15 06:15:59', '2025-10-15 06:16:11', 1),
 (36, 'Dhani', '8459671332', 'mp20ac3890', '2025-10-11', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154844, Lng: 79.926025)', 23.15484408, 79.92602549, 'breaked', '', '2025-10-11 07:13:48', 'pending', NULL, NULL, NULL, NULL, 0);
 
 --
@@ -539,7 +539,7 @@ CREATE TABLE `drivers` (
 --
 
 INSERT INTO `drivers` (`id`, `driver_name`, `email`, `password`, `number`, `address`, `vehicle_type`, `vehicle_number`, `model_rating`, `aadhar_photo`, `licence_photo`, `rc_photo`, `created_at`, `updated_at`, `kyc_status`, `account_details`) VALUES
-(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', NULL, 'aadhar_rajesh.jpg', 'licence_rajesh.jpg', 'rc_rajesh.jpg', '2025-09-24 05:52:18', '2025-10-14 06:38:20', 'approved', '{\"account_number\":\"12345678908\",\"bank_name\":\"State Bank Of India\",\"ifsc_code\":\"SBIN0001234\",\"account_holder_name\":\"Rajesh Sharma\",\"updated_at\":\"2025-10-14 06:38:20\"}'),
+(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543210', '123, Gandhi Marg, Sue Delhi', 'Ambulance', 'DL01AB1234', NULL, 'aadhar_rajesh.jpg', 'licence_rajesh.jpg', 'rc_rajesh.jpg', '2025-09-24 05:52:18', '2025-10-14 07:09:27', 'approved', '{\"account_number\":\"12345678907\",\"bank_name\":\"State Bank Of India\",\"ifsc_code\":\"SBIN0001234\",\"account_holder_name\":\"Rajesh Sharma\",\"updated_at\":\"2025-10-14 07:09:27\"}'),
 (2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'beohari mp', 'Ambulance', 'mp20mz4528', NULL, 'Moon.jpg', 'Flower.jpg', 'Blue Flower.jpg', '2025-09-25 04:20:15', '2025-10-08 11:14:15', 'approved', NULL),
 (3, 'amit', 'kalmaliindia@gmail.com', '$2y$10$5umnfnk.EgxwjelKFomLLekkdsYdHe6FKGVNkGWILLhim6j1lgvna', '8770658824', 'jabalpur', 'ambulance', 'mp20ja6365', NULL, 'JPEG_20250927_235821_3502812970878090506.jpg', 'JPEG_20250927_235827_7286715491207715510.jpg', 'default_rc.jpg', '2025-09-27 18:28:45', '2025-10-09 05:48:45', 'approved', NULL),
 (12, 'komal', 'komal@gmail.com', '$2y$10$.Br01UJJL3ZMi.9uMegVQeHB90Q.KBSK/XiDpotjJzzA1NMmFMn5O', '9643153484', 'katni', 'Ambulance', 'mp89gh5647', NULL, '12_aadhar_1759909111_68e614f7b803b.jpeg', '12_licence_1759909111_68e614f7b8bf0.jpeg', '12_rc_1759909111_68e614f7b966c.jpeg', '2025-10-08 07:38:31', '2025-10-09 05:22:34', 'approved', NULL),
@@ -4070,30 +4070,28 @@ CREATE TABLE `trips` (
   `client_name` varchar(100) NOT NULL,
   `location` text NOT NULL,
   `timing` timestamp NULL DEFAULT NULL,
-  `amount` decimal(8,2) NOT NULL,
   `duration` int(11) NOT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `start_latitude` decimal(10,8) DEFAULT NULL,
+  `start_longitude` decimal(11,8) DEFAULT NULL,
+  `end_latitude` decimal(10,8) DEFAULT NULL,
+  `end_longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `trips`
 --
 
-INSERT INTO `trips` (`history_id`, `driver_id`, `client_name`, `location`, `timing`, `amount`, `duration`, `start_time`, `end_time`, `created_at`) VALUES
-(0, 1, '', 'XGWG+8J Pathar Kansiya, Madhya Pradesh, India (Lat: 22.995800, Lng: 77.526600)', '2025-10-04 09:11:59', 505.00, 1, '2025-10-04 09:11:59', '2025-10-04 03:42:16', '2025-10-04 09:12:16'),
-(1, 1, 'Priya Sharma', 'Apollo Hospital, Indore', '2025-09-20 09:00:00', 1800.00, 45, '2025-09-20 09:05:00', '2025-09-20 09:50:00', '2025-09-20 09:00:00'),
-(2, 1, 'Rajesh Kumar', 'Fortis Hospital, Bhopal', '2025-09-27 03:45:00', 2200.00, 60, '2025-09-27 03:50:00', '2025-09-27 04:50:00', '2025-09-27 03:45:00'),
-(3, 1, 'Meera Patel', 'Manipal Hospital, Jabalpur', '2025-10-01 11:15:00', 1950.00, 50, '2025-10-01 11:20:00', '2025-10-01 12:10:00', '2025-10-01 11:15:00'),
-(4, 1, 'Vikram Singh', 'AIIMS Hospital, Delhi', '2025-10-02 06:00:00', 2800.00, 75, '2025-10-02 06:05:00', '2025-10-02 06:15:00', '2025-10-02 06:00:00'),
-(9, 1, 'siddharth', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926024)', '2025-10-06 04:46:16', 505.00, 1, '2025-10-06 04:46:16', '2025-10-05 23:16:37', '2025-10-06 04:46:37'),
-(14, 1, 'Shreyash', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', '2025-10-08 05:35:02', 505.00, 1, '2025-10-08 05:35:02', '2025-10-08 00:05:09', '2025-10-08 05:35:09'),
-(16, 1, 'dhaneshwari', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926017)', '2025-10-06 09:18:39', 505.00, 1, '2025-10-06 09:18:39', '2025-10-06 03:49:23', '2025-10-06 09:19:23'),
-(19, 1, 'siddharth', 'shanti nagar, Mayur Nagar, Musakhedi, Indore, Madhya Pradesh 452001, India (Lat: 22.700200, Lng: 75.907800)', '2025-10-07 10:10:22', 505.00, 1, '2025-10-07 10:10:22', '2025-10-07 04:40:41', '2025-10-07 10:10:41'),
-(25, 1, 'Shreyash', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154826, Lng: 79.926055)', '2025-10-07 11:19:08', 505.00, 1, '2025-10-07 11:19:08', '2025-10-07 05:49:56', '2025-10-07 11:19:56'),
-(30, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926022)', '2025-10-09 04:41:52', 505.00, 1, '2025-10-09 04:41:52', '2025-10-08 23:12:43', '2025-10-09 04:42:43'),
-(35, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', '2025-10-11 07:11:22', 505.00, 1, '2025-10-11 07:11:22', '2025-10-11 01:42:26', '2025-10-11 07:12:26');
+INSERT INTO `trips` (`history_id`, `driver_id`, `client_name`, `location`, `timing`, `duration`, `start_time`, `end_time`, `created_at`, `start_latitude`, `start_longitude`, `end_latitude`, `end_longitude`) VALUES
+(0, 1, '', 'XGWG+8J Pathar Kansiya, Madhya Pradesh, India (Lat: 22.995800, Lng: 77.526600)', '2025-10-04 09:11:59', 1, '2025-10-04 09:11:59', '2025-10-04 03:42:16', '2025-10-04 09:12:16', NULL, NULL, NULL, NULL),
+(1, 1, 'Priya Sharma', 'Apollo Hospital, Indore', '2025-09-20 09:00:00', 45, '2025-09-20 09:05:00', '2025-09-20 09:50:00', '2025-09-20 09:00:00', NULL, NULL, NULL, NULL),
+(2, 1, 'Rajesh Kumar', 'Fortis Hospital, Bhopal', '2025-09-27 03:45:00', 60, '2025-09-27 03:50:00', '2025-09-27 04:50:00', '2025-09-27 03:45:00', NULL, NULL, NULL, NULL),
+(3, 1, 'Meera Patel', 'Manipal Hospital, Jabalpur', '2025-10-01 11:15:00', 50, '2025-10-01 11:20:00', '2025-10-01 12:10:00', '2025-10-01 11:15:00', NULL, NULL, NULL, NULL),
+(4, 1, 'Vikram Singh', 'AIIMS Hospital, Delhi', '2025-10-02 06:00:00', 75, '2025-10-02 06:05:00', '2025-10-02 06:15:00', '2025-10-02 06:00:00', NULL, NULL, NULL, NULL),
+(34, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926038)', '2025-10-15 06:16:25', 57, '2025-10-15 06:16:25', '2025-10-15 06:17:22', '2025-10-15 06:17:22', 23.15484074, 79.92603774, 23.15484729, 79.92602640),
+(35, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', '2025-10-15 06:15:59', 12, '2025-10-15 06:15:59', '2025-10-15 06:16:11', '2025-10-15 06:16:11', 23.15484466, 79.92603483, 23.15484729, 79.92602640);
 
 -- --------------------------------------------------------
 
@@ -4164,7 +4162,7 @@ CREATE TABLE `wallet` (
 --
 
 INSERT INTO `wallet` (`wallet_id`, `driver_id`, `balance`, `total_earned`, `total_withdrawn`, `created_at`, `updated_at`) VALUES
-(1, 1, 4600.00, 5950.00, 1350.00, '2025-08-01 04:30:00', '2025-10-11 07:23:57'),
+(1, 1, 4600.00, 5950.00, 1350.00, '2025-08-01 04:30:00', '2025-10-15 06:13:14'),
 (13, 2, 0.00, 0.00, 0.00, '2025-10-08 11:09:43', '2025-10-09 04:47:19'),
 (14, 13, 0.00, 0.00, 0.00, '2025-10-09 05:51:44', '2025-10-09 05:52:20');
 
