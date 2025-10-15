@@ -1635,6 +1635,8 @@ class CentralizedApiService {
     required int accidentId,
     required int driverId,
     required bool confirmed,
+    double? driverLatitude,
+    double? driverLongitude,
   }) async {
     try {
       print('=== API SERVICE COMPLETE ACCIDENT ===');
@@ -1642,16 +1644,25 @@ class CentralizedApiService {
       print('Accident ID: $accidentId');
       print('Driver ID: $driverId');
       print('Confirmed: $confirmed');
+      print('Driver Location: $driverLatitude, $driverLongitude');
+      
+      final requestBody = {
+        'action': 'complete_accident',
+        'accident_id': accidentId,
+        'driver_id': driverId,
+        'confirmed': confirmed,
+      };
+      
+      // Add location if provided
+      if (driverLatitude != null && driverLongitude != null) {
+        requestBody['driver_latitude'] = driverLatitude;
+        requestBody['driver_longitude'] = driverLongitude;
+      }
       
       final response = await http.post(
         Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.getAccidents)),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'action': 'complete_accident',
-          'accident_id': accidentId,
-          'driver_id': driverId,
-          'confirmed': confirmed,
-        }),
+        body: json.encode(requestBody),
       );
 
       print('Response status: ${response.statusCode}');

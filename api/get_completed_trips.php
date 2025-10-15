@@ -29,6 +29,10 @@ try {
             duration,
             start_time,
             end_time,
+            start_latitude,
+            start_longitude,
+            end_latitude,
+            end_longitude,
             created_at
         FROM trips 
         WHERE driver_id = ? AND end_time IS NOT NULL

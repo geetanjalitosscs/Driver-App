@@ -204,5 +204,13 @@ DEALLOCATE PREPARE stmt;
 -- Verify the fix
 SHOW CREATE TABLE drivers;
 
-
 ALTER TABLE drivers ADD COLUMN account_details TEXT DEFAULT NULL;
+
+-- Remove amount column (if not done already)
+ALTER TABLE trips DROP COLUMN amount;
+
+-- Add coordinate columns for real distance calculation
+ALTER TABLE trips ADD COLUMN start_latitude DECIMAL(10, 8) NULL;
+ALTER TABLE trips ADD COLUMN start_longitude DECIMAL(11, 8) NULL;
+ALTER TABLE trips ADD COLUMN end_latitude DECIMAL(10, 8) NULL;
+ALTER TABLE trips ADD COLUMN end_longitude DECIMAL(11, 8) NULL;

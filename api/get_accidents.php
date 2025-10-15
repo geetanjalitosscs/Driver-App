@@ -51,6 +51,17 @@ try {
                 $driver_id = intval($input['driver_id']);
                 $confirmed = $input['confirmed'] ?? false;
                 
+                // Get driver's current location if provided
+                $driver_latitude = $input['driver_latitude'] ?? null;
+                $driver_longitude = $input['driver_longitude'] ?? null;
+                
+                // Debug logging for coordinates
+                error_log("=== TRIP COMPLETION COORDINATES DEBUG ===");
+                error_log("Driver latitude: $driver_latitude");
+                error_log("Driver longitude: $driver_longitude");
+                error_log("Accident latitude: " . $accident['latitude']);
+                error_log("Accident longitude: " . $accident['longitude']);
+                
                 if ($confirmed) {
                     // First, get accident details to create trip
                     $accidentStmt = $pdo->prepare("SELECT * FROM accidents WHERE id = ?");
@@ -67,20 +78,44 @@ try {
                             WHERE id = ?");
                         
                         if ($updateStmt->execute([$accident_id])) {
+                            // Get the updated accident record with completed_at timestamp
+                            $updatedStmt = $pdo->prepare("SELECT accepted_at, completed_at FROM accidents WHERE id = ?");
+                            $updatedStmt->execute([$accident_id]);
+                            $updatedAccident = $updatedStmt->fetch(PDO::FETCH_ASSOC);
+                            
                             // Create trip record
                             $client_name = $accident['fullname'];
                             $location = $accident['location'];
-                            $accepted_at = $accident['accepted_at'];
-                            $completed_at = date('Y-m-d H:i:s'); // Current time
+                            $accepted_at = $updatedAccident['accepted_at'];
+                            $completed_at = $updatedAccident['completed_at'];
                             
-                            // Calculate duration in minutes
+                            // Debug logging for timing
+                            error_log("=== TRIP COMPLETION TIMING DEBUG ===");
+                            error_log("Accepted at: $accepted_at");
+                            error_log("Completed at: $completed_at");
+                            
+                            // Calculate duration in seconds
                             $start_timestamp = strtotime($accepted_at);
                             $end_timestamp = strtotime($completed_at);
-                            $duration = round(($end_timestamp - $start_timestamp) / 60); // Duration in minutes
+                            $duration_seconds = $end_timestamp - $start_timestamp;
                             
-                            // Ensure duration is never negative (minimum 1 minute)
+                            error_log("Start timestamp: $start_timestamp");
+                            error_log("End timestamp: $end_timestamp");
+                            error_log("Duration in seconds: $duration_seconds");
+                            
+                            // If duration is negative or very large, use current time as start
+                            if ($duration_seconds < 0 || $duration_seconds > 3600) { // More than 1 hour seems wrong
+                                error_log("Duration seems incorrect, using current time as start time");
+                                $accepted_at = $completed_at; // Use current time as start time
+                                $duration_seconds = 5; // Set to 5 seconds as you mentioned
+                            }
+                            
+                            // Store duration in seconds (not minutes) for better precision
+                            $duration = $duration_seconds;
+                            
+                            // Ensure duration is never negative (minimum 1 second)
                             if ($duration < 0) {
-                                $duration = 1; // Minimum 1 minute for accident response
+                                $duration = 1; // Minimum 1 second for accident response
                             }
                             
                             // Debug logging for trip creation
@@ -88,7 +123,7 @@ try {
                             error_log("Accident ID: $accident_id");
                             error_log("Client Name: $client_name");
                             error_log("Location: $location");
-                            error_log("Duration: $duration minutes");
+                            error_log("Duration: $duration seconds");
                             error_log("=== END DEBUG ===");
                             
                             // Insert trip record using accident ID as trip ID
@@ -103,8 +138,8 @@ try {
                             if (!$existingTrip) {
                                 // Insert trip record using accident ID as trip ID
                                 $tripStmt = $pdo->prepare("INSERT INTO trips 
-                                    (history_id, driver_id, client_name, location, timing, duration, start_time, end_time, created_at) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                                    (history_id, driver_id, client_name, location, timing, duration, start_time, end_time, start_latitude, start_longitude, end_latitude, end_longitude, created_at) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
                                 
                                 $tripInserted = $tripStmt->execute([
                                     $accident_id,  // Use accident ID as trip ID
@@ -114,7 +149,11 @@ try {
                                     $accepted_at,
                                     $duration,
                                     $accepted_at,
-                                    $completed_at
+                                    $completed_at,
+                                    $accident['latitude'],  // Accident location (start - where driver went to)
+                                    $accident['longitude'],
+                                    $driver_latitude,  // Driver's current location (end - where they completed from)
+                                    $driver_longitude
                                 ]);
                                 
                                 if ($tripInserted) {

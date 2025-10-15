@@ -361,6 +361,8 @@ class AccidentProvider extends ChangeNotifier {
   Future<bool> completeAcceptedAccident({
     required int driverId,
     required bool confirmed,
+    double? driverLatitude,
+    double? driverLongitude,
   }) async {
     if (_acceptedAccident == null) return false;
 
@@ -372,6 +374,8 @@ class AccidentProvider extends ChangeNotifier {
           accidentId: _acceptedAccident!.id,
           driverId: driverId,
           confirmed: confirmed,
+          driverLatitude: driverLatitude,
+          driverLongitude: driverLongitude,
         );
         
         print('Complete API Response: $result');

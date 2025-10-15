@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
+
 class Trip {
   final int historyId;
   final int driverId;
@@ -48,12 +51,12 @@ class Trip {
       startTime: json['start_time'] != null ? DateTime.parse(json['start_time']) : null,
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
       createdAt: DateTime.parse(json['created_at']),
-      startLatitude: json['start_latitude']?.toDouble(),
-      startLongitude: json['start_longitude']?.toDouble(),
-      endLatitude: json['end_latitude']?.toDouble(),
-      endLongitude: json['end_longitude']?.toDouble(),
-      currentLatitude: json['current_latitude']?.toDouble(),
-      currentLongitude: json['current_longitude']?.toDouble(),
+      startLatitude: json['start_latitude'] != null ? double.tryParse(json['start_latitude'].toString()) : null,
+      startLongitude: json['start_longitude'] != null ? double.tryParse(json['start_longitude'].toString()) : null,
+      endLatitude: json['end_latitude'] != null ? double.tryParse(json['end_latitude'].toString()) : null,
+      endLongitude: json['end_longitude'] != null ? double.tryParse(json['end_longitude'].toString()) : null,
+      currentLatitude: json['current_latitude'] != null ? double.tryParse(json['current_latitude'].toString()) : null,
+      currentLongitude: json['current_longitude'] != null ? double.tryParse(json['current_longitude'].toString()) : null,
       lastLocationUpdate: json['last_location_update'] != null ? DateTime.parse(json['last_location_update']) : null,
     );
   }
@@ -122,16 +125,58 @@ class Trip {
   }
 
   String get formattedDuration {
-    if (duration == 0) return 'N/A';
-    
-    final hours = duration ~/ 60;
-    final minutes = duration % 60;
-    
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else {
-      return '${minutes}m';
+    // First try to calculate from startTime and endTime
+    if (startTime != null && endTime != null) {
+      final actualDuration = endTime!.difference(startTime!);
+      
+      // If the calculated duration is 0 (same times), use the database duration field
+      if (actualDuration.inSeconds == 0 && duration != null && duration! > 0) {
+        // Duration is now stored in seconds, not minutes
+        final totalSeconds = duration!;
+        final hours = totalSeconds ~/ 3600;
+        final minutes = (totalSeconds % 3600) ~/ 60;
+        final seconds = totalSeconds % 60;
+        
+        if (hours > 0) {
+          return '${hours}h ${minutes}m ${seconds}s';
+        } else if (minutes > 0) {
+          return '${minutes}m ${seconds}s';
+        } else {
+          return '${seconds}s';
+        }
+      }
+      
+      // Otherwise use the calculated duration
+      final hours = actualDuration.inHours;
+      final minutes = actualDuration.inMinutes % 60;
+      final seconds = actualDuration.inSeconds % 60;
+      
+      if (hours > 0) {
+        return '${hours}h ${minutes}m ${seconds}s';
+      } else if (minutes > 0) {
+        return '${minutes}m ${seconds}s';
+      } else {
+        return '${seconds}s';
+      }
     }
+    
+    // Fallback to database duration field (now in seconds)
+    if (duration != null && duration! > 0) {
+      final totalSeconds = duration!;
+      final hours = totalSeconds ~/ 3600;
+      final minutes = (totalSeconds % 3600) ~/ 60;
+      final seconds = totalSeconds % 60;
+      
+      if (hours > 0) {
+        return '${hours}h ${minutes}m ${seconds}s';
+      } else if (minutes > 0) {
+        return '${minutes}m ${seconds}s';
+      } else {
+        return '${seconds}s';
+      }
+    }
+    
+    return 'N/A';
   }
 
   // Getter for tripId - returns historyId for compatibility
@@ -141,8 +186,22 @@ class Trip {
   String get startLocation => location; // Using location as start location
   String get endLocation => location; // Using location as end location for now
   
-  // Distance getters (placeholder - would need actual distance calculation)
-  double? get distanceKm => null; // Placeholder - would need to calculate from coordinates
+  // Distance getters - calculate from coordinates if available
+  double? get distanceKm {
+    if (startLatitude != null && startLongitude != null && 
+        endLatitude != null && endLongitude != null) {
+      // Use Geolocator's built-in distance calculation
+      return Geolocator.distanceBetween(
+        startLatitude!, startLongitude!,
+        endLatitude!, endLongitude!
+      ) / 1000; // Convert meters to kilometers
+    }
+    return null;
+  }
   
-  String get formattedDistance => 'N/A'; // Placeholder
+  String get formattedDistance {
+    final distance = distanceKm;
+    if (distance == null) return 'N/A';
+    return '${distance.toStringAsFixed(2)} km';
+  }
 }

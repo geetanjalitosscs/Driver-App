@@ -107,6 +107,17 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       // Get route from start to end
       await _getRoute();
 
+      // Calculate initial distance from driver location to accident location
+      if (_startLocation != null && _endLocation != null) {
+        _tripDistance = Geolocator.distanceBetween(
+          _startLocation!.latitude,
+          _startLocation!.longitude,
+          _endLocation!.latitude,
+          _endLocation!.longitude,
+        ) / 1000; // Convert meters to kilometers
+        print('Calculated trip distance: ${_tripDistance.toStringAsFixed(2)} km');
+      }
+
       // Start location tracking
       await _startLocationTracking();
 
@@ -259,9 +270,24 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   void _startTripTimer() {
+    // Calculate initial duration from trip start time if available
+    if (widget.trip.startTime != null) {
+      final now = DateTime.now();
+      _tripDuration = now.difference(widget.trip.startTime!);
+    } else {
+      _tripDuration = Duration.zero;
+    }
+    
     _tripTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _tripDuration = Duration(seconds: _tripDuration.inSeconds + 1);
+        if (widget.trip.startTime != null) {
+          // Calculate duration from actual trip start time
+          final now = DateTime.now();
+          _tripDuration = now.difference(widget.trip.startTime!);
+        } else {
+          // Fallback to timer-based calculation
+          _tripDuration = Duration(seconds: _tripDuration.inSeconds + 1);
+        }
       });
     });
   }
@@ -367,6 +393,8 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       final success = await accidentProvider.completeAcceptedAccident(
         driverId: driverId,
         confirmed: true,
+        driverLatitude: _currentLocation?.latitude,
+        driverLongitude: _currentLocation?.longitude,
       );
 
           if (success) {
@@ -549,11 +577,14 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
+    final seconds = duration.inSeconds % 60;
     
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
+      return '${hours}h ${minutes}m ${seconds}s';
+    } else if (minutes > 0) {
+      return '${minutes}m ${seconds}s';
     } else {
-      return '${minutes}m';
+      return '${seconds}s';
     }
   }
 
