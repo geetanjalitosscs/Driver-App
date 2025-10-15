@@ -329,7 +329,6 @@ class NotificationProvider extends ChangeNotifier {
   void addTripAcceptedNotification({
     required String location,
     required int accidentId,
-    required double amount,
     required String driverId,
   }) {
     addNotification(
@@ -340,7 +339,6 @@ class NotificationProvider extends ChangeNotifier {
       actionData: {
         'accident_id': accidentId,
         'location': location,
-        'amount': amount,
         'action': 'navigate_to_trip',
       },
       driverId: driverId,
@@ -350,7 +348,6 @@ class NotificationProvider extends ChangeNotifier {
   // Trip Completion Notifications - Only for newly completed trips
   void addTripCompletedNotification({
     required String location,
-    required double amount,
     required int tripId,
     required String driverId,
     String? vehicleNumber,
@@ -358,11 +355,10 @@ class NotificationProvider extends ChangeNotifier {
     addNotification(
       id: 'trip_completed_$tripId',
       title: 'Trip Completed',
-      message: 'Trip #$tripId completed for vehicle ${vehicleNumber ?? 'unknown'}. Earnings: ₹${amount.toStringAsFixed(0)}',
+      message: 'Trip #$tripId completed for vehicle ${vehicleNumber ?? 'unknown'}.',
       type: NotificationType.trip,
       actionData: {
         'trip_id': tripId,
-        'amount': amount,
         'location': location,
         'vehicle_number': vehicleNumber,
         'action': 'view_trips',

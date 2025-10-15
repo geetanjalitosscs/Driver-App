@@ -359,7 +359,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   ),
                 ),
                 Text(
-                  '₹${trip.amount}',
+                  'Trip Completed',
                   style: GoogleFonts.roboto(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

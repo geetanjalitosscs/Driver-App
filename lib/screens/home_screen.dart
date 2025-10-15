@@ -1484,13 +1484,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppTheme.primaryBlue,
                         ),
                       ),
-                      Text(
-                        'Fare: ₹${trip.amount}',
-                        style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -1811,7 +1804,6 @@ class _HomeScreenState extends State<HomeScreen> {
         notificationProvider.addTripAcceptedNotification(
           location: accident.location,
           accidentId: accident.id,
-          amount: trip.amount,
           driverId: driverId,
         );
 
@@ -1870,7 +1862,6 @@ class _HomeScreenState extends State<HomeScreen> {
           driverId: driverId,
           clientName: accident.fullname,
           location: locationString, // Include coordinates for parsing
-          amount: 500.0, // Default fare for accident response
           duration: 0, // Will be updated when trip is completed
           startTime: DateTime.now(),
           endTime: null,

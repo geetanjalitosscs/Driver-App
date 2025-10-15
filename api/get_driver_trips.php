@@ -26,7 +26,6 @@ try {
             client_name,
             location,
             timing,
-            amount,
             duration,
             start_time,
             end_time,
@@ -49,7 +48,6 @@ try {
     foreach ($trips as &$trip) {
         $trip['history_id'] = (int)$trip['history_id'];
         $trip['driver_id'] = (int)$trip['driver_id'];
-        $trip['amount'] = (float)$trip['amount'];
         $trip['duration'] = (int)$trip['duration'];
     }
     

@@ -84,7 +84,7 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
         Navigator.of(context).pop(true); // Return true to indicate success
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
+            content: Text('Trip completed successfully!'),
             backgroundColor: AppTheme.accentGreen,
           ),
         );
@@ -161,7 +161,6 @@ class _TripCompletionDialogState extends State<TripCompletionDialog> {
                   const SizedBox(height: 8),
                   _buildDetailRow('Location:', widget.trip.location),
                   _buildDetailRow('Client:', widget.trip.clientName),
-                  _buildDetailRow('Fare:', '₹${widget.trip.amount}'),
                   if (widget.trip.startTime != null)
                     _buildDetailRow('Started:', _formatDateTime(widget.trip.startTime!)),
                 ],

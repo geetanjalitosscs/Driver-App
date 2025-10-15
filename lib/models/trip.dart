@@ -4,7 +4,6 @@ class Trip {
   final String clientName;
   final String location;
   final DateTime? timing;
-  final double amount;
   final int duration; // in minutes
   final DateTime? startTime;
   final DateTime? endTime;
@@ -25,7 +24,6 @@ class Trip {
     required this.clientName,
     required this.location,
     this.timing,
-    required this.amount,
     required this.duration,
     this.startTime,
     this.endTime,
@@ -46,7 +44,6 @@ class Trip {
       clientName: json['client_name'] ?? '',
       location: json['location'] ?? '',
       timing: json['timing'] != null ? DateTime.parse(json['timing']) : null,
-      amount: (json['amount'] ?? 0).toDouble(),
       duration: json['duration'] ?? 0,
       startTime: json['start_time'] != null ? DateTime.parse(json['start_time']) : null,
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
@@ -68,7 +65,6 @@ class Trip {
       'client_name': clientName,
       'location': location,
       'timing': timing?.toIso8601String(),
-      'amount': amount,
       'duration': duration,
       'start_time': startTime?.toIso8601String(),
       'end_time': endTime?.toIso8601String(),
@@ -82,7 +78,6 @@ class Trip {
     String? clientName,
     String? location,
     DateTime? timing,
-    double? amount,
     int? duration,
     DateTime? startTime,
     DateTime? endTime,
@@ -101,7 +96,6 @@ class Trip {
       clientName: clientName ?? this.clientName,
       location: location ?? this.location,
       timing: timing ?? this.timing,
-      amount: amount ?? this.amount,
       duration: duration ?? this.duration,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,

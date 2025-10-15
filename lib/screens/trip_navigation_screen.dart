@@ -80,7 +80,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       print('Trip endLatitude: ${widget.trip.endLatitude}');
       print('Trip endLongitude: ${widget.trip.endLongitude}');
       print('Trip clientName: ${widget.trip.clientName}');
-      print('Trip amount: ${widget.trip.amount}');
+      print('Trip completed: ${widget.trip.historyId}');
 
       // Get current location
       final currentPos = await CentralizedApiService.getCurrentLocation();
@@ -335,7 +335,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
         children: [
           Text('Trip Duration: ${_formatDuration(_tripDuration)}'),
           Text('Distance Traveled: ${_tripDistance.toStringAsFixed(1)} km'),
-          Text('Fare: ₹${widget.trip.amount}'),
           const SizedBox(height: 16),
           const Text('Are you sure you want to complete this trip?'),
         ],
@@ -377,7 +376,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
             final driverId = authProvider.currentUser?.driverId ?? 'unknown';
             notificationProvider.addTripCompletedNotification(
               location: widget.trip.location,
-              amount: widget.trip.amount,
               tripId: widget.trip.historyId,
               driverId: driverId,
               vehicleNumber: widget.trip.clientName, // Use clientName as vehicle identifier
@@ -388,7 +386,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
               tripId: widget.trip.historyId,
               vehicle: widget.trip.clientName, // Use clientName instead of vehicleNumber
               location: widget.trip.endLocation,
-              earnings: widget.trip.amount,
             );
 
             // Refresh trip data to get updated amount and details
@@ -398,7 +395,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
             Navigator.of(context).pop(true);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Trip completed successfully! Fare: ₹${widget.trip.amount}'),
+                content: Text('Trip completed successfully!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -626,7 +623,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                   const SizedBox(height: 12),
                   _buildTripDetailRow('Client', widget.trip.clientName ?? 'N/A'),
                   _buildTripDetailRow('Location', widget.trip.location.split(',')[0]), // Show only address part
-                  _buildTripDetailRow('Fare', '₹${widget.trip.amount}'),
                   _buildTripDetailRow('Duration', _formatDuration(_tripDuration)),
                   _buildTripDetailRow('Distance', '${_tripDistance.toStringAsFixed(1)} km'),
                 ],
@@ -829,14 +825,6 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
                         icon: const Icon(Icons.refresh),
                         color: AppTheme.primaryBlue,
                         tooltip: 'Reload Trip Data',
-                      ),
-                      Text(
-                        '₹${widget.trip.amount}',
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.accentGreen,
-                        ),
                       ),
                     ],
                   ),

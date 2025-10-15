@@ -368,10 +368,9 @@ class NotificationService {
     required int tripId,
     required String vehicle,
     required String location,
-    required double earnings,
   }) async {
     final title = "✅ Trip Completed";
-    final message = "Trip #$tripId completed for vehicle $vehicle. Earnings: ₹$earnings";
+    final message = "Trip #$tripId completed for vehicle $vehicle.";
     
     print('🔔 Creating notification for completed trip ID: $tripId');
     
@@ -384,7 +383,6 @@ class NotificationService {
         'trip_id': tripId,
         'vehicle': vehicle,
         'location': location,
-        'earnings': earnings,
       }),
       type: 'trip_completed',
     );
