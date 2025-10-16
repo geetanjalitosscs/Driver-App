@@ -1857,13 +1857,28 @@ class _HomeScreenState extends State<HomeScreen> {
         // Format location string to include coordinates for trip navigation
         final locationString = '${accident.location}, Lat: ${accident.latitude}, Lng: ${accident.longitude}';
         
+        // Parse accepted_at time if available, otherwise use current time
+        DateTime? startTime;
+        if (accident.acceptedAt != null && accident.acceptedAt!.isNotEmpty) {
+          try {
+            startTime = DateTime.parse(accident.acceptedAt!);
+            print('Using accepted_at time: $startTime');
+          } catch (e) {
+            print('Error parsing accepted_at: $e, using current time');
+            startTime = DateTime.now();
+          }
+        } else {
+          print('No accepted_at time available, using current time');
+          startTime = DateTime.now();
+        }
+
         final trip = Trip(
           historyId: accident.id, // Use accident ID as trip ID
           driverId: driverId,
           clientName: accident.fullname,
           location: locationString, // Include coordinates for parsing
           duration: 0, // Will be updated when trip is completed
-          startTime: DateTime.now(),
+          startTime: startTime, // Use actual acceptance time
           endTime: null,
           createdAt: DateTime.now(),
           endLatitude: accident.latitude, // Add end coordinates

@@ -3,6 +3,7 @@ import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
 import '../services/api_service_endpoints.dart';
 import '../services/notification_service.dart';
+import '../screens/trip_navigation_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AccidentProvider extends ChangeNotifier {
@@ -512,6 +513,9 @@ class AccidentProvider extends ChangeNotifier {
       // Clear the accepted accident locally
       _acceptedAccident = null;
       notifyListeners();
+      
+      // Clear global timer state since accident is cancelled
+      TripNavigationScreen.clearGlobalTimer();
       
       print('Accident cancelled successfully');
     } catch (e) {

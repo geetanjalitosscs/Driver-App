@@ -29,6 +29,23 @@ class TripNavigationScreen extends StatefulWidget {
 
   @override
   State<TripNavigationScreen> createState() => _TripNavigationScreenState();
+  
+  // Static method to get current duration from global timer
+  static Duration? getCurrentDuration() {
+    if (_TripNavigationScreenState._globalTripStartTime != null) {
+      return DateTime.now().difference(_TripNavigationScreenState._globalTripStartTime!);
+    }
+    return null;
+  }
+  
+  // Static method to clear global timer state (call when trip is completed or cancelled)
+  static void clearGlobalTimer() {
+    _TripNavigationScreenState._globalTripTimer?.cancel();
+    _TripNavigationScreenState._globalTripTimer = null;
+    _TripNavigationScreenState._globalTripStartTime = null;
+    _TripNavigationScreenState._globalDurationCallback = null;
+    print('Global timer cleared');
+  }
 }
 
 class _TripNavigationScreenState extends State<TripNavigationScreen> {
@@ -52,6 +69,11 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   
   String _currentStep = 'Starting trip...';
   String _nextStep = '';
+  
+  // Static variables to preserve timer state across navigation
+  static DateTime? _globalTripStartTime;
+  static Timer? _globalTripTimer;
+  static Function(Duration)? _globalDurationCallback;
 
   @override
   void initState() {
@@ -62,7 +84,10 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   @override
   void dispose() {
     _locationUpdateTimer?.cancel();
-    _tripTimer?.cancel();
+    // Clear callback for this instance
+    _globalDurationCallback = null;
+    // Don't cancel the global timer - let it continue running
+    // _tripTimer?.cancel(); // Removed this line
     CentralizedApiService.stopTracking();
     super.dispose();
   }
@@ -121,7 +146,7 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
       // Start location tracking
       await _startLocationTracking();
 
-      // Start trip timer
+      // Always start timer (will use global timer if already running)
       _startTripTimer();
 
       // Automatically start navigation since we don't have a separate button
@@ -270,26 +295,64 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
   }
 
   void _startTripTimer() {
-    // Calculate initial duration from trip start time if available
-    if (widget.trip.startTime != null) {
-      final now = DateTime.now();
-      _tripDuration = now.difference(widget.trip.startTime!);
-    } else {
-      _tripDuration = Duration.zero;
+    // Use global timer if already running, otherwise start new one
+    if (_globalTripTimer != null && _globalTripTimer!.isActive) {
+      print('Global timer already running, using existing timer');
+      // Get current duration from global timer
+      final currentDuration = TripNavigationScreen.getCurrentDuration();
+      if (currentDuration != null) {
+        _tripDuration = currentDuration;
+        print('Restored duration from global timer: ${_tripDuration.inSeconds} seconds');
+      }
+      // Set callback for this instance
+      _globalDurationCallback = (duration) {
+        if (mounted) {
+          setState(() {
+            _tripDuration = duration;
+          });
+        }
+      };
+      return;
     }
     
-    _tripTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (widget.trip.startTime != null) {
-          // Calculate duration from actual trip start time
-          final now = DateTime.now();
-          _tripDuration = now.difference(widget.trip.startTime!);
-        } else {
-          // Fallback to timer-based calculation
-          _tripDuration = Duration(seconds: _tripDuration.inSeconds + 1);
-        }
-      });
+    // Set global start time if not already set
+    if (_globalTripStartTime == null) {
+      if (widget.trip.startTime != null) {
+        _globalTripStartTime = widget.trip.startTime;
+        print('Global timer started - Trip accepted at: ${widget.trip.startTime}');
+      } else {
+        _globalTripStartTime = DateTime.now();
+        print('No start time available, using current time: $_globalTripStartTime');
+      }
+    }
+    
+    // Calculate initial duration from global start time
+    final now = DateTime.now();
+    _tripDuration = now.difference(_globalTripStartTime!);
+    print('Current time: $now');
+    print('Initial duration: ${_tripDuration.inSeconds} seconds');
+    
+    // Set callback for this instance
+    _globalDurationCallback = (duration) {
+      if (mounted) {
+        setState(() {
+          _tripDuration = duration;
+        });
+      }
+    };
+    
+    // Start global timer
+    _globalTripTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      final duration = now.difference(_globalTripStartTime!);
+      
+      // Call the callback if it exists
+      if (_globalDurationCallback != null) {
+        _globalDurationCallback!(duration);
+      }
     });
+    
+    _tripTimer = _globalTripTimer;
   }
 
   Future<void> _startNavigation() async {
@@ -419,6 +482,9 @@ class _TripNavigationScreenState extends State<TripNavigationScreen> {
             // Refresh trip data to get updated amount and details
             final tripProvider = Provider.of<TripProvider>(context, listen: false);
             await tripProvider.loadCompletedTrips(widget.trip.driverId);
+
+            // Clear global timer state since trip is completed
+            TripNavigationScreen.clearGlobalTimer();
 
             Navigator.of(context).pop(true);
             ScaffoldMessenger.of(context).showSnackBar(

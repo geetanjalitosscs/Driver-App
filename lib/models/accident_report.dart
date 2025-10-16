@@ -15,6 +15,7 @@ class AccidentReport {
   final String createdAt;
   final String status;
   final String? driverStatus;
+  final String? acceptedAt;
 
   AccidentReport({
     required this.id,
@@ -31,6 +32,7 @@ class AccidentReport {
     required this.createdAt,
     required this.status,
     this.driverStatus,
+    this.acceptedAt,
   });
 
   factory AccidentReport.fromMap(Map<String, dynamic> map) {
@@ -74,6 +76,7 @@ class AccidentReport {
       createdAt: safeString(map['created_at']),
       status: safeString(map['status']),
       driverStatus: map['driver_status'] != null ? safeString(map['driver_status']) : null,
+      acceptedAt: map['accepted_at'] != null ? safeString(map['accepted_at']) : null,
     );
   }
 
@@ -128,6 +131,7 @@ class AccidentReport {
       createdAt: safeString(map['created_at']),
       status: 'pending', // Default status for API data
       driverStatus: map['driver_status'] != null ? safeString(map['driver_status']) : null,
+      acceptedAt: map['accepted_at'] != null ? safeString(map['accepted_at']) : null,
     );
   }
 
