@@ -172,6 +172,10 @@ class AuthProvider extends ChangeNotifier {
     required String aadharPhoto,
     required String licencePhoto,
     required String rcPhoto,
+    required String accountNumber,
+    required String bankName,
+    required String ifscCode,
+    required String accountHolderName,
   }) async {
     _setLoading(true);
     _clearError();
@@ -188,6 +192,10 @@ class AuthProvider extends ChangeNotifier {
         licencePhoto: licencePhoto,
         rcPhoto: rcPhoto,
         address: address,
+        accountNumber: accountNumber,
+        bankName: bankName,
+        ifscCode: ifscCode,
+        accountHolderName: accountHolderName,
       );
       
       print('Signup API response: $data'); // Debug log
@@ -206,12 +214,36 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       print('Signup error: $e'); // Debug log
-      // Check if it's a signup error (400 status) and show appropriate message
-      if (e.toString().contains('400') || e.toString().contains('signup failed')) {
-        _setError('Invalid credentials');
-      } else {
-        _setError('Network error: $e');
+      print('Signup error type: ${e.runtimeType}'); // Debug log
+      print('Signup error string: ${e.toString()}'); // Debug log
+      
+      // More specific error handling
+      String errorMessage = 'Network error: $e';
+      
+      // Check if the error message contains specific API error messages
+      if (e.toString().contains('Email already exists')) {
+        errorMessage = 'Email already exists';
+      } else if (e.toString().contains('Phone number already exists')) {
+        errorMessage = 'Phone number already exists';
+      } else if (e.toString().contains('Invalid email format')) {
+        errorMessage = 'Invalid email format';
+      } else if (e.toString().contains('Password must be at least 6 characters')) {
+        errorMessage = 'Password must be at least 6 characters long';
+      } else if (e.toString().contains('400')) {
+        errorMessage = 'Bad request - please check your information';
+      } else if (e.toString().contains('401')) {
+        errorMessage = 'Unauthorized - please try again';
+      } else if (e.toString().contains('403')) {
+        errorMessage = 'Forbidden - access denied';
+      } else if (e.toString().contains('404')) {
+        errorMessage = 'Service not found - please try again later';
+      } else if (e.toString().contains('500')) {
+        errorMessage = 'Server error - please try again later';
+      } else if (e.toString().contains('ClientException')) {
+        errorMessage = 'Network connection failed - please check your internet connection';
       }
+      
+      _setError(errorMessage);
       _setLoading(false);
       return false;
     }

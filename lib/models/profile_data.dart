@@ -12,6 +12,12 @@ class ProfileData {
   final String rcPhoto;
   final String kycStatus;
   final String createdAt;
+  
+  // Account details
+  final String? accountNumber;
+  final String? bankName;
+  final String? ifscCode;
+  final String? accountHolderName;
 
   ProfileData({
     required this.driverName,
@@ -27,6 +33,10 @@ class ProfileData {
     required this.rcPhoto,
     required this.kycStatus,
     required this.createdAt,
+    this.accountNumber,
+    this.bankName,
+    this.ifscCode,
+    this.accountHolderName,
   });
 
   // Helper method to safely get driver ID as integer
@@ -59,6 +69,10 @@ class ProfileData {
       rcPhoto: 'placeholder_rc.jpg',
       kycStatus: 'approved',
       createdAt: DateTime.now().toIso8601String(),
+      accountNumber: '1234567890',
+      bankName: 'Demo Bank',
+      ifscCode: 'DEMO0001234',
+      accountHolderName: 'Demo Driver',
     );
   }
 
@@ -77,6 +91,10 @@ class ProfileData {
     String? rcPhoto,
     String? kycStatus,
     String? createdAt,
+    String? accountNumber,
+    String? bankName,
+    String? ifscCode,
+    String? accountHolderName,
   }) {
     return ProfileData(
       driverName: driverName ?? this.driverName,
@@ -92,6 +110,10 @@ class ProfileData {
       rcPhoto: rcPhoto ?? this.rcPhoto,
       kycStatus: kycStatus ?? this.kycStatus,
       createdAt: createdAt ?? this.createdAt,
+      accountNumber: accountNumber ?? this.accountNumber,
+      bankName: bankName ?? this.bankName,
+      ifscCode: ifscCode ?? this.ifscCode,
+      accountHolderName: accountHolderName ?? this.accountHolderName,
     );
   }
 
@@ -111,6 +133,10 @@ class ProfileData {
       'rcPhoto': rcPhoto,
       'kycStatus': kycStatus,
       'createdAt': createdAt,
+      'accountNumber': accountNumber,
+      'bankName': bankName,
+      'ifscCode': ifscCode,
+      'accountHolderName': accountHolderName,
     };
   }
 
@@ -133,6 +159,10 @@ class ProfileData {
       rcPhoto: json['rc_photo'] ?? json['rcPhoto'] ?? '',
       kycStatus: json['kyc_status'] ?? json['kycStatus'] ?? 'pending',
       createdAt: json['created_at'] ?? json['createdAt'] ?? '',
+      accountNumber: json['account_number'] ?? json['accountNumber'],
+      bankName: json['bank_name'] ?? json['bankName'],
+      ifscCode: json['ifsc_code'] ?? json['ifscCode'],
+      accountHolderName: json['account_holder_name'] ?? json['accountHolderName'],
     );
   }
 }

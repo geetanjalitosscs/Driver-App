@@ -17,7 +17,7 @@ if (!$input) {
 }
 
 // Validate required fields
-$requiredFields = ['driver_name', 'email', 'password', 'number', 'address', 'vehicle_type', 'vehicle_number', 'aadhar_photo', 'licence_photo', 'rc_photo'];
+$requiredFields = ['driver_name', 'email', 'password', 'number', 'address', 'vehicle_type', 'vehicle_number', 'aadhar_photo', 'licence_photo', 'rc_photo', 'account_number', 'bank_name', 'ifsc_code', 'account_holder_name'];
 foreach ($requiredFields as $field) {
     if (!isset($input[$field]) || empty($input[$field])) {
         sendErrorResponse("Field '$field' is required");
@@ -34,6 +34,12 @@ $vehicleNumber = $input['vehicle_number'];
 $aadharPhoto = $input['aadhar_photo'];
 $licencePhoto = $input['licence_photo'];
 $rcPhoto = $input['rc_photo'];
+
+// Account details
+$accountNumber = $input['account_number'];
+$bankName = $input['bank_name'];
+$ifscCode = $input['ifsc_code'];
+$accountHolderName = $input['account_holder_name'];
 
 // Function to save base64 image to file
 function saveBase64Image($base64Data, $driverId, $photoType, $uploadsDir) {
@@ -127,8 +133,12 @@ try {
             aadhar_photo,
             licence_photo,
             rc_photo,
+            account_number,
+            bank_name,
+            ifsc_code,
+            account_holder_name,
             kyc_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
     
     // Hash the password before storing
@@ -144,7 +154,11 @@ try {
         $vehicleNumber,
         'pending_aadhar', // Placeholder for aadhar photo
         'pending_licence', // Placeholder for licence photo
-        'pending_rc' // Placeholder for rc photo
+        'pending_rc', // Placeholder for rc photo
+        $accountNumber,
+        $bankName,
+        $ifscCode,
+        $accountHolderName,
     ]);
 
     $driverId = $pdo->lastInsertId();

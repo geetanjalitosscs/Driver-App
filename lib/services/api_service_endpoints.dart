@@ -168,6 +168,10 @@ class CentralizedApiService {
     required String licencePhoto,
     required String rcPhoto,
     String address = 'Default Address',
+    required String accountNumber,
+    required String bankName,
+    required String ifscCode,
+    required String accountHolderName,
   }) async {
     try {
       final requestBody = {
@@ -181,29 +185,65 @@ class CentralizedApiService {
         'licence_photo': licencePhoto,
         'rc_photo': rcPhoto,
         'address': address,
+        'account_number': accountNumber,
+        'bank_name': bankName,
+        'ifsc_code': ifscCode,
+        'account_holder_name': accountHolderName,
       };
       
-      print('Signup request body keys: ${requestBody.keys.toList()}');
-      print('Aadhar photo length: ${aadharPhoto.length}');
-      print('Licence photo length: ${licencePhoto.length}');
-      print('RC photo length: ${rcPhoto.length}');
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.signup);
+      
+      print('🔐 SIGNUP DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 Request Body Keys: ${requestBody.keys.toList()}');
+      print('📤 Driver Name: $name');
+      print('📤 Email: $email');
+      print('📤 Phone: $phone');
+      print('📤 Vehicle Number: $vehicleNumber');
+      print('📤 Vehicle Type: $vehicleType');
+      print('📤 Address: $address');
+      print('📤 Aadhar photo length: ${aadharPhoto.length}');
+      print('📤 Licence photo length: ${licencePhoto.length}');
+      print('📤 RC photo length: ${rcPhoto.length}');
+      print('🌐 Base URL: ${ApiEndpoints.accidentBaseUrl}');
+      print('🔗 Endpoint: ${ApiEndpoints.signup}');
       
       final response = await http.post(
-        Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.signup)),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestBody),
       );
 
-      print('Signup response status: ${response.statusCode}');
-      print('Signup response body: ${response.body}');
+      print('📥 Signup Response Status: ${response.statusCode}');
+      print('📥 Signup Response Headers: ${response.headers}');
+      print('📥 Signup Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final responseData = json.decode(response.body);
+        print('✅ Signup Success: $responseData');
+        return responseData;
       } else {
-        throw Exception('Signup failed: ${response.statusCode}');
+        print('❌ Signup Failed - Status: ${response.statusCode}');
+        print('❌ Error Response: ${response.body}');
+        
+        // Try to parse the error response as JSON
+        try {
+          final errorData = json.decode(response.body);
+          if (errorData['error'] != null) {
+            throw Exception(errorData['error']);
+          }
+        } catch (jsonError) {
+          // If JSON parsing fails, use the raw response
+        }
+        
+        throw Exception('Signup failed: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('Signup API error: $e');
+      print('💥 Signup Exception: $e');
+      print('💥 Exception Type: ${e.runtimeType}');
+      if (e is http.ClientException) {
+        print('💥 Client Exception Details: ${e.message}');
+      }
       throw Exception('Signup error: $e');
     }
   }

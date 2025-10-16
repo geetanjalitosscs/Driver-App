@@ -66,6 +66,10 @@ try {
             aadhar_photo,
             licence_photo,
             rc_photo,
+            account_number,
+            bank_name,
+            ifsc_code,
+            account_holder_name,
             created_at
         FROM drivers 
         WHERE id = ?
@@ -90,6 +94,10 @@ try {
         'aadhar_photo' => getUploadsUrl($driver['aadhar_photo']),
         'licence_photo' => getUploadsUrl($driver['licence_photo']),
         'rc_photo' => getUploadsUrl($driver['rc_photo']),
+        'account_number' => $driver['account_number'],
+        'bank_name' => $driver['bank_name'],
+        'ifsc_code' => $driver['ifsc_code'],
+        'account_holder_name' => $driver['account_holder_name'],
         'created_at' => $driver['created_at'],
     ];
 

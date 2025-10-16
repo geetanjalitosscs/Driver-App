@@ -57,23 +57,34 @@ try {
         exit;
     }
 
-    // Prepare account details as JSON
-    $account_details = json_encode([
-        'account_number' => $account_number,
-        'bank_name' => $bank_name,
-        'ifsc_code' => $ifsc_code,
-        'account_holder_name' => $account_holder_name,
-        'updated_at' => date('Y-m-d H:i:s')
+    // Update driver's account details in separate columns
+    $stmt = $pdo->prepare("
+        UPDATE drivers 
+        SET 
+            account_number = ?,
+            bank_name = ?,
+            ifsc_code = ?,
+            account_holder_name = ?,
+            updated_at = NOW()
+        WHERE id = ?
+    ");
+    $stmt->execute([
+        $account_number,
+        $bank_name,
+        $ifsc_code,
+        $account_holder_name,
+        $driver_id
     ]);
-
-    // Update driver's account details
-    $stmt = $pdo->prepare("UPDATE drivers SET account_details = ?, updated_at = NOW() WHERE id = ?");
-    $stmt->execute([$account_details, $driver_id]);
 
     echo json_encode([
         'success' => true,
         'message' => 'Account details saved successfully',
-        'account_details' => json_decode($account_details)
+        'account_details' => [
+            'account_number' => $account_number,
+            'bank_name' => $bank_name,
+            'ifsc_code' => $ifsc_code,
+            'account_holder_name' => $account_holder_name,
+        ]
     ]);
 
 } catch (PDOException $e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -33,6 +34,12 @@ class _SignupScreenState extends State<SignupScreen> {
   String _selectedVehicleType = 'Ambulance';
   final _vehicleNumberController = TextEditingController();
   
+  // Account details controllers
+  final _accountNumberController = TextEditingController();
+  final _bankNameController = TextEditingController();
+  final _ifscCodeController = TextEditingController();
+  final _accountHolderNameController = TextEditingController();
+  
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
@@ -51,11 +58,34 @@ class _SignupScreenState extends State<SignupScreen> {
     _confirmPasswordController.dispose();
     _addressController.dispose();
     _vehicleNumberController.dispose();
+    
+    // Account details controllers
+    _accountNumberController.dispose();
+    _bankNameController.dispose();
+    _ifscCodeController.dispose();
+    _accountHolderNameController.dispose();
+    
     super.dispose();
   }
 
   Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Validate photos are selected
+    if (_aadharPhotoPath == null) {
+      _showErrorSnackBar('Please select Aadhar Card photo');
+      return;
+    }
+    
+    if (_licencePhotoPath == null) {
+      _showErrorSnackBar('Please select Driving Licence photo');
+      return;
+    }
+    
+    if (_rcPhotoPath == null) {
+      _showErrorSnackBar('Please select RC photo');
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -68,6 +98,22 @@ class _SignupScreenState extends State<SignupScreen> {
       final uploadedAadhar = await _encodePhotoAsBase64(_aadharPhotoPath);
       final uploadedLicence = await _encodePhotoAsBase64(_licencePhotoPath);
       final uploadedRc = await _encodePhotoAsBase64(_rcPhotoPath);
+      
+      // Double-check that photos were encoded successfully
+      if (uploadedAadhar == null || uploadedAadhar.isEmpty) {
+        _showErrorSnackBar('Failed to process Aadhar Card photo. Please try again.');
+        return;
+      }
+      
+      if (uploadedLicence == null || uploadedLicence.isEmpty) {
+        _showErrorSnackBar('Failed to process Driving Licence photo. Please try again.');
+        return;
+      }
+      
+      if (uploadedRc == null || uploadedRc.isEmpty) {
+        _showErrorSnackBar('Failed to process RC photo. Please try again.');
+        return;
+      }
 
       final success = await authProvider.signup(
         name: _nameController.text.trim(),
@@ -80,6 +126,10 @@ class _SignupScreenState extends State<SignupScreen> {
         aadharPhoto: uploadedAadhar ?? '',
         licencePhoto: uploadedLicence ?? '',
         rcPhoto: uploadedRc ?? '',
+        accountNumber: _accountNumberController.text.trim(),
+        bankName: _bankNameController.text.trim(),
+        ifscCode: _ifscCodeController.text.trim(),
+        accountHolderName: _accountHolderNameController.text.trim(),
       );
 
       if (success && mounted) {
@@ -372,6 +422,118 @@ class _SignupScreenState extends State<SignupScreen> {
                       
                       const SizedBox(height: 12),
                       
+                      // Account Details Section
+                      Text(
+                        'Bank Account Details',
+                        style: GoogleFonts.roboto(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Account Holder Name
+                      TextFormField(
+                        controller: _accountHolderNameController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: true,
+                        decoration: InputDecoration(
+                          labelText: 'Account Holder Name',
+                          prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter account holder name';
+                          }
+                          return null;
+                        },
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Bank Name
+                      TextFormField(
+                        controller: _bankNameController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: true,
+                        autocorrect: true,
+                        decoration: InputDecoration(
+                          labelText: 'Bank Name',
+                          prefixIcon: const Icon(Icons.account_balance_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter bank name';
+                          }
+                          return null;
+                        },
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Account Number
+                      TextFormField(
+                        controller: _accountNumberController,
+                        keyboardType: TextInputType.number,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          labelText: 'Account Number',
+                          prefixIcon: const Icon(Icons.credit_card_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter account number';
+                          }
+                          if (value.length < 9) {
+                            return 'Account number must be at least 9 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // IFSC Code
+                      TextFormField(
+                        controller: _ifscCodeController,
+                        enableInteractiveSelection: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textCapitalization: TextCapitalization.characters,
+                        decoration: InputDecoration(
+                          labelText: 'IFSC Code',
+                          prefixIcon: const Icon(Icons.qr_code_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter IFSC code';
+                          }
+                          if (value.length != 11) {
+                            return 'IFSC code must be 11 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
                       // Document Upload Section
                       Text(
                         'Upload Documents',
@@ -616,13 +778,74 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _selectFile(String label, Function(String) onFileSelected) async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: false,
+      print('🔍 Starting file picker for: $label');
+      
+      // Show options dialog
+      final result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Select $label'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Choose from Gallery'),
+                onTap: () => Navigator.pop(context, 'gallery'),
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Take Photo'),
+                onTap: () => Navigator.pop(context, 'camera'),
+              ),
+            ],
+          ),
+        ),
       );
 
-      if (result != null && result.files.single.path != null) {
-        final filePath = result.files.single.path!;
+      if (result == null) {
+        print('🔍 User cancelled selection');
+        return;
+      }
+
+      String? filePath;
+      
+      if (result == 'gallery') {
+        // Use file picker for gallery
+        FilePickerResult? pickerResult = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: false,
+        );
+        
+        if (pickerResult != null && pickerResult.files.single.path != null) {
+          filePath = pickerResult.files.single.path!;
+        }
+      } else if (result == 'camera') {
+        // Use image picker for camera
+        try {
+          final ImagePicker picker = ImagePicker();
+          final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+          if (photo != null) {
+            filePath = photo.path;
+          }
+        } catch (e) {
+          print('🔍 Camera error: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Camera not available: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+      }
+
+      print('🔍 File picker result: ${filePath != null ? 'SUCCESS' : 'CANCELLED'}');
+      
+      if (filePath != null) {
+        print('🔍 Selected file path: $filePath');
+        print('🔍 File exists: ${File(filePath).existsSync()}');
+        print('🔍 File size: ${File(filePath).lengthSync()} bytes');
         
         onFileSelected(filePath);
         
@@ -632,8 +855,11 @@ class _SignupScreenState extends State<SignupScreen> {
             backgroundColor: AppTheme.accentGreen,
           ),
         );
+      } else {
+        print('🔍 No file selected or path is null');
       }
     } catch (e) {
+      print('🔍 File picker error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error selecting file: $e'),
@@ -641,6 +867,15 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 }
 
@@ -669,12 +904,37 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<String?> _encodePhotoAsBase64(String? filePath) async {
     try {
-      if (filePath == null) return null;
-      final bytes = await File(filePath).readAsBytes();
+      print('🔍 Encoding photo: $filePath');
+      if (filePath == null) {
+        print('🔍 File path is null, returning null');
+        return null;
+      }
+      
+      final file = File(filePath);
+      if (!file.existsSync()) {
+        print('🔍 File does not exist: $filePath');
+        return null;
+      }
+      
+      final bytes = await file.readAsBytes();
+      print('🔍 File size: ${bytes.length} bytes');
+      
+      if (bytes.isEmpty) {
+        print('🔍 File is empty');
+        return null;
+      }
+      
       final mime = filePath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
       final b64 = base64Encode(bytes);
-      return 'data:$mime;base64,$b64';
-    } catch (_) {
-      return null;
-    }
+      final result = 'data:$mime;base64,$b64';
+      
+      print('🔍 Base64 length: ${b64.length}');
+      print('🔍 MIME type: $mime');
+      print('🔍 Result preview: ${result.substring(0, 50)}...');
+      
+      return result;
+  } catch (e) {
+    print('🔍 Error encoding photo: $e');
+    return null;
   }
+}

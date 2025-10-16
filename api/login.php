@@ -46,6 +46,10 @@ try {
             licence_photo,
             rc_photo,
             kyc_status,
+            account_number,
+            bank_name,
+            ifsc_code,
+            account_holder_name,
             created_at
         FROM drivers 
         WHERE email = ?
@@ -89,6 +93,10 @@ try {
             'licence_photo' => $driver['licence_photo'],
             'rc_photo' => $driver['rc_photo'],
             'kyc_status' => $driver['kyc_status'],
+            'account_number' => $driver['account_number'],
+            'bank_name' => $driver['bank_name'],
+            'ifsc_code' => $driver['ifsc_code'],
+            'account_holder_name' => $driver['account_holder_name'],
             'created_at' => $driver['created_at'],
         ];
         
@@ -119,6 +127,10 @@ try {
         'licence_photo' => getUploadsUrl($driver['licence_photo']),
         'rc_photo' => getUploadsUrl($driver['rc_photo']),
         'kyc_status' => $driver['kyc_status'],
+        'account_number' => $driver['account_number'],
+        'bank_name' => $driver['bank_name'],
+        'ifsc_code' => $driver['ifsc_code'],
+        'account_holder_name' => $driver['account_holder_name'],
         'created_at' => $driver['created_at'],
     ];
 
