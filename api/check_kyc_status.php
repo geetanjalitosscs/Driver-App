@@ -33,6 +33,9 @@ $driverId = $input['driver_id'];
 // Debug logging
 error_log("KYC Status Check - Driver ID: " . $driverId);
 
+// Check driver status before proceeding
+checkDriverStatus($driverId);
+
 try {
     // Get driver data with current KYC status
     $stmt = $pdo->prepare("

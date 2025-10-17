@@ -26,6 +26,9 @@ foreach ($required_fields as $field) {
     }
 }
 
+// Check driver status before proceeding
+checkDriverStatus($input['driver_id']);
+
 $driver_id = (int)$input['driver_id'];
 $amount = (float)$input['amount'];
 $bank_account_number = trim($input['bank_account_number']);

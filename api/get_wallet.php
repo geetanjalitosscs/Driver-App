@@ -18,6 +18,9 @@ if ($driver_id <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Calculate total earnings for this driver
     $stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) as total_earnings FROM earnings WHERE driver_id = ?");

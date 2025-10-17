@@ -25,6 +25,9 @@ if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Calculate distance using Haversine formula - Fixed 10km radius
     $stmt = $pdo->prepare("

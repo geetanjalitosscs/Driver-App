@@ -44,6 +44,9 @@ try {
         exit();
     }
     
+    // Check driver status before proceeding
+    checkDriverStatus($driver_id);
+    
     // Start transaction
     $conn->begin_transaction();
     

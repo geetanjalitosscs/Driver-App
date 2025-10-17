@@ -139,6 +139,39 @@ function getApiBaseUrl() {
 }
 
 /**
+ * Check driver status and block access if rejected
+ * 
+ * @param int $driver_id The driver ID to check
+ * @return void Exits with error response if driver is rejected
+ */
+function checkDriverStatus($driver_id) {
+    try {
+        $pdo = getDatabaseConnection();
+        
+        // Get driver's KYC status
+        $stmt = $pdo->prepare("SELECT kyc_status, driver_name FROM drivers WHERE id = ?");
+        $stmt->execute([$driver_id]);
+        $driver = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$driver) {
+            sendErrorResponse('Driver not found', 404);
+        }
+        
+        // Check if driver status is rejected
+        if ($driver['kyc_status'] === 'rejected') {
+            sendErrorResponse('Your account is rejected contact apatkalindia@gmail.com', 403);
+        }
+        
+        // If status is pending, allow access but could add warning if needed
+        // For now, we only block 'rejected' status
+        
+    } catch (PDOException $e) {
+        error_log("Driver status check failed: " . $e->getMessage());
+        sendErrorResponse('Unable to verify driver status', 500);
+    }
+}
+
+/**
  * Get site URL
  * 
  * @return string Site URL

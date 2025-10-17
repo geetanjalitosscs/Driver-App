@@ -17,6 +17,9 @@ if ($driver_id <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Fetch completed trips for the driver (assuming trips with end_time are completed)
     $stmt = $pdo->prepare("

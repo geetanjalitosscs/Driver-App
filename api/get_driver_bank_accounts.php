@@ -17,6 +17,9 @@ if ($driver_id <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Get bank accounts for the driver, ordered by most recent first
     $stmt = $pdo->prepare("

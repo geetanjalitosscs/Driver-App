@@ -17,6 +17,9 @@ if ($driverId <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driverId);
+
 try {
     // Get earnings for the current week (Monday to Sunday)
     $stmt = $pdo->prepare("

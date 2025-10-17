@@ -18,6 +18,9 @@ if ($driverId <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driverId);
+
 try {
     // Build date condition based on period
     $dateCondition = '';

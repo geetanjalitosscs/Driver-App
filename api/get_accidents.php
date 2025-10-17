@@ -6,9 +6,25 @@ setApiHeaders();
 try {
     $pdo = getDatabaseConnection();
     
+    // Get driver ID from query parameter or POST data
+    $driver_id = null;
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $driver_id = isset($input['driver_id']) ? (int)$input['driver_id'] : 0;
+    }
+    
+    if ($driver_id <= 0) {
+        sendErrorResponse('Driver ID is required');
+    }
+    
+    // Check driver status before proceeding
+    checkDriverStatus($driver_id);
+    
     // Handle POST requests for updating accident status
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
+        // Input already parsed above for driver_id check
         
         if (isset($input['action'])) {
             if ($input['action'] === 'accept_accident') {

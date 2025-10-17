@@ -9,6 +9,16 @@ try {
     sendErrorResponse('Database connection failed: ' . $e->getMessage());
 }
 
+// Get driver ID from query parameter
+$driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
+
+if ($driver_id <= 0) {
+    sendErrorResponse('Driver ID is required');
+}
+
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 // Get parameters from query string
 $latitude = isset($_GET['latitude']) ? (float)$_GET['latitude'] : null;
 $longitude = isset($_GET['longitude']) ? (float)$_GET['longitude'] : null;

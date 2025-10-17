@@ -18,6 +18,9 @@ if ($driver_id <= 0) {
     exit;
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Get wallet transactions (earnings, payments, withdrawals, etc.)
     // This combines data from earnings, payments, and withdrawals tables

@@ -23,6 +23,9 @@ if (empty($currentPassword) || empty($newPassword)) {
     sendErrorResponse('Current password and new password are required', 400);
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driverId);
+
 if (strlen($newPassword) < 6) {
     sendErrorResponse('New password must be at least 6 characters long', 400);
 }

@@ -40,6 +40,9 @@ if (!in_array($photo_type, ['aadhar', 'licence', 'rc'])) {
     sendErrorResponse('Invalid photo type. Must be: aadhar, licence, or rc');
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 // Validate base64 data
 if (!preg_match('/^data:image\/(jpeg|jpg|png|gif);base64,/', $photo_data)) {
     sendErrorResponse('Invalid photo data format. Expected base64 encoded image');

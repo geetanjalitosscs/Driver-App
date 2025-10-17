@@ -21,6 +21,9 @@ if (!in_array($photo_type, ['aadhar', 'licence', 'rc'])) {
     sendErrorResponse('Invalid photo type. Must be: aadhar, licence, or rc');
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 try {
     // Get driver photo path
     $stmt = $pdo->prepare("SELECT driver_name, {$photo_type}_photo FROM drivers WHERE id = ?");

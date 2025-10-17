@@ -42,6 +42,9 @@ if (!in_array($photo_type, ['aadhar', 'licence', 'rc'])) {
     sendErrorResponse('Invalid photo type. Must be: aadhar, licence, or rc');
 }
 
+// Check driver status before proceeding
+checkDriverStatus($driver_id);
+
 $file = $_FILES['photo'];
 
 // Validate file type

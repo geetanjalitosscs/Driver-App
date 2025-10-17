@@ -24,6 +24,9 @@ $address = $input['address'] ?? '';
 $vehicleType = $input['vehicle_type'] ?? '';
 $vehicleNumber = $input['vehicle_number'] ?? '';
 
+// Check driver status before proceeding
+checkDriverStatus($driverId);
+
 try {
     // Update driver profile
     $stmt = $pdo->prepare("
