@@ -414,7 +414,7 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
         // and displayed on the home screen with continue/cancel buttons
         
         // Refresh the pending count in the background
-        provider.refreshPendingCount();
+        provider.refreshPendingCount(driverId: int.tryParse(driverId));
       } else {
         _showErrorDialog('Failed to accept accident report');
       }

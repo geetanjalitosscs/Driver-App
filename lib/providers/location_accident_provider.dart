@@ -104,6 +104,7 @@ class LocationAccidentProvider with ChangeNotifier {
 
   /// Get accidents by specific location
   Future<void> getAccidentsByLocation({
+    required int driverId,
     required double latitude,
     required double longitude,
     String status = 'pending',
@@ -113,6 +114,7 @@ class LocationAccidentProvider with ChangeNotifier {
 
     try {
       final accidents = await LocationAccidentService.getAccidentsByLocation(
+        driverId: driverId,
         latitude: latitude,
         longitude: longitude,
         status: status,

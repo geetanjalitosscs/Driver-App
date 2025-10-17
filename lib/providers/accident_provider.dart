@@ -592,9 +592,9 @@ class AccidentProvider extends ChangeNotifier {
   }
 
   /// Refresh pending count from API
-  Future<void> refreshPendingCount() async {
+  Future<void> refreshPendingCount({int? driverId}) async {
     try {
-      _allAccidents = await CentralizedApiService.getAccidents();
+      _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
       _applyFilter();
       notifyListeners();
     } catch (e) {

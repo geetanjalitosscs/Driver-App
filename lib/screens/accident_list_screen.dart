@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/accident_report.dart';
 import '../models/accident_filter.dart';
 import '../widgets/common/app_button.dart';
@@ -24,7 +25,9 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-      accidentProvider.loadAccidents();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final driverId = authProvider.currentUser?.driverIdAsInt;
+      accidentProvider.loadAccidents(driverId: driverId);
     });
   }
 
@@ -55,7 +58,11 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
           Consumer<AccidentProvider>(
             builder: (context, accidentProvider, child) {
               return IconButton(
-                onPressed: () => accidentProvider.refreshAccidents(),
+                onPressed: () {
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final driverId = authProvider.currentUser?.driverIdAsInt;
+                  accidentProvider.refreshAccidents(driverId: driverId);
+                },
                 icon: const Icon(Icons.refresh),
                 tooltip: 'Refresh',
               );
@@ -118,7 +125,9 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
                 text: 'Retry',
                 onPressed: () {
                   final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-                  accidentProvider.loadAccidents();
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final driverId = authProvider.currentUser?.driverIdAsInt;
+                  accidentProvider.loadAccidents(driverId: driverId);
                 },
                 variant: AppButtonVariant.primary,
               ),

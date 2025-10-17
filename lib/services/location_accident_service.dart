@@ -23,12 +23,14 @@ class LocationAccidentService {
 
   /// Get accidents by specific location coordinates
   static Future<List<AccidentReport>> getAccidentsByLocation({
+    required int driverId,
     required double latitude,
     required double longitude,
     String status = 'pending',
   }) async {
     try {
       return await CentralizedApiService.getAccidentsByLocation(
+        driverId: driverId,
         latitude: latitude,
         longitude: longitude,
         status: status,

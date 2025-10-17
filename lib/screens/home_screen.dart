@@ -135,7 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (mounted) {
         final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-        accidentProvider.refreshPendingCount();
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final driverId = authProvider.currentUser?.driverIdAsInt;
+        accidentProvider.refreshPendingCount(driverId: driverId);
         // Also check for profile photo updates
         _loadProfilePhoto();
       }
@@ -293,7 +295,9 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-        accidentProvider.refreshPendingCount();
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final driverId = authProvider.currentUser?.driverIdAsInt;
+        accidentProvider.refreshPendingCount(driverId: driverId);
       }
     });
   }
@@ -820,7 +824,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           _saveOnDutyState(true); // Save state
                           // Refresh accident count when going online
                           final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-                          accidentProvider.refreshPendingCount();
+                          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                          final driverId = authProvider.currentUser?.driverIdAsInt;
+                          accidentProvider.refreshPendingCount(driverId: driverId);
                         },
                       ),
                     ),
@@ -863,7 +869,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           _saveOnDutyState(true); // Save state
                           // Refresh accident count when going online
                           final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
-                          accidentProvider.refreshPendingCount();
+                          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                          final driverId = authProvider.currentUser?.driverIdAsInt;
+                          accidentProvider.refreshPendingCount(driverId: driverId);
                         },
                       ),
                     ),
@@ -1047,7 +1055,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       _showAccidentReports();
                       // Refresh count in background
-                      accidentProvider.refreshPendingCount();
+                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      final driverId = authProvider.currentUser?.driverIdAsInt;
+                      accidentProvider.refreshPendingCount(driverId: driverId);
                     },
                   );
                 },

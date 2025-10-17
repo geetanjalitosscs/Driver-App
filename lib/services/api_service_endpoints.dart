@@ -805,6 +805,7 @@ class CentralizedApiService {
 
   /// Get Accidents by Location API
   static Future<List<AccidentReport>> getAccidentsByLocation({
+    required int driverId,
     required double latitude,
     required double longitude,
     String status = 'pending',
@@ -812,6 +813,7 @@ class CentralizedApiService {
     try {
       final uri = Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.getAccidentsByLocation)).replace(
         queryParameters: {
+          'driver_id': driverId.toString(),
           'latitude': latitude.toString(),
           'longitude': longitude.toString(),
           'status': status,
@@ -899,11 +901,14 @@ class CentralizedApiService {
   /// Get Accidents API
   static Future<List<AccidentReport>> getAccidents({int? driverId}) async {
     try {
-      // Build URL with driver_id parameter if provided
-      String baseUrl = ApiEndpoints.getAccidentUrl(ApiEndpoints.getAccidents);
-      if (driverId != null) {
-        baseUrl += '?driver_id=$driverId';
+      // Driver ID is required for this API
+      if (driverId == null) {
+        throw Exception('Driver ID is required for getAccidents API');
       }
+      
+      // Build URL with driver_id parameter
+      String baseUrl = ApiEndpoints.getAccidentUrl(ApiEndpoints.getAccidents);
+      baseUrl += '?driver_id=$driverId';
       
       final urls = [
         baseUrl,

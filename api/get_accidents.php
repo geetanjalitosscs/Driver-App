@@ -15,12 +15,10 @@ try {
         $driver_id = isset($input['driver_id']) ? (int)$input['driver_id'] : 0;
     }
     
-    if ($driver_id <= 0) {
-        sendErrorResponse('Driver ID is required');
+    // Check driver status before proceeding (skip for cancel operations)
+    if ($driver_id > 0) {
+        checkDriverStatus($driver_id);
     }
-    
-    // Check driver status before proceeding
-    checkDriverStatus($driver_id);
     
     // Handle POST requests for updating accident status
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -32,6 +30,11 @@ try {
                 $accident_id = intval($input['accident_id']);
                 $driver_id = intval($input['driver_id']);
                 $vehicle_number = trim($input['vehicle_number']);
+                
+                // Additional driver status check for accept operation
+                if ($driver_id <= 0) {
+                    sendErrorResponse('Driver ID is required for accepting accident');
+                }
                 
                 // Fetch driver name from drivers table
                 $driverStmt = $pdo->prepare("SELECT driver_name FROM drivers WHERE id = ?");
@@ -75,16 +78,23 @@ try {
                 error_log("=== TRIP COMPLETION COORDINATES DEBUG ===");
                 error_log("Driver latitude: $driver_latitude");
                 error_log("Driver longitude: $driver_longitude");
-                error_log("Accident latitude: " . $accident['latitude']);
-                error_log("Accident longitude: " . $accident['longitude']);
                 
                 if ($confirmed) {
+                    // Additional driver status check for complete operation
+                    if ($driver_id <= 0) {
+                        sendErrorResponse('Driver ID is required for completing accident');
+                    }
+                    
                     // First, get accident details to create trip
                     $accidentStmt = $pdo->prepare("SELECT * FROM accidents WHERE id = ?");
                     $accidentStmt->execute([$accident_id]);
                     $accident = $accidentStmt->fetch(PDO::FETCH_ASSOC);
                     
                     if ($accident) {
+                        // Debug logging for accident coordinates
+                        error_log("Accident latitude: " . $accident['latitude']);
+                        error_log("Accident longitude: " . $accident['longitude']);
+                        
                         // Update accident status
                         $updateStmt = $pdo->prepare("UPDATE accidents SET 
                             driver_status = 'completed',
@@ -143,9 +153,6 @@ try {
                             error_log("=== END DEBUG ===");
                             
                             // Insert trip record using accident ID as trip ID
-                            // Temporarily disable auto-increment to force specific ID
-                            $pdo->exec("SET SESSION sql_mode = 'NO_AUTO_VALUE_ON_ZERO'");
-                            
                             // First check if trip with this ID already exists
                             $checkStmt = $pdo->prepare("SELECT history_id FROM trips WHERE history_id = ?");
                             $checkStmt->execute([$accident_id]);
@@ -202,6 +209,7 @@ try {
                     }
                 } else {
                     // Cancel accident - reset all driver-related fields to NULL
+                    // No driver ID required for cancel operation
                     $cancelStmt = $pdo->prepare("UPDATE accidents SET 
                         driver_status = NULL,
                         driver_details = NULL,
@@ -209,10 +217,15 @@ try {
                         completed_at = NULL,
                         completion_confirmed = FALSE,
                         status = 'pending'
-                        WHERE id = ?");
+                        WHERE id = ? AND status = 'investigating'");
                     
                     if ($cancelStmt->execute([$accident_id])) {
-                        echo json_encode(['success' => true, 'message' => 'Accident cancelled successfully']);
+                        $affected_rows = $cancelStmt->rowCount();
+                        if ($affected_rows > 0) {
+                            echo json_encode(['success' => true, 'message' => 'Accident cancelled successfully', 'affected_rows' => $affected_rows]);
+                        } else {
+                            echo json_encode(['success' => false, 'message' => 'No rows updated - accident may not be in investigating status', 'affected_rows' => $affected_rows]);
+                        }
                     } else {
                         echo json_encode(['success' => false, 'message' => 'Failed to cancel accident']);
                     }
