@@ -218,6 +218,7 @@ try {
             INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
             WHERE a.status = 'pending' 
             AND (a.driver_status IS NULL OR a.driver_status = 'available')
+            AND c.status = 'paid'
             ORDER BY a.created_at DESC
         ");
         error_log("Using driver_status filter with case-insensitive client matching (collation fixed)");
@@ -227,6 +228,7 @@ try {
             SELECT a.* FROM accidents a 
             INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
             WHERE a.status = 'pending' 
+            AND c.status = 'paid'
             ORDER BY a.created_at DESC
         ");
         error_log("Driver_status column not found, using simple query with case-insensitive client matching (collation fixed)");

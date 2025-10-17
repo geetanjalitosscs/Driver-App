@@ -44,7 +44,9 @@ try {
                 )
             ) AS distance_km
         FROM accidents a
+        INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
         WHERE a.status = ?
+        AND c.status = 'paid'
         HAVING distance_km <= ?
         ORDER BY distance_km ASC, a.created_at DESC
     ");
