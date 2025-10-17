@@ -276,12 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                   Navigator.of(context).pop();
                 } else if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(authProvider.errorMessage ?? 'Password change failed'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  AppErrorDialog.show(context, authProvider.errorMessage ?? 'Password change failed');
                 }
               }
             },

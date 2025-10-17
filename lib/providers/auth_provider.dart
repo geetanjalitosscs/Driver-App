@@ -376,10 +376,37 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Network error: $e');
+      // Extract the actual error message from the exception
+      String errorMessage = _cleanErrorMessage(e.toString());
+      _setError(errorMessage);
       _setLoading(false);
       return false;
     }
+  }
+
+  // Helper method to clean error messages
+  String _cleanErrorMessage(String errorMessage) {
+    // Remove common exception prefixes
+    if (errorMessage.contains('Exception: ')) {
+      errorMessage = errorMessage.split('Exception: ').last;
+    }
+    
+    // Remove common API error prefixes
+    List<String> prefixesToRemove = [
+      'Password change error: ',
+      'Profile update error: ',
+      'Network error: ',
+      'Login error: ',
+      'Signup error: ',
+    ];
+    
+    for (String prefix in prefixesToRemove) {
+      if (errorMessage.contains(prefix)) {
+        errorMessage = errorMessage.replaceFirst(prefix, '');
+      }
+    }
+    
+    return errorMessage.trim();
   }
 
   // Change password method
@@ -411,7 +438,9 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Network error: $e');
+      // Extract the actual error message from the exception
+      String errorMessage = _cleanErrorMessage(e.toString());
+      _setError(errorMessage);
       _setLoading(false);
       return false;
     }

@@ -82,7 +82,10 @@ function sendErrorResponse($message, $httpCode = 400) {
     http_response_code($httpCode);
     echo json_encode([
         'success' => false,
-        'error' => $message
+        'error' => $message,
+        'message' => $message,
+        'status' => 'error',
+        'data' => null
     ]);
     exit;
 }
@@ -159,7 +162,16 @@ function checkDriverStatus($driver_id) {
         
         // Check if driver status is rejected
         if ($driver['kyc_status'] === 'rejected') {
-            sendErrorResponse('Your account is rejected contact apatkalindia@gmail.com', 403);
+            // Return 200 status with error message for better app compatibility
+            http_response_code(200);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Your account is rejected contact apatkalindia@gmail.com',
+                'message' => 'Your account is rejected contact apatkalindia@gmail.com',
+                'status' => 'rejected',
+                'driver_id' => $driver_id
+            ]);
+            exit;
         }
         
         // If status is pending, allow access but could add warning if needed

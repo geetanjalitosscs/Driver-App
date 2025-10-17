@@ -307,9 +307,9 @@ class CentralizedApiService {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'driver_id': driverId,
-          'name': name,
+          'driver_name': name,
           'email': email,
-          'phone': phone,
+          'number': phone,
           'vehicle_number': vehicleNumber,
           'vehicle_type': vehicleType,
           'license_number': licenseNumber,
@@ -318,7 +318,16 @@ class CentralizedApiService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+        
+        // Check if the response indicates an error (even with 200 status)
+        if (data['success'] == false) {
+          // Extract the error message from our API response format
+          String errorMessage = data['error'] ?? data['message'] ?? 'Profile update failed';
+          throw Exception(errorMessage);
+        }
+        
+        return data;
       } else {
         throw Exception('Profile update failed: ${response.statusCode}');
       }
@@ -345,7 +354,16 @@ class CentralizedApiService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+        
+        // Check if the response indicates an error (even with 200 status)
+        if (data['success'] == false) {
+          // Extract the error message from our API response format
+          String errorMessage = data['error'] ?? data['message'] ?? 'Password change failed';
+          throw Exception(errorMessage);
+        }
+        
+        return data;
       } else {
         throw Exception('Password change failed: ${response.statusCode}');
       }
