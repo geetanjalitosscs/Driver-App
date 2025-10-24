@@ -119,9 +119,11 @@ class AuthProvider extends ChangeNotifier {
         print('Login response data: $data'); // Debug log
         print('Driver data from API: ${data['driver']}'); // Debug log
         print('Driver ID from API: ${data['driver']['driver_id']} (type: ${data['driver']['driver_id'].runtimeType})'); // Debug log
+        print('Address from API: "${data['driver']['address']}"'); // Debug log
         _currentUser = ProfileData.fromJson(data['driver']);
         print('Parsed user data: ${_currentUser?.driverName}'); // Debug log
         print('Parsed driver ID: ${_currentUser?.driverId} (type: ${_currentUser?.driverId.runtimeType})'); // Debug log
+        print('Parsed address: "${_currentUser?.address}"'); // Debug log
         await _saveUserData(); // Save user data to storage
         await _setDefaultOfflineState(); // Set default offline state on login
         _setLoading(false);
@@ -359,6 +361,7 @@ class AuthProvider extends ChangeNotifier {
         name: name,
         email: email,
         phone: phone,
+        address: address,
         vehicleNumber: vehicleNumber,
         vehicleType: vehicleType,
         licenseNumber: _currentUser!.licencePhoto,
@@ -501,4 +504,15 @@ class AuthProvider extends ChangeNotifier {
   // Getter for KYC status
   String get kycStatus => _currentUser?.kycStatus ?? 'pending';
   bool get isKycApproved => kycStatus == 'approved';
+
+  /**
+   * @description Send TGH trade data message
+   * @return void
+   * @author dong.zhao
+   * @date 2024/12/6
+   */
+  void sendTghSubmitTradeDataMsg(String driverId, String txAcctNo) {
+    // TODO: Implement TGH trade data message
+    print('Sending TGH trade data message for driver: $driverId, account: $txAcctNo');
+  }
 }

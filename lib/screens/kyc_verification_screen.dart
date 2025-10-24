@@ -96,7 +96,7 @@ class _KycVerificationScreenState extends State<KycVerificationScreen> {
       textColor = Colors.green.shade700;
       icon = Icons.check_circle_outline;
     } else if (status != 'approved') {
-      message = 'Your application is pending';
+      message = 'Your application is pending for confirmation login again after logout';
       backgroundColor = Colors.orange.shade50;
       textColor = Colors.orange.shade700;
       icon = Icons.pending_outlined;

@@ -85,7 +85,7 @@ try {
             'driver_name' => $driver['driver_name'],
             'email' => $driver['email'],
             'phone' => $driver['number'],
-            'address' => $driver['address'],
+            'address' => !empty($driver['address']) ? $driver['address'] : null,
             'vehicle_type' => $driver['vehicle_type'],
             'vehicle_number' => $driver['vehicle_number'],
             'model_rating' => (float)($driver['model_rating'] ?? 0.0),
@@ -113,14 +113,17 @@ try {
     // Remove password from response
     unset($driver['password']);
 
-    // Format driver data for response (matching ProfileData.fromJson expectations)
-    $driverData = [
-        'driver_id' => $driver['id'],
-        'driver_name' => $driver['driver_name'],
-        'email' => $driver['email'],
-        'phone' => $driver['number'],
-        'address' => $driver['address'],
-        'vehicle_type' => $driver['vehicle_type'],
+    // Debug logging for address
+    error_log("Login - Driver address from DB: " . ($driver['address'] ?? 'NULL'));
+    
+        // Format driver data for response (matching ProfileData.fromJson expectations)
+        $driverData = [
+            'driver_id' => $driver['id'],
+            'driver_name' => $driver['driver_name'],
+            'email' => $driver['email'],
+            'phone' => $driver['number'],
+            'address' => !empty($driver['address']) ? $driver['address'] : null,
+            'vehicle_type' => $driver['vehicle_type'],
         'vehicle_number' => $driver['vehicle_number'],
         'model_rating' => (float)($driver['model_rating'] ?? 0.0),
         'aadhar_photo' => getUploadsUrl($driver['aadhar_photo']),

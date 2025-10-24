@@ -27,7 +27,12 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
       final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final driverId = authProvider.currentUser?.driverIdAsInt;
-      accidentProvider.loadAccidents(driverId: driverId);
+      
+      if (driverId != null) {
+        accidentProvider.loadAccidents(driverId: driverId);
+      } else {
+        print('Error: Driver ID is null, cannot load accidents');
+      }
     });
   }
 
@@ -127,7 +132,12 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
                   final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
                   final authProvider = Provider.of<AuthProvider>(context, listen: false);
                   final driverId = authProvider.currentUser?.driverIdAsInt;
-                  accidentProvider.loadAccidents(driverId: driverId);
+                  
+                  if (driverId != null) {
+                    accidentProvider.loadAccidents(driverId: driverId);
+                  } else {
+                    print('Error: Driver ID is null, cannot retry loading accidents');
+                  }
                 },
                 variant: AppButtonVariant.primary,
               ),
@@ -256,9 +266,6 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
             Row(
               children: [
                 Expanded(child: AppButton(text: 'View Details', variant: AppButtonVariant.outline, size: AppButtonSize.small, onPressed: () => _showAccidentDetails(accident))),
-                const SizedBox(width: 8),
-                if (accident.status == 'pending')
-                  Expanded(child: AppButton(text: 'Accept', variant: AppButtonVariant.secondary, size: AppButtonSize.small, onPressed: () => _acceptAccident(accident))),
               ],
             ),
           ],
@@ -366,7 +373,4 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
     );
   }
 
-  Future<void> _acceptAccident(AccidentReport accident) async {
-    // keep success snackbar; use dialog for errors when added
-  }
 }

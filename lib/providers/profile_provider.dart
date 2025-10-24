@@ -42,6 +42,7 @@ class ProfileProvider with ChangeNotifier {
         name: newProfile.driverName,
         email: newProfile.email,
         phone: newProfile.phone,
+        address: newProfile.address,
         vehicleNumber: newProfile.vehicleNumber,
         vehicleType: newProfile.vehicleType,
         licenseNumber: newProfile.licencePhoto,

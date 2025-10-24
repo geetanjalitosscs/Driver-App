@@ -123,28 +123,6 @@ class _ApiAccidentReportDialogState extends State<ApiAccidentReportDialog> {
                 style: AppTheme.heading3,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'There are currently no pending accident reports from the API.',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Please check if accident reports are being submitted to the server.',
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              AppButton(
-                text: 'Close',
-                onPressed: () => Navigator.of(context).pop(),
-                variant: AppButtonVariant.primary,
-              ),
             ],
           ),
         ),

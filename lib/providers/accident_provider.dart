@@ -38,6 +38,15 @@ class AccidentProvider extends ChangeNotifier {
       return;
     }
     
+    // Check if driverId is provided
+    if (driverId == null) {
+      print('Error: Driver ID is null, cannot load accidents');
+      _setError('Driver ID is required to load accidents');
+      _isLoadingAccidents = false;
+      _setLoading(false);
+      return;
+    }
+    
     _isLoadingAccidents = true;
     _setLoading(true);
     _clearError();
@@ -593,6 +602,11 @@ class AccidentProvider extends ChangeNotifier {
 
   /// Refresh pending count from API
   Future<void> refreshPendingCount({int? driverId}) async {
+    if (driverId == null) {
+      print('Error: Driver ID is null, cannot refresh pending count');
+      return;
+    }
+    
     try {
       _allAccidents = await CentralizedApiService.getAccidents(driverId: driverId);
       _applyFilter();

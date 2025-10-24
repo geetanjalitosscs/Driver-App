@@ -11,10 +11,27 @@ try {
 
 // Get driver ID from query parameter
 $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
-$radius_km = 0.005; // Fixed 5 meters radius (0.005 km)
 
 if ($driver_id <= 0) {
     sendErrorResponse('Invalid driver ID');
+}
+
+// Function to calculate dynamic radius based on accident age
+function calculateDynamicRadius($created_at) {
+    $now = new DateTime();
+    $accident_time = new DateTime($created_at);
+    $age_seconds = $now->getTimestamp() - $accident_time->getTimestamp();
+    
+    // Start with 500m, increase by 500m every 15 seconds
+    $base_radius_km = 0.5; // 500 meters (0.5 kilometers)
+    $expansion_km = 0.5; // 500 meters per expansion
+    $expansion_interval_seconds = 15; // Every 15 seconds
+    
+    $expansions = floor($age_seconds / $expansion_interval_seconds);
+    $dynamic_radius_km = $base_radius_km + ($expansions * $expansion_km);
+    
+    // No maximum cap - keep expanding
+    return $dynamic_radius_km;
 }
 
 // Check driver status before proceeding
@@ -23,7 +40,7 @@ checkDriverStatus($driver_id);
 try {
     // First, get driver's current location
     $stmt = $pdo->prepare("
-        SELECT latitude, longitude, updated_at
+        SELECT latitude, longitude, address, updated_at
         FROM driver_locations 
         WHERE driver_id = ?
         ORDER BY updated_at DESC 
@@ -39,7 +56,8 @@ try {
     $driver_latitude = (float)$driver_location['latitude'];
     $driver_longitude = (float)$driver_location['longitude'];
     
-    // Find nearby accidents using Haversine formula
+    // Find nearby accidents using Haversine formula with dynamic radius
+    // First get all pending accidents with their distances
     $stmt = $pdo->prepare("
         SELECT 
             a.id,
@@ -63,18 +81,32 @@ try {
                 )
             ) AS distance_km
         FROM accidents a
-        WHERE a.status = 'pending'
-        HAVING distance_km <= ?
+        INNER JOIN clients c ON LOWER(a.vehicle) COLLATE utf8mb4_general_ci = LOWER(c.vehicle_no) COLLATE utf8mb4_general_ci
+        WHERE a.status = 'pending' 
+        AND c.status = 'paid'
         ORDER BY distance_km ASC, a.created_at DESC
-        LIMIT 20
     ");
     
-    $stmt->execute([$driver_latitude, $driver_longitude, $driver_latitude, $radius_km]);
-    $accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute([$driver_latitude, $driver_longitude, $driver_latitude]);
+    $all_accidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Filter accidents based on dynamic radius
+    $filtered_accidents = [];
+    foreach ($all_accidents as $accident) {
+        $dynamic_radius = calculateDynamicRadius($accident['created_at']);
+        if ($accident['distance_km'] <= $dynamic_radius) {
+            $accident['dynamic_radius_km'] = $dynamic_radius;
+            $filtered_accidents[] = $accident;
+        }
+    }
+    
+    // Limit to 20 results
+    $accidents = array_slice($filtered_accidents, 0, 20);
     
     // Add photos for each accident
     foreach ($accidents as &$accident) {
         $accident['distance_km'] = round((float)$accident['distance_km'], 2);
+        $accident['dynamic_radius_km'] = round((float)$accident['dynamic_radius_km'], 2);
         
         // Get photos and convert to full URLs (only first photo)
         $photo_stmt = $pdo->prepare("
@@ -103,11 +135,18 @@ try {
             'driver_location' => [
                 'latitude' => $driver_latitude,
                 'longitude' => $driver_longitude,
+                'address' => $driver_location['address'],
                 'last_updated' => $driver_location['updated_at']
             ],
             'accidents' => $accidents,
-            'search_radius_km' => $radius_km,
-            'total_found' => count($accidents)
+            'search_radius_info' => [
+                'base_radius_km' => 0.5,
+                'expansion_interval_seconds' => 15,
+                'expansion_increment_km' => 0.5,
+                'dynamic_radius_enabled' => true
+            ],
+            'total_found' => count($accidents),
+            'total_available' => count($filtered_accidents)
         ]
     ]);
     

@@ -68,6 +68,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profile = authProvider.currentUser;
     
     if (profile != null) {
+      print('DEBUG - Profile Data:');
+      print('Name: ${profile.driverName}');
+      print('Email: ${profile.email}');
+      print('Contact: ${profile.contact}');
+      print('Address: "${profile.address}"');
+      print('Address length: ${profile.address.length}');
+      
       _nameController.text = profile.driverName;
       _emailController.text = profile.email;
       _contactController.text = profile.contact;

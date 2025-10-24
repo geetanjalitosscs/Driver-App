@@ -72,6 +72,14 @@ class ApiEndpoints {
   static const String getDriverPhoto = 'get_driver_photo.php';
   
   // ============================================================================
+  // NEW ACCIDENT ASSIGNMENT ENDPOINTS
+  // ============================================================================
+  static const String submitAccidentReport = 'submit_accident_report.php';
+  static const String findAvailableDrivers = 'find_available_drivers.php';
+  static const String manageDriverAssignment = 'manage_driver_assignment.php';
+  static const String accidentAssignmentWorkflow = 'accident_assignment_workflow.php';
+  
+  // ============================================================================
   // NOTIFICATION ENDPOINTS
   // ============================================================================
   static const String sendNotification = 'send_notification.php';
@@ -296,6 +304,7 @@ class CentralizedApiService {
     required String name,
     required String email,
     required String phone,
+    required String address,
     required String vehicleNumber,
     required String vehicleType,
     required String licenseNumber,
@@ -310,6 +319,7 @@ class CentralizedApiService {
           'driver_name': name,
           'email': email,
           'number': phone,
+          'address': address,
           'vehicle_number': vehicleNumber,
           'vehicle_type': vehicleType,
           'license_number': licenseNumber,
@@ -1742,6 +1752,230 @@ class CentralizedApiService {
     } catch (e) {
       print('API Service Error: $e');
       throw Exception('Complete accident error: $e');
+    }
+  }
+
+  // ============================================================================
+  // NEW ACCIDENT ASSIGNMENT APIs
+  // ============================================================================
+
+  /// Submit Accident Report API
+  static Future<Map<String, dynamic>> submitAccidentReport({
+    required String fullname,
+    required String phone,
+    required String vehicle,
+    required String accidentDate,
+    required String location,
+    required double latitude,
+    required double longitude,
+    required String description,
+    String? photo,
+  }) async {
+    try {
+      print('=== API SERVICE SUBMIT ACCIDENT REPORT ===');
+      print('URL: ${ApiEndpoints.getAccidentUrl(ApiEndpoints.submitAccidentReport)}');
+      print('Name: $fullname, Phone: $phone, Vehicle: $vehicle');
+      print('Location: $location, Lat: $latitude, Lng: $longitude');
+      
+      final requestBody = {
+        'fullname': fullname,
+        'phone': phone,
+        'vehicle': vehicle,
+        'accident_date': accidentDate,
+        'location': location,
+        'latitude': latitude,
+        'longitude': longitude,
+        'description': description,
+      };
+      
+      if (photo != null && photo.isNotEmpty) {
+        requestBody['photo'] = photo;
+      }
+      
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.submitAccidentReport)),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        throw Exception('Submit accident report failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('API Service Error: $e');
+      throw Exception('Submit accident report error: $e');
+    }
+  }
+
+  /// Find Available Drivers API
+  static Future<Map<String, dynamic>> findAvailableDrivers({
+    required int accidentId,
+  }) async {
+    try {
+      print('=== API SERVICE FIND AVAILABLE DRIVERS ===');
+      print('URL: ${ApiEndpoints.getAccidentUrl(ApiEndpoints.findAvailableDrivers)}');
+      print('Accident ID: $accidentId');
+      
+      final requestBody = {
+        'accident_id': accidentId.toString(),
+      };
+      
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.findAvailableDrivers)),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        throw Exception('Find available drivers failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('API Service Error: $e');
+      throw Exception('Find available drivers error: $e');
+    }
+  }
+
+  /// Manage Driver Assignment API
+  static Future<Map<String, dynamic>> manageDriverAssignment({
+    required String action,
+    required int accidentId,
+    int? driverId,
+    String? vehicleNumber,
+    String? reason,
+  }) async {
+    try {
+      print('=== API SERVICE MANAGE DRIVER ASSIGNMENT ===');
+      print('URL: ${ApiEndpoints.getAccidentUrl(ApiEndpoints.manageDriverAssignment)}');
+      print('Action: $action, Accident ID: $accidentId, Driver ID: $driverId');
+      
+      final requestBody = {
+        'action': action,
+        'accident_id': accidentId.toString(),
+      };
+      
+      if (driverId != null) {
+        requestBody['driver_id'] = driverId.toString();
+      }
+      if (vehicleNumber != null && vehicleNumber.isNotEmpty) {
+        requestBody['vehicle_number'] = vehicleNumber;
+      }
+      if (reason != null && reason.isNotEmpty) {
+        requestBody['reason'] = reason;
+      }
+      
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.manageDriverAssignment)),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        throw Exception('Manage driver assignment failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('API Service Error: $e');
+      throw Exception('Manage driver assignment error: $e');
+    }
+  }
+
+  /// Accident Assignment Workflow API (Comprehensive)
+  static Future<Map<String, dynamic>> accidentAssignmentWorkflow({
+    required String action,
+    int? accidentId,
+    int? driverId,
+    String? vehicleNumber,
+    String? reason,
+    // For submit_report action
+    String? fullname,
+    String? phone,
+    String? vehicle,
+    String? accidentDate,
+    String? location,
+    double? latitude,
+    double? longitude,
+    String? description,
+    String? photo,
+  }) async {
+    try {
+      print('=== API SERVICE ACCIDENT ASSIGNMENT WORKFLOW ===');
+      print('URL: ${ApiEndpoints.getAccidentUrl(ApiEndpoints.accidentAssignmentWorkflow)}');
+      print('Action: $action');
+      
+      final requestBody = {
+        'action': action,
+      };
+      
+      // Add fields based on action
+      if (accidentId != null) {
+        requestBody['accident_id'] = accidentId.toString();
+      }
+      if (driverId != null) {
+        requestBody['driver_id'] = driverId.toString();
+      }
+      if (vehicleNumber != null && vehicleNumber.isNotEmpty) {
+        requestBody['vehicle_number'] = vehicleNumber;
+      }
+      if (reason != null && reason.isNotEmpty) {
+        requestBody['reason'] = reason;
+      }
+      
+      // For submit_report action
+      if (action == 'submit_report') {
+        if (fullname != null) requestBody['fullname'] = fullname;
+        if (phone != null) requestBody['phone'] = phone;
+        if (vehicle != null) requestBody['vehicle'] = vehicle;
+        if (accidentDate != null) requestBody['accident_date'] = accidentDate;
+        if (location != null) requestBody['location'] = location;
+        if (latitude != null) requestBody['latitude'] = latitude.toString();
+        if (longitude != null) requestBody['longitude'] = longitude.toString();
+        if (description != null) requestBody['description'] = description;
+        if (photo != null && photo.isNotEmpty) requestBody['photo'] = photo;
+      }
+      
+      final response = await http.post(
+        Uri.parse(ApiEndpoints.getAccidentUrl(ApiEndpoints.accidentAssignmentWorkflow)),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestBody),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print('Parsed result: $result');
+        return result;
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        throw Exception('Accident assignment workflow failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('API Service Error: $e');
+      throw Exception('Accident assignment workflow error: $e');
     }
   }
 
