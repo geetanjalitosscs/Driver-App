@@ -53,6 +53,12 @@ try {
         sendErrorResponse('Driver location not found. Please update your location first.');
     }
     
+    // Check if location is recent (within last 5 minutes)
+    $location_age_minutes = (time() - strtotime($driver_location['updated_at'])) / 60;
+    if ($location_age_minutes > 5) {
+        error_log("Warning: Driver {$driver_id} location is {$location_age_minutes} minutes old");
+    }
+    
     $driver_latitude = (float)$driver_location['latitude'];
     $driver_longitude = (float)$driver_location['longitude'];
     
@@ -136,7 +142,9 @@ try {
                 'latitude' => $driver_latitude,
                 'longitude' => $driver_longitude,
                 'address' => $driver_location['address'],
-                'last_updated' => $driver_location['updated_at']
+                'last_updated' => $driver_location['updated_at'],
+                'age_minutes' => round($location_age_minutes, 2),
+                'is_recent' => $location_age_minutes <= 5
             ],
             'accidents' => $accidents,
             'search_radius_info' => [

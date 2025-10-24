@@ -34,7 +34,7 @@ try {
     $stmt = $pdo->prepare("
         CREATE TABLE IF NOT EXISTS driver_locations (
             id INT PRIMARY KEY AUTO_INCREMENT,
-            driver_id INT NOT NULL,
+            driver_id INT NOT NULL UNIQUE,
             latitude DECIMAL(10, 8) NOT NULL,
             longitude DECIMAL(11, 8) NOT NULL,
             address TEXT NULL,

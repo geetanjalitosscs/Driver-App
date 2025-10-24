@@ -17,7 +17,6 @@ import '../models/trip.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service_endpoints.dart';
 import '../services/notification_service.dart';
-import '../config/maps_config.dart';
 
 class TripNavigationScreen extends StatefulWidget {
   final Trip trip;

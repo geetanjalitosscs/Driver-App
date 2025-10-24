@@ -228,12 +228,85 @@ try {
     $stmt = $pdo->prepare("UPDATE drivers SET " . implode(', ', $update_fields) . " WHERE id = ?");
     $stmt->execute($update_values);
 
-    // Create wallet entry for new driver
-    $stmt = $pdo->prepare("
-        INSERT INTO wallet (driver_id, balance, total_earned, total_withdrawn) 
-        VALUES (?, 0.00, 0.00, 0.00)
-    ");
-    $stmt->execute([$driverId]);
+
+    // Store driver location if provided during signup
+    if (isset($_POST['latitude']) && isset($_POST['longitude'])) {
+        $latitude = (float)$_POST['latitude'];
+        $longitude = (float)$_POST['longitude'];
+        $location_address = $_POST['address'] ?? null;
+        
+        try {
+            // Create driver_locations table if not exists
+            $stmt = $pdo->prepare("
+                CREATE TABLE IF NOT EXISTS driver_locations (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    driver_id INT NOT NULL UNIQUE,
+                    latitude DECIMAL(10, 8) NOT NULL,
+                    longitude DECIMAL(11, 8) NOT NULL,
+                    address TEXT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE
+                )
+            ");
+            $stmt->execute();
+            
+            // Insert driver location
+            $stmt = $pdo->prepare("
+                INSERT INTO driver_locations (driver_id, latitude, longitude, address, updated_at)
+                VALUES (?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([$driverId, $latitude, $longitude, $location_address]);
+            
+            error_log("Signup - Driver location stored: Driver {$driverId}, Lat: {$latitude}, Lng: {$longitude}");
+        } catch (Exception $e) {
+            error_log("Signup - Failed to store driver location: " . $e->getMessage());
+        }
+    }
+
+    // Store device session if provided during signup
+    $device_id = $input['device_id'] ?? null;
+    $device_name = $input['device_name'] ?? 'Unknown Device';
+    $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+    
+    // Debug logging for device information
+    error_log("Signup - Device ID: " . ($device_id ?? 'NULL'));
+    error_log("Signup - Device Name: " . ($device_name ?? 'NULL'));
+    error_log("Signup - IP Address: " . ($ip_address ?? 'NULL'));
+    error_log("Signup - All input data: " . json_encode($input));
+    
+    if ($device_id) {
+        try {
+            // Create device_sessions table if not exists
+            $stmt = $pdo->prepare("
+                CREATE TABLE IF NOT EXISTS device_sessions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    driver_id INT NOT NULL,
+                    device_id VARCHAR(255) NOT NULL,
+                    device_name VARCHAR(255) DEFAULT NULL,
+                    login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    ip_address VARCHAR(45) DEFAULT NULL,
+                    user_agent TEXT DEFAULT NULL,
+                    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE,
+                    UNIQUE KEY unique_driver_device (driver_id, device_id)
+                )
+            ");
+            $stmt->execute();
+            
+            // Insert device session
+            $stmt = $pdo->prepare("
+                INSERT INTO device_sessions (driver_id, device_id, device_name, ip_address, user_agent, is_active)
+                VALUES (?, ?, ?, ?, ?, TRUE)
+            ");
+            $stmt->execute([$driverId, $device_id, $device_name, $ip_address, $user_agent]);
+            
+            error_log("Signup - Device session created: Driver {$driverId}, Device: {$device_id} ({$device_name})");
+        } catch (Exception $e) {
+            error_log("Signup - Failed to create device session: " . $e->getMessage());
+        }
+    }
 
     // Get the created driver data
     $stmt = $pdo->prepare("

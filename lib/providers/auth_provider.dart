@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/profile_data.dart';
 import '../services/api_service_endpoints.dart';
+import '../services/location_tracking_service.dart';
+import '../services/device_id_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 class AuthProvider extends ChangeNotifier {
   ProfileData? _currentUser;
@@ -113,7 +116,25 @@ class AuthProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final data = await CentralizedApiService.login(email, password);
+      // Get current location and device info before login
+      Position? currentLocation = await LocationTrackingService().getCurrentLocation();
+      String deviceId = await DeviceIdService().getDeviceId();
+      String deviceName = await DeviceIdService().getDeviceName();
+      
+      // Debug logging for device information
+      print('🔍 Login Debug - Device ID: $deviceId');
+      print('🔍 Login Debug - Device Name: $deviceName');
+      print('🔍 Login Debug - Location: ${currentLocation?.latitude}, ${currentLocation?.longitude}');
+      
+      final data = await CentralizedApiService.login(
+        email, 
+        password,
+        latitude: currentLocation?.latitude,
+        longitude: currentLocation?.longitude,
+        address: null, // Could be enhanced to get address from coordinates
+        deviceId: deviceId,
+        deviceName: deviceName,
+      );
       
       if (data['success'] == true) {
         print('Login response data: $data'); // Debug log
@@ -126,6 +147,10 @@ class AuthProvider extends ChangeNotifier {
         print('Parsed address: "${_currentUser?.address}"'); // Debug log
         await _saveUserData(); // Save user data to storage
         await _setDefaultOfflineState(); // Set default offline state on login
+        
+        // Start location tracking after successful login
+        await _startLocationTracking();
+        
         _setLoading(false);
         return true;
       } else if (data['kyc_pending'] == true) {
@@ -253,6 +278,21 @@ class AuthProvider extends ChangeNotifier {
 
   // Logout method
   Future<void> logout() async {
+    // Stop location tracking before logout
+    await _stopLocationTracking();
+    
+    // Call logout API to clear device session
+    if (_currentUser?.driverIdAsInt != null) {
+      try {
+        String deviceId = await DeviceIdService().getDeviceId();
+        await CentralizedApiService.logout(_currentUser!.driverIdAsInt, deviceId);
+        print('Logout API called successfully');
+      } catch (e) {
+        print('Error calling logout API: $e');
+        // Continue with logout even if API call fails
+      }
+    }
+    
     _currentUser = null;
     _errorMessage = null;
     await _clearUserData(); // Clear stored user data
@@ -514,5 +554,59 @@ class AuthProvider extends ChangeNotifier {
   void sendTghSubmitTradeDataMsg(String driverId, String txAcctNo) {
     // TODO: Implement TGH trade data message
     print('Sending TGH trade data message for driver: $driverId, account: $txAcctNo');
+  }
+
+  /// Start location tracking for the current user
+  Future<void> _startLocationTracking() async {
+    if (_currentUser?.driverIdAsInt == null) {
+      print('Cannot start location tracking: No driver ID');
+      return;
+    }
+
+    try {
+      bool started = await LocationTrackingService().startLocationTracking(_currentUser!.driverIdAsInt);
+      if (started) {
+        print('Location tracking started for driver ${_currentUser!.driverIdAsInt}');
+      } else {
+        print('Failed to start location tracking for driver ${_currentUser!.driverIdAsInt}');
+      }
+    } catch (e) {
+      print('Error starting location tracking: $e');
+    }
+  }
+
+  /// Stop location tracking
+  Future<void> _stopLocationTracking() async {
+    try {
+      await LocationTrackingService().stopLocationTracking();
+      print('Location tracking stopped');
+    } catch (e) {
+      print('Error stopping location tracking: $e');
+    }
+  }
+
+  /// Update location manually (for immediate updates)
+  Future<bool> updateLocationManually() async {
+    if (_currentUser?.driverIdAsInt == null) {
+      print('Cannot update location: No driver ID');
+      return false;
+    }
+
+    try {
+      return await LocationTrackingService().updateLocationManually(_currentUser!.driverIdAsInt);
+    } catch (e) {
+      print('Error updating location manually: $e');
+      return false;
+    }
+  }
+
+  /// Get current location (for manual use)
+  Future<Position?> getCurrentLocation() async {
+    try {
+      return await LocationTrackingService().getCurrentLocation();
+    } catch (e) {
+      print('Error getting current location: $e');
+      return null;
+    }
   }
 }
