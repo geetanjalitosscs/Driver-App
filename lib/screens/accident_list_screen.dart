@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../widgets/common/app_error_dialog.dart';
 import 'package:provider/provider.dart';
 import '../providers/accident_provider.dart';
@@ -20,6 +21,8 @@ class AccidentListScreen extends StatefulWidget {
 }
 
 class _AccidentListScreenState extends State<AccidentListScreen> {
+  Timer? _autoRefreshTimer;
+  
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,7 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
       
       if (driverId != null) {
         accidentProvider.loadAccidents(driverId: driverId);
+        _startAutoRefreshTimer(driverId);
       } else {
         print('Error: Driver ID is null, cannot load accidents');
       }
@@ -274,33 +278,6 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label:',
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: AppTheme.bodySmall.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: null, // Allow unlimited lines
-            overflow: TextOverflow.visible,
-          ),
-        ],
-      ),
-    );
-  }
-
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending': return AppTheme.accentOrange;
@@ -324,6 +301,51 @@ class _AccidentListScreenState extends State<AccidentListScreen> {
         ),
       );
     }
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _autoRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Start automatic refresh timer for every 5 minutes
+  void _startAutoRefreshTimer(int driverId) {
+    _autoRefreshTimer?.cancel(); // Cancel any existing timer
+    
+    _autoRefreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (mounted) {
+        print('Auto-refreshing accidents every 5 minutes...');
+        final accidentProvider = Provider.of<AccidentProvider>(context, listen: false);
+        accidentProvider.loadAccidents(driverId: driverId);
+      }
+    });
+    
+    print('Auto-refresh timer started: Every 5 minutes');
   }
 
   void _showAccidentDetails(AccidentReport accident) {

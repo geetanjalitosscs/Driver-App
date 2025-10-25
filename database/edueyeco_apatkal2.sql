@@ -4721,3 +4721,28 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- Keep only the most recent record for each driver
+DELETE dl1 FROM driver_locations dl1
+INNER JOIN driver_locations dl2 
+WHERE dl1.driver_id = dl2.driver_id 
+AND dl1.updated_at < dl2.updated_at;
+
+-- Add UNIQUE constraint to driver_id
+ALTER TABLE driver_locations 
+ADD CONSTRAINT unique_driver_id UNIQUE (driver_id);
+
+-- Drop existing table (WARNING: This deletes all data)
+DROP TABLE IF EXISTS `driver_locations`;
+
+-- Create new table with proper constraints
+CREATE TABLE `driver_locations` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `driver_id` INT NOT NULL UNIQUE,
+  `latitude` DECIMAL(10, 8) NOT NULL,
+  `longitude` DECIMAL(11, 8) NOT NULL,
+  `address` TEXT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`driver_id`) REFERENCES `drivers`(`id`) ON DELETE CASCADE
+);

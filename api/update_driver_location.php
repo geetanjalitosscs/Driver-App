@@ -19,7 +19,6 @@ if (!$input || !isset($input['driver_id']) || !isset($input['latitude']) || !iss
 $driver_id = (int)$input['driver_id'];
 $latitude = (float)$input['latitude'];
 $longitude = (float)$input['longitude'];
-$address = isset($input['address']) ? $input['address'] : null;
 $timestamp = date('Y-m-d H:i:s');
 
 if ($driver_id <= 0) {
@@ -37,7 +36,6 @@ try {
             driver_id INT NOT NULL UNIQUE,
             latitude DECIMAL(10, 8) NOT NULL,
             longitude DECIMAL(11, 8) NOT NULL,
-            address TEXT NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE
         )
@@ -46,16 +44,15 @@ try {
     
     // Insert or update driver location
     $stmt = $pdo->prepare("
-        INSERT INTO driver_locations (driver_id, latitude, longitude, address, updated_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO driver_locations (driver_id, latitude, longitude, updated_at)
+        VALUES (?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
             latitude = VALUES(latitude),
             longitude = VALUES(longitude),
-            address = VALUES(address),
             updated_at = VALUES(updated_at)
     ");
     
-    $stmt->execute([$driver_id, $latitude, $longitude, $address, $timestamp]);
+    $stmt->execute([$driver_id, $latitude, $longitude, $timestamp]);
     
     echo json_encode([
         'success' => true,
@@ -64,7 +61,6 @@ try {
             'driver_id' => $driver_id,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'address' => $address,
             'updated_at' => $timestamp
         ]
     ]);

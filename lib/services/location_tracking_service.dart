@@ -166,7 +166,6 @@ class LocationTrackingService {
           'driver_id': _currentDriverId,
           'latitude': position.latitude,
           'longitude': position.longitude,
-          'address': null, // Could be enhanced to get address from coordinates
         }),
       );
 
