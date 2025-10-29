@@ -33,8 +33,10 @@ $driverId = $input['driver_id'];
 // Debug logging
 error_log("KYC Status Check - Driver ID: " . $driverId);
 
-// Check driver status before proceeding
-checkDriverStatus($driverId);
+// Note: We don't call checkDriverStatus() here because this endpoint
+// is specifically for checking status, including rejected status.
+// The status check blocking should happen in other APIs (login, trips, etc.)
+// but NOT in the status check endpoint itself.
 
 try {
     // Get driver data with current KYC status
