@@ -7,6 +7,7 @@ import '../widgets/common/app_card.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/common/app_error_dialog.dart';
 import 'signup_screen.dart';
+import 'forgot_password_screen.dart';
 import 'kyc_verification_screen.dart';
 import '../main.dart';
 
@@ -293,6 +294,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         isLoading: _isLoading,
                         variant: AppButtonVariant.primary,
                         isFullWidth: true,
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Forgot Password Link
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Forgot Password?',
+                            style: GoogleFonts.roboto(
+                              color: AppTheme.primaryBlue,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                       ),
                       
                       const SizedBox(height: 24),

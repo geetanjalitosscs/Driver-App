@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -8,6 +9,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/centered_api.dart';
 import 'kyc_verification_screen.dart';
+import 'otp_verification_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
 import '../widgets/common/app_card.dart';
@@ -48,9 +50,13 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _aadharPhotoPath; // full file path
   String? _licencePhotoPath; // full file path
   String? _rcPhotoPath; // full file path
+  
+  // Scroll controller for scrolling to top
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -133,10 +139,57 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (success && mounted) {
-        // After signup, force KYC verification screen until approved
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const KycVerificationScreen()),
-        );
+        // Check if OTP was sent
+        if (authProvider.lastSignupResponse?['otp_sent'] == true) {
+          // Collect all form data to pass to OTP screen
+          final signupData = {
+            'name': _nameController.text.trim(),
+            'email': _emailController.text.trim(),
+            'phone': _phoneController.text.trim(),
+            'password': _passwordController.text,
+            'address': _addressController.text.trim(),
+            'vehicleType': _selectedVehicleType,
+            'vehicleNumber': _vehicleNumberController.text.trim(),
+            'accountNumber': _accountNumberController.text.trim(),
+            'bankName': _bankNameController.text.trim(),
+            'ifscCode': _ifscCodeController.text.trim(),
+            'accountHolderName': _accountHolderNameController.text.trim(),
+            'aadharPhotoPath': _aadharPhotoPath,
+            'licencePhotoPath': _licencePhotoPath,
+            'rcPhotoPath': _rcPhotoPath,
+          };
+          
+          // Navigate to OTP verification screen (use push instead of pushReplacement to allow going back)
+          final phone = _phoneController.text.trim();
+          final result = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => OtpVerificationScreen(
+                phone: phone,
+                signupData: signupData,
+              ),
+            ),
+          );
+          
+          // If we get data back, restore the form
+          if (result != null && result is Map<String, dynamic> && mounted) {
+            _restoreFormData(result);
+            // Scroll to top after a brief delay to ensure widget is rebuilt
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (mounted && _scrollController.hasClients) {
+                _scrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          }
+        } else {
+          // Old flow - direct to KYC (shouldn't happen now)
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const KycVerificationScreen()),
+          );
+        }
       } else if (mounted) {
         AppErrorDialog.show(context, authProvider.errorMessage ?? 'Signup failed');
       }
@@ -153,7 +206,26 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  
+  // Restore form data when returning from OTP screen
+  void _restoreFormData(Map<String, dynamic> data) {
+    setState(() {
+      _nameController.text = data['name'] ?? '';
+      _emailController.text = data['email'] ?? '';
+      _phoneController.text = data['phone'] ?? '';
+      _passwordController.text = data['password'] ?? '';
+      _confirmPasswordController.text = data['password'] ?? '';
+      _addressController.text = data['address'] ?? '';
+      _selectedVehicleType = data['vehicleType'] ?? 'Ambulance';
+      _vehicleNumberController.text = data['vehicleNumber'] ?? '';
+      _accountNumberController.text = data['accountNumber'] ?? '';
+      _bankNameController.text = data['bankName'] ?? '';
+      _ifscCodeController.text = data['ifscCode'] ?? '';
+      _accountHolderNameController.text = data['accountHolderName'] ?? '';
+      _aadharPhotoPath = data['aadharPhotoPath'];
+      _licencePhotoPath = data['licencePhotoPath'];
+      _rcPhotoPath = data['rcPhotoPath'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +249,7 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -283,7 +356,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Phone Field
                       TextFormField(
                         controller: _phoneController,
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // Only allow numbers
+                          LengthLimitingTextInputFormatter(10), // Limit to 10 digits
+                        ],
                         enableInteractiveSelection: true,
                         enableSuggestions: false,
                         autocorrect: false,
@@ -306,12 +383,11 @@ class _SignupScreenState extends State<SignupScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your phone number';
                           }
-                          // Remove any spaces or special characters
-                          String cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
-                          if (cleanValue.length != 10) {
+                          // Value is already digits only due to input formatter
+                          if (value.length != 10) {
                             return 'Phone number must be exactly 10 digits';
                           }
-                          if (!RegExp(r'^[6-9][0-9]{9}$').hasMatch(cleanValue)) {
+                          if (!RegExp(r'^[6-9][0-9]{9}$').hasMatch(value)) {
                             return 'Phone number must start with 6, 7, 8, or 9';
                           }
                           return null;
@@ -395,6 +471,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Vehicle Number Field
                       TextFormField(
                         controller: _vehicleNumberController,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // Only alphanumeric
+                        ],
                         enableInteractiveSelection: true,
                         enableSuggestions: false,
                         autocorrect: false,
@@ -415,6 +494,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your vehicle number';
+                          }
+                          // Validate alphanumeric only
+                          if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+                            return 'Vehicle number must contain only letters and numbers';
                           }
                           return null;
                         },

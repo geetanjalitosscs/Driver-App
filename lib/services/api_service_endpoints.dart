@@ -26,6 +26,11 @@ class ApiEndpoints {
   // ============================================================================
   static const String login = 'login.php';
   static const String signup = 'signup.php';
+  static const String verifyOtp = 'verify_otp.php';
+  static const String resendOtp = 'resend_otp.php';
+  static const String forgotPassword = 'forgot_password.php';
+  static const String verifyForgotPasswordOtp = 'verify_forgot_password_otp.php';
+  static const String resetPassword = 'reset_password.php';
   static const String checkKycStatus = 'check_kyc_status.php';
   static const String updateProfile = 'update_profile.php';
   static const String changePassword = 'change_password.php';
@@ -168,12 +173,34 @@ class CentralizedApiService {
         body: json.encode(requestBody),
       );
 
+      print('📥 Login Response Status: ${response.statusCode}');
+      print('📥 Login Response Body: ${response.body}');
+
+      // Try to parse JSON regardless of status code to get error details
+      Map<String, dynamic> responseData;
+      try {
+        responseData = json.decode(response.body);
+      } catch (parseError) {
+        print('❌ Failed to parse login response: $parseError');
+        throw Exception('Login failed: Invalid response from server');
+      }
+
+      // Handle both 200 and non-200 status codes
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        // Check if response indicates success
+        if (responseData['success'] == true) {
+          return responseData;
+        } else {
+          // Success: false but status 200 (e.g., KYC pending)
+          return responseData;
+        }
       } else {
-        throw Exception('Login failed: ${response.statusCode}');
+        // Non-200 status code - extract error message if available
+        String errorMessage = responseData['error'] ?? responseData['message'] ?? 'Login failed: ${response.statusCode}';
+        throw Exception(errorMessage);
       }
     } catch (e) {
+      print('💥 Login Exception: $e');
       throw Exception('Login error: $e');
     }
   }
@@ -272,6 +299,35 @@ class CentralizedApiService {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
+        
+        // Extract session cookie from response headers
+        String? sessionCookie;
+        String? cookieHeader;
+        
+        // HTTP headers are case-insensitive, but Dart's map is case-sensitive
+        // Check all possible cases
+        for (var key in response.headers.keys) {
+          if (key.toLowerCase() == 'set-cookie') {
+            cookieHeader = response.headers[key];
+            break;
+          }
+        }
+        
+        if (cookieHeader != null && cookieHeader.isNotEmpty) {
+          // Extract PHPSESSID from cookie string (handle multiple cookies)
+          final cookieMatch = RegExp(r'PHPSESSID=([^;\s]+)', caseSensitive: false).firstMatch(cookieHeader);
+          if (cookieMatch != null) {
+            sessionCookie = 'PHPSESSID=${cookieMatch.group(1)}';
+            print('🍪 Session cookie extracted: $sessionCookie');
+            responseData['session_cookie'] = sessionCookie;
+          } else {
+            print('⚠️ PHPSESSID not found in cookie header: $cookieHeader');
+          }
+        } else {
+          print('⚠️ No set-cookie header found in response');
+          print('📋 Available headers: ${response.headers.keys.toList()}');
+        }
+        
         print('✅ Signup Success: $responseData');
         return responseData;
       } else {
@@ -297,6 +353,368 @@ class CentralizedApiService {
         print('💥 Client Exception Details: ${e.message}');
       }
       throw Exception('Signup error: $e');
+    }
+  }
+
+  /// Verify OTP API
+  static Future<Map<String, dynamic>> verifyOtp({
+    required String otp,
+    required String phone,
+    String? sessionCookie,
+  }) async {
+    try {
+      final requestBody = {
+        'otp': otp,
+        'phone': phone,
+      };
+      
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.verifyOtp);
+      
+      print('🔐 VERIFY OTP DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 OTP: $otp');
+      print('📤 Phone: $phone');
+      print('📤 Session Cookie: ${sessionCookie ?? "NOT PROVIDED"}');
+      
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      
+      // Add session cookie if available
+      if (sessionCookie != null) {
+        headers['Cookie'] = sessionCookie;
+        print('🍪 Sending cookie: $sessionCookie');
+      } else {
+        print('⚠️ No session cookie to send');
+      }
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(requestBody),
+      );
+
+      print('📥 Verify OTP Response Status: ${response.statusCode}');
+      print('📥 Verify OTP Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print('✅ OTP Verification Success: $responseData');
+        return responseData;
+      } else {
+        print('❌ OTP Verification Failed - Status: ${response.statusCode}');
+        
+        try {
+          final errorData = json.decode(response.body);
+          if (errorData['error'] != null) {
+            throw Exception(errorData['error']);
+          }
+        } catch (jsonError) {
+          // If JSON parsing fails, use the raw response
+        }
+        
+        throw Exception('OTP verification failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('💥 Verify OTP Exception: $e');
+      throw Exception('OTP verification error: $e');
+    }
+  }
+
+  /// Resend OTP API
+  static Future<Map<String, dynamic>> resendOtp({
+    required String phone,
+    String? sessionCookie,
+  }) async {
+    try {
+      final requestBody = {
+        'phone': phone,
+      };
+      
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.resendOtp);
+      
+      print('🔐 RESEND OTP DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 Phone: $phone');
+      print('📤 Session Cookie: ${sessionCookie ?? "NOT PROVIDED"}');
+      
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      
+      // Add session cookie if available
+      if (sessionCookie != null) {
+        headers['Cookie'] = sessionCookie;
+        print('🍪 Sending cookie for resend: $sessionCookie');
+      } else {
+        print('⚠️ No session cookie to send for resend');
+      }
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(requestBody),
+      );
+
+      print('📥 Resend OTP Response Status: ${response.statusCode}');
+      print('📥 Resend OTP Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        
+        // Extract session cookie from response headers if available
+        String? sessionCookie;
+        String? cookieHeader = response.headers['set-cookie'] ?? response.headers['set-cookie']?.toLowerCase();
+        if (cookieHeader == null) {
+          for (var key in response.headers.keys) {
+            if (key.toLowerCase() == 'set-cookie') {
+              cookieHeader = response.headers[key];
+              break;
+            }
+          }
+        }
+        
+        if (cookieHeader != null && cookieHeader.isNotEmpty) {
+          final cookieMatch = RegExp(r'PHPSESSID=([^;]+)', caseSensitive: false).firstMatch(cookieHeader);
+          if (cookieMatch != null) {
+            sessionCookie = 'PHPSESSID=${cookieMatch.group(1)}';
+            responseData['session_cookie'] = sessionCookie;
+          }
+        }
+        
+        print('✅ OTP Resent Success: $responseData');
+        return responseData;
+      } else {
+        print('❌ Resend OTP Failed - Status: ${response.statusCode}');
+        
+        try {
+          final errorData = json.decode(response.body);
+          if (errorData['error'] != null) {
+            throw Exception(errorData['error']);
+          }
+        } catch (jsonError) {
+          // If JSON parsing fails, use the raw response
+        }
+        
+        throw Exception('Resend OTP failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('💥 Resend OTP Exception: $e');
+      throw Exception('Resend OTP error: $e');
+    }
+  }
+
+  /// Forgot Password API - Send OTP
+  static Future<Map<String, dynamic>> forgotPassword({
+    required String phone,
+    String? sessionCookie,
+  }) async {
+    try {
+      final requestBody = {
+        'phone': phone,
+      };
+      
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.forgotPassword);
+      
+      print('🔐 FORGOT PASSWORD DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 Phone: $phone');
+      print('📤 Session Cookie: ${sessionCookie ?? "NOT PROVIDED"}');
+      
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      
+      // Add session cookie if available (for resend to maintain same session)
+      if (sessionCookie != null) {
+        headers['Cookie'] = sessionCookie;
+        print('🍪 Sending existing cookie for resend: $sessionCookie');
+      }
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(requestBody),
+      );
+
+      print('📥 Forgot Password Response Status: ${response.statusCode}');
+      print('📥 Forgot Password Response Body: ${response.body}');
+
+      // Try to parse the response as JSON
+      Map<String, dynamic> responseData;
+      try {
+        responseData = json.decode(response.body);
+      } catch (e) {
+        throw Exception('Failed to send OTP. Please try again.');
+      }
+      
+      // Check if request was successful
+      if (response.statusCode == 200 && responseData['success'] == true) {
+        // Extract session cookie
+        String? sessionCookie;
+        for (var key in response.headers.keys) {
+          if (key.toLowerCase() == 'set-cookie') {
+            final cookieHeader = response.headers[key];
+            if (cookieHeader != null && cookieHeader.isNotEmpty) {
+              final cookieMatch = RegExp(r'PHPSESSID=([^;\s]+)', caseSensitive: false).firstMatch(cookieHeader);
+              if (cookieMatch != null) {
+                sessionCookie = 'PHPSESSID=${cookieMatch.group(1)}';
+                responseData['session_cookie'] = sessionCookie;
+              }
+            }
+            break;
+          }
+        }
+        
+        print('✅ Forgot Password Success: $responseData');
+        return responseData;
+      } else {
+        // Handle error response (could be 200 with success: false, or non-200 status)
+        print('❌ Forgot Password Failed - Status: ${response.statusCode}');
+        
+        String? errorMessage = responseData['error'] ?? responseData['message'];
+        
+        if (errorMessage != null) {
+          // Clean up error message - check for phone number not found
+          if (errorMessage.toLowerCase().contains('phone number not found') || 
+              errorMessage.toLowerCase().contains('not found in our records')) {
+            errorMessage = 'Phone number is not registered';
+          }
+          throw Exception(errorMessage);
+        }
+        
+        throw Exception('Failed to send OTP. Please try again.');
+      }
+    } catch (e) {
+      print('💥 Forgot Password Exception: $e');
+      
+      // Extract clean error message from nested exceptions
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      
+      // Check for phone number not found (final check)
+      if (errorMessage.toLowerCase().contains('phone number not found') || 
+          errorMessage.toLowerCase().contains('not found in our records')) {
+        errorMessage = 'Phone number is not registered';
+      }
+      
+      throw Exception(errorMessage);
+    }
+  }
+
+  /// Verify Forgot Password OTP API
+  static Future<Map<String, dynamic>> verifyForgotPasswordOtp({
+    required String otp,
+    required String phone,
+    String? sessionCookie,
+  }) async {
+    try {
+      final requestBody = {
+        'otp': otp,
+        'phone': phone,
+      };
+      
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.verifyForgotPasswordOtp);
+      
+      print('🔐 VERIFY FORGOT PASSWORD OTP DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 OTP: $otp');
+      print('📤 Phone: $phone');
+      
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      
+      if (sessionCookie != null) {
+        headers['Cookie'] = sessionCookie;
+      }
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(requestBody),
+      );
+
+      print('📥 Verify Forgot Password OTP Response Status: ${response.statusCode}');
+      print('📥 Verify Forgot Password OTP Response Body: ${response.body}');
+
+      // Try to parse response body
+      Map<String, dynamic> responseData;
+      try {
+        responseData = json.decode(response.body);
+      } catch (e) {
+        throw Exception('Invalid OTP. Please check and try again.');
+      }
+
+      // Check if API returned an error (even with 200 status)
+      if (responseData['success'] == false || response.statusCode != 200) {
+        final errorMsg = responseData['error'] ?? responseData['message'] ?? 'Invalid OTP. Please check and try again.';
+        throw Exception(errorMsg);
+      }
+      
+      // Success case
+      print('✅ Verify Forgot Password OTP Success: $responseData');
+      return responseData;
+    } catch (e) {
+      print('💥 Verify Forgot Password OTP Exception: $e');
+      
+      // Return clean error message
+      String errorMessage = 'Invalid OTP. Please check and try again.';
+      if (e.toString().contains('Invalid OTP')) {
+        errorMessage = 'Invalid OTP. Please check and try again.';
+      } else if (e.toString().contains('expired')) {
+        errorMessage = 'OTP has expired. Please request a new one.';
+      } else if (e.toString().contains('session expired')) {
+        errorMessage = 'OTP session expired. Please request a new one.';
+      }
+      
+      throw Exception(errorMessage);
+    }
+  }
+
+  /// Reset Password API
+  static Future<Map<String, dynamic>> resetPassword({
+    required String phone,
+    required String newPassword,
+    String? sessionCookie,
+  }) async {
+    try {
+      final requestBody = {
+        'phone': phone,
+        'new_password': newPassword,
+      };
+      
+      final url = ApiEndpoints.getAccidentUrl(ApiEndpoints.resetPassword);
+      
+      print('🔐 RESET PASSWORD DEBUG START');
+      print('📡 API URL: $url');
+      print('📤 Phone: $phone');
+      
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      
+      if (sessionCookie != null) {
+        headers['Cookie'] = sessionCookie;
+      }
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print('✅ Reset Password Success: $responseData');
+        return responseData;
+      } else {
+        try {
+          final errorData = json.decode(response.body);
+          if (errorData['error'] != null) {
+            throw Exception(errorData['error']);
+          }
+        } catch (jsonError) {
+          // If JSON parsing fails, use the raw response
+        }
+        
+        throw Exception('Reset password failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('💥 Reset Password Exception: $e');
+      throw Exception('Reset password error: $e');
     }
   }
 
@@ -407,9 +825,16 @@ class CentralizedApiService {
         }),
       );
 
+      // Try to parse JSON response
+      Map<String, dynamic> data;
+      try {
+        data = json.decode(response.body);
+      } catch (e) {
+        // If response is not JSON, throw generic error
+        throw Exception('Password change failed: ${response.statusCode}');
+      }
+      
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
         // Check if the response indicates an error (even with 200 status)
         if (data['success'] == false) {
           // Extract the error message from our API response format
@@ -419,6 +844,12 @@ class CentralizedApiService {
         
         return data;
       } else {
+        // For non-200 status codes, try to extract error message from JSON
+        if (data['success'] == false) {
+          String errorMessage = data['error'] ?? data['message'] ?? 'Password change failed';
+          throw Exception(errorMessage);
+        }
+        // Fallback if JSON parsing fails or doesn't have expected structure
         throw Exception('Password change failed: ${response.statusCode}');
       }
     } catch (e) {
@@ -1556,7 +1987,7 @@ class CentralizedApiService {
   // ============================================================================
 
   /// Get Route from Google Maps Directions API
-  static Future<Route?> getRoute(LatLng start, LatLng end) async {
+  static Future<MapsRoute?> getRoute(LatLng start, LatLng end) async {
     try {
       final url = Uri.parse(
         'https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&key=${DatabaseConfig.googleMapsApiKey}',
@@ -1584,7 +2015,7 @@ class CentralizedApiService {
             ));
           }
           
-          return Route(
+          return MapsRoute(
             points: points,
             distance: leg['distance']['text'],
             duration: leg['duration']['text'],
@@ -1844,13 +2275,13 @@ class BankAccount {
 }
 
 /// Route Model for Google Maps
-class Route {
+class MapsRoute {
   final List<LatLng> points;
   final String distance;
   final String duration;
   final List<RouteStep> steps;
 
-  Route({
+  MapsRoute({
     required this.points,
     required this.distance,
     required this.duration,

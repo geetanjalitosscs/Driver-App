@@ -41,11 +41,20 @@ class ProfileData {
 
   // Helper method to safely get driver ID as integer
   int get driverIdAsInt {
+    if (driverId.isEmpty) {
+      print('⚠️ ERROR: driverId is empty! Defaulting to 0');
+      return 0; // Return 0 instead of 1 to make it obvious there's an issue
+    }
     try {
-      return int.parse(driverId);
+      final parsed = int.parse(driverId.trim());
+      if (parsed <= 0) {
+        print('⚠️ ERROR: Invalid driver ID value: $parsed');
+        return 0;
+      }
+      return parsed;
     } catch (e) {
-      print('Error parsing driver ID "$driverId": $e');
-      return 1; // Default fallback
+      print('❌ ERROR parsing driver ID "$driverId": $e');
+      return 0; // Return 0 instead of 1 to make it obvious there's an issue
     }
   }
 

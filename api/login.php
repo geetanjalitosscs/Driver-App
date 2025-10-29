@@ -66,10 +66,40 @@ try {
         sendErrorResponse('Invalid email or password');
     }
 
-    // Verify password using password_verify (for hashed passwords)
-    if (!password_verify($password, $driver['password'])) {
+    // Verify password (handle both plain text and hashed passwords for old accounts)
+    $isValidPassword = false;
+    
+    // Log password type for debugging
+    $isHashed = (strpos($driver['password'], '$2y$') === 0);
+    error_log("Login - Password type: " . ($isHashed ? "HASHED" : "PLAIN TEXT"));
+    error_log("Login - Stored password starts with: " . substr($driver['password'], 0, 10));
+    
+    // Check if password is hashed (starts with $2y$)
+    if ($isHashed) {
+        // Password is hashed, use password_verify
+        $isValidPassword = password_verify($password, $driver['password']);
+        error_log("Login - Password verification (hashed): " . ($isValidPassword ? "SUCCESS" : "FAILED"));
+        if (!$isValidPassword) {
+            error_log("Login - Password hash verification failed. Input password length: " . strlen($password));
+        }
+    } else {
+        // Password is plain text (old accounts), do direct comparison
+        // Trim both for safety
+        $isValidPassword = (trim($password) === trim($driver['password']));
+        error_log("Login - Password verification (plain text): " . ($isValidPassword ? "SUCCESS" : "FAILED"));
+        if (!$isValidPassword) {
+            error_log("Login - Plain text password mismatch. Input length: " . strlen($password) . ", Stored length: " . strlen($driver['password']));
+            error_log("Login - Input password first 5 chars: " . substr($password, 0, 5));
+            error_log("Login - Stored password first 5 chars: " . substr($driver['password'], 0, 5));
+        }
+    }
+    
+    if (!$isValidPassword) {
+        error_log("Login - Invalid password for email: $email");
         sendErrorResponse('Invalid email or password');
     }
+    
+    error_log("Login - Password verified successfully for driver ID: " . $driver['id']);
 
     // Debug logging
     error_log("Login - KYC Status: " . $driver['kyc_status']);
@@ -83,7 +113,7 @@ try {
         
         // Format driver data for response (matching ProfileData.fromJson expectations)
         $driverData = [
-            'driver_id' => $driver['id'],
+            'driver_id' => (int)$driver['id'],  // Ensure it's an integer, not string
             'driver_name' => $driver['driver_name'],
             'email' => $driver['email'],
             'phone' => $driver['number'],
@@ -161,28 +191,47 @@ try {
             
             if ($existing_session) {
                 // Driver is already logged in on another device
+                error_log("Login - Driver {$driver['id']} attempted login from device {$device_id} but already logged in on device {$existing_session['device_id']}");
                 sendErrorResponse("Account is already logged in on another device: {$existing_session['device_name']} (since {$existing_session['login_time']})");
             }
             
-            // Deactivate any existing sessions for this driver
-            $stmt = $pdo->prepare("UPDATE device_sessions SET is_active = FALSE WHERE driver_id = ?");
-            $stmt->execute([$driver['id']]);
-            
-            // Create new session for this device
+            // Check if this same device already has a session (even if inactive)
             $stmt = $pdo->prepare("
-                INSERT INTO device_sessions (driver_id, device_id, device_name, ip_address, user_agent, is_active)
-                VALUES (?, ?, ?, ?, ?, TRUE)
-                ON DUPLICATE KEY UPDATE
-                    device_name = VALUES(device_name),
-                    login_time = CURRENT_TIMESTAMP,
-                    last_activity = CURRENT_TIMESTAMP,
-                    is_active = TRUE,
-                    ip_address = VALUES(ip_address),
-                    user_agent = VALUES(user_agent)
+                SELECT id FROM device_sessions 
+                WHERE driver_id = ? AND device_id = ?
             ");
-            $stmt->execute([$driver['id'], $device_id, $device_name, $ip_address, $user_agent]);
+            $stmt->execute([$driver['id'], $device_id]);
+            $same_device_session = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            error_log("Login - Device session created: Driver {$driver['id']}, Device: {$device_id} ({$device_name})");
+            if ($same_device_session) {
+                // Same device - update existing session
+                $stmt = $pdo->prepare("
+                    UPDATE device_sessions 
+                    SET device_name = ?,
+                        login_time = CURRENT_TIMESTAMP,
+                        last_activity = CURRENT_TIMESTAMP,
+                        is_active = TRUE,
+                        ip_address = ?,
+                        user_agent = ?
+                    WHERE driver_id = ? AND device_id = ?
+                ");
+                $stmt->execute([$device_name, $ip_address, $user_agent, $driver['id'], $device_id]);
+                error_log("Login - Device session updated: Driver {$driver['id']}, Device: {$device_id} ({$device_name})");
+            } else {
+                // New device - create new session (after deactivating any other sessions)
+                // Deactivate any other existing sessions for this driver
+                $stmt = $pdo->prepare("UPDATE device_sessions SET is_active = FALSE WHERE driver_id = ?");
+                $stmt->execute([$driver['id']]);
+                
+                // Create new session for this device
+                $stmt = $pdo->prepare("
+                    INSERT INTO device_sessions (driver_id, device_id, device_name, ip_address, user_agent, is_active)
+                    VALUES (?, ?, ?, ?, ?, TRUE)
+                ");
+                $stmt->execute([$driver['id'], $device_id, $device_name, $ip_address, $user_agent]);
+                
+                error_log("Login - Device session created: Driver {$driver['id']}, Device: {$device_id} ({$device_name})");
+            }
         } catch (Exception $e) {
             error_log("Login - Failed to manage device session: " . $e->getMessage());
             // Don't fail login if device session management fails
@@ -230,32 +279,43 @@ try {
     
         // Format driver data for response (matching ProfileData.fromJson expectations)
         $driverData = [
-            'driver_id' => $driver['id'],
+            'driver_id' => (int)$driver['id'],  // Ensure it's an integer, not string
             'driver_name' => $driver['driver_name'],
             'email' => $driver['email'],
             'phone' => $driver['number'],
             'address' => !empty($driver['address']) ? $driver['address'] : null,
             'vehicle_type' => $driver['vehicle_type'],
-        'vehicle_number' => $driver['vehicle_number'],
-        'model_rating' => (float)($driver['model_rating'] ?? 0.0),
-        'aadhar_photo' => getUploadsUrl($driver['aadhar_photo']),
-        'licence_photo' => getUploadsUrl($driver['licence_photo']),
-        'rc_photo' => getUploadsUrl($driver['rc_photo']),
-        'kyc_status' => $driver['kyc_status'],
-        'account_number' => $driver['account_number'],
-        'bank_name' => $driver['bank_name'],
-        'ifsc_code' => $driver['ifsc_code'],
-        'account_holder_name' => $driver['account_holder_name'],
-        'created_at' => $driver['created_at'],
-    ];
+            'vehicle_number' => $driver['vehicle_number'],
+            'model_rating' => (float)($driver['model_rating'] ?? 0.0),
+            'aadhar_photo' => getUploadsUrl($driver['aadhar_photo']),
+            'licence_photo' => getUploadsUrl($driver['licence_photo']),
+            'rc_photo' => getUploadsUrl($driver['rc_photo']),
+            'kyc_status' => $driver['kyc_status'],
+            'account_number' => $driver['account_number'],
+            'bank_name' => $driver['bank_name'],
+            'ifsc_code' => $driver['ifsc_code'],
+            'account_holder_name' => $driver['account_holder_name'],
+            'created_at' => $driver['created_at'],
+        ];
 
-    echo json_encode([
+    error_log("Login - Preparing success response for driver ID: " . $driverData['driver_id']);
+    error_log("Login - Response driver data keys: " . implode(', ', array_keys($driverData)));
+    
+    $response = [
         'success' => true,
         'message' => 'Login successful',
         'driver' => $driverData
-    ]);
+    ];
+    
+    error_log("Login - Final response: " . json_encode($response));
+    
+    echo json_encode($response);
 
 } catch (PDOException $e) {
+    error_log("Login - Database exception: " . $e->getMessage());
     sendErrorResponse('Database operation failed: ' . $e->getMessage());
+} catch (Exception $e) {
+    error_log("Login - General exception: " . $e->getMessage());
+    sendErrorResponse('Login failed: ' . $e->getMessage());
 }
 ?>

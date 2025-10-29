@@ -53,7 +53,7 @@ try {
     }
     
     if (!$isValidPassword) {
-        sendErrorResponse('Current password is incorrect', 401);
+        sendErrorResponse('Wrong password please check again', 401);
     }
 
     // Hash the new password

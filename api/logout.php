@@ -42,20 +42,19 @@ try {
     ");
     $stmt->execute();
     
-    // Deactivate the current device session
+    // Delete the device session record completely
     $stmt = $pdo->prepare("
-        UPDATE device_sessions 
-        SET is_active = FALSE, last_activity = CURRENT_TIMESTAMP
-        WHERE driver_id = ? AND device_id = ? AND is_active = TRUE
+        DELETE FROM device_sessions 
+        WHERE driver_id = ? AND device_id = ?
     ");
     $stmt->execute([$driver_id, $device_id]);
     
-    $affected_rows = $stmt->rowCount();
+    $deleted_rows = $stmt->rowCount();
     
-    if ($affected_rows > 0) {
+    if ($deleted_rows > 0) {
         echo json_encode([
             'success' => true,
-            'message' => 'Logout successful - device session cleared',
+            'message' => 'Logout successful - device session deleted',
             'data' => [
                 'driver_id' => $driver_id,
                 'device_id' => $device_id,
@@ -63,11 +62,11 @@ try {
             ]
         ]);
         
-        error_log("Logout - Device session cleared: Driver {$driver_id}, Device: {$device_id}");
+        error_log("Logout - Device session deleted: Driver {$driver_id}, Device: {$device_id}");
     } else {
         echo json_encode([
             'success' => true,
-            'message' => 'Logout successful - no active session found',
+            'message' => 'Logout successful - no device session found to delete',
             'data' => [
                 'driver_id' => $driver_id,
                 'device_id' => $device_id,
@@ -75,7 +74,7 @@ try {
             ]
         ]);
         
-        error_log("Logout - No active session found: Driver {$driver_id}, Device: {$device_id}");
+        error_log("Logout - No device session found to delete: Driver {$driver_id}, Device: {$device_id}");
     }
     
 } catch (PDOException $e) {

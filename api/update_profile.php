@@ -86,7 +86,7 @@ try {
 
     // Format driver data for response (matching ProfileData.fromJson expectations)
     $driverData = [
-        'driver_id' => $driver['id'],
+        'driver_id' => (int)$driver['id'],  // Ensure it's an integer, not string
         'driver_name' => $driver['driver_name'],
         'email' => $driver['email'],
         'phone' => $driver['number'],

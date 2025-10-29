@@ -562,11 +562,44 @@ class NotificationProvider extends ChangeNotifier {
 
   // Initialize with some sample notifications
   void initializeWithSampleNotifications(String driverId) {
-    if (_notifications.isEmpty) {
+    // Check if old welcome notification exists and update it
+    final oldWelcomeIndex = _notifications.indexWhere((n) => 
+      n.title.toLowerCase().contains('welcome') || 
+      n.title.toLowerCase().contains('apatkal')
+    );
+    
+    // Define new welcome notification details
+    const newWelcomeTitle = 'Welcome to APATKAL App';
+    const newWelcomeMessage = 'You\'re all set! Start by accepting accident reports to begin trips.';
+    
+    if (oldWelcomeIndex != -1) {
+      // Old welcome notification exists - update it with new message
+      final oldNotification = _notifications[oldWelcomeIndex];
+      
+      // Check if it needs updating
+      if (oldNotification.title != newWelcomeTitle || oldNotification.message != newWelcomeMessage) {
+        // Remove old notification
+        _notifications.removeAt(oldWelcomeIndex);
+        _notificationIds.remove(oldNotification.id);
+        notifyListeners(); // Update UI immediately
+        
+        // Add updated welcome notification
+        addSystemNotification(
+          title: newWelcomeTitle,
+          message: newWelcomeMessage,
+          driverId: driverId,
+          action: 'view_accident', // Navigate to home page when clicked
+        );
+        
+        print('🔄 Updated old welcome notification to new version');
+      }
+    } else if (_notifications.isEmpty) {
+      // No notifications at all - add new welcome notification
       addSystemNotification(
-        title: 'Welcome to Apatkal Driver App',
-        message: 'You\'re all set! Start by accepting accident reports to begin earning.',
+        title: newWelcomeTitle,
+        message: newWelcomeMessage,
         driverId: driverId,
+        action: 'view_accident', // Navigate to home page when clicked
       );
     }
   }

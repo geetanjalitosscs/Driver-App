@@ -96,7 +96,7 @@ class _KycVerificationScreenState extends State<KycVerificationScreen> {
       textColor = Colors.green.shade700;
       icon = Icons.check_circle_outline;
     } else if (status != 'approved') {
-      message = 'Your application is pending for confirmation login again after logout';
+      message = 'Your application is pending please wait then check again.';
       backgroundColor = Colors.orange.shade50;
       textColor = Colors.orange.shade700;
       icon = Icons.pending_outlined;
@@ -205,8 +205,8 @@ class _KycVerificationScreenState extends State<KycVerificationScreen> {
                   // Description
                   Text(
                     authProvider.kycStatus == 'rejected'
-                        ? 'Your KYC verification has been rejected. Please contact our support team for more information about the rejection reason.\n\nYou may need to resubmit your documents with corrections.'
-                        : 'Your KYC documents have been submitted successfully and are currently under review by our verification team.\n\nPlease allow up to 24–48 hours for verification. You\'ll be notified once your profile is approved and activated.',
+                        ? 'Your KYC verification has been rejected. Please contact our support team on email apatkalindia@gmail.com for more information about the rejection reason.\n\nYou may need to resubmit your documents with corrections.'
+                        : 'Your KYC documents have been submitted successfully and are currently under review by our verification team.\n\nPlease allow up to 24–48 hours for verification. If it takes time more than that then login again after logout.',
                     style: AppTheme.bodyLarge.copyWith(
                       fontSize: 16,
                       height: 1.5,

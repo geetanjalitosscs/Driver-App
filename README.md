@@ -87,29 +87,48 @@ Apatkal-App/
    - Email, password
    - Latitude, longitude
    - Device ID, device name
-6. API validates credentials in `drivers` table
-7. API checks `device_sessions` for existing sessions
+6. API validates credentials in `drivers` table (supports hashed and plain-text passwords)
+7. API checks `device_sessions` for existing active sessions
 8. If another device is active → Login blocked (single-device security)
-9. If allowed → Creates device session + updates `driver_locations`
-10. Returns driver data + starts location tracking service
-11. Location updates every **5 seconds** via `update_driver_location.php`
+9. If same device → Updates existing device session
+10. If different device (and no active session) → Creates new device session
+11. Updates `driver_locations` table with current location
+12. Returns driver data + starts location tracking service
+13. Location updates every **5 seconds** via `update_driver_location.php`
 
-#### **Signup Process** (`signup_screen.dart` → `signup.php`)
+#### **Signup Process** (`signup_screen.dart` → `signup.php` → `verify_otp.php`)
 1. User fills registration form with:
    - Personal info (name, email, phone, address)
    - Vehicle details (type, number)
    - Bank details (account, IFSC, holder name)
    - KYC documents (Aadhar, Licence, RC photos)
-2. Photos are uploaded to `uploads/` directory
-3. API creates driver record in `drivers` table
-4. Adds bank details to `driver_bank_accounts`
-5. Updates KYC documents
-6. Returns driver ID for login
+2. User submits form → `signup.php` is called
+3. API generates 4-digit OTP and sends SMS to phone number
+4. All signup data stored in PHP session (temporary)
+5. User navigates to OTP verification screen
+6. User enters OTP → `verify_otp.php` is called
+7. OTP verified → API creates driver record in `drivers` table
+8. Photos uploaded to `uploads/` directory
+9. Device session created in `device_sessions` table
+10. Bank details added to `driver_bank_accounts`
+11. KYC documents updated
+12. Returns driver data for auto-login
+
+#### **Forgot Password Process** (`forgot_password_screen.dart` → `forgot_password.php` → `verify_forgot_password_otp.php` → `reset_password.php`)
+1. User clicks "Forgot Password?" on login screen
+2. User enters phone number → `forgot_password.php`
+3. API finds driver by phone number
+4. Generates OTP and sends SMS
+5. User enters OTP → `verify_forgot_password_otp.php`
+6. OTP verified → Navigate to reset password screen
+7. User enters new password → `reset_password.php`
+8. Password updated in database (hashed)
+9. Returns to login screen
 
 #### **Logout Process** (`logout.php`)
 1. User taps logout
 2. Stops location tracking service
-3. Calls `logout.php` to deactivate device session
+3. Calls `logout.php` to **delete** device session record
 4. Clears local storage data
 5. Returns to login screen
 
@@ -249,7 +268,9 @@ Always → 10 kilometers fixed radius
 - login_time, last_activity
 - is_active (boolean)
 - ip_address, user_agent
+- UNIQUE KEY unique_driver_device (driver_id, device_id)
 ```
+**Note:** Device sessions are automatically created on login/signup and **deleted** on logout
 
 #### **4. accidents** - Accident reports
 ```sql
@@ -297,15 +318,32 @@ Always → 10 kilometers fixed radius
 ### **1. Single-Device Login**
 - One driver account can only be active on one device
 - `device_sessions` table tracks active sessions
-- Login checks for existing active sessions
-- New login deactivates old device session
+- Login checks for existing active sessions on other devices
+- Same device login: Updates existing session
+- Different device login: Deactivates old sessions and creates new session
+- Logout: **Deletes** device session record completely
+- Prevents account from being logged in on multiple devices simultaneously
 
-### **2. KYC Verification**
+### **2. OTP Verification**
+- Two-step signup process with SMS OTP verification
+- OTP sent via SMS gateway (bhashsms.com)
+- OTP valid for 10 minutes
+- Resend OTP with 30-second cooldown
+- Session-based OTP storage (not stored in database)
+- Forgot password flow also uses OTP verification
+
+### **3. Password Security**
+- Passwords stored as bcrypt hashes
+- Backward compatibility with plain-text passwords for old accounts
+- Password change requires current password verification
+- Password reset via OTP verification flow
+
+### **4. KYC Verification**
 - Aadhar, Licence, RC document upload required
 - Admin approval needed before driver can accept trips
 - Status: pending → approved/rejected
 
-### **3. Location Security**
+### **5. Location Security**
 - Real-time location tracking for driver safety
 - Location stored securely in database
 - No location data exposed to unauthorized users
@@ -325,6 +363,10 @@ Always → 10 kilometers fixed radius
 ✅ KYC verification  
 ✅ Profile management  
 ✅ Single-device login security  
+✅ OTP-based signup verification  
+✅ Forgot password with OTP  
+✅ Password reset functionality  
+✅ Secure password storage (bcrypt)  
 
 ### **API Features**
 ✅ RESTful API architecture  
@@ -439,8 +481,12 @@ Show Trip Completion Dialog
 ### **Frontend (Flutter)**
 
 #### **lib/screens/**
-- `login_screen.dart` - User login interface
-- `signup_screen.dart` - User registration interface
+- `login_screen.dart` - User login interface with "Forgot Password?" link
+- `signup_screen.dart` - User registration interface (validates input before OTP)
+- `otp_verification_screen.dart` - OTP verification screen for signup (with resend functionality)
+- `forgot_password_screen.dart` - Enter phone number for password reset
+- `forgot_password_otp_screen.dart` - OTP verification for password reset
+- `reset_password_screen.dart` - Set new password after OTP verification
 - `home_screen.dart` - Main dashboard with status toggle
 - `accident_list_screen.dart` - List of nearby accidents (auto-refresh every 5 min)
 - `trip_navigation_screen.dart` - Active trip navigation with map
@@ -476,10 +522,16 @@ Show Trip Completion Dialog
 ### **Backend (PHP)**
 
 #### **Authentication APIs**
-- `login.php` - Driver login with location & device tracking
-- `signup.php` - Driver registration with KYC upload
-- `logout.php` - Device session deactivation
+- `login.php` - Driver login with location & device tracking (supports hashed/plain-text passwords)
+- `signup.php` - Initiate signup, generate and send OTP via SMS
+- `verify_otp.php` - Verify signup OTP and create driver account
+- `resend_otp.php` - Resend OTP during signup with 30-second cooldown
+- `logout.php` - **Delete** device session record
 - `update_profile.php` - Profile updates
+- `forgot_password.php` - Send OTP for password reset
+- `verify_forgot_password_otp.php` - Verify OTP for password reset
+- `reset_password.php` - Reset password after OTP verification
+- `change_password.php` - Change password (requires current password)
 
 #### **Location APIs**
 - `update_driver_location.php` - Real-time location updates (every 5 seconds)
@@ -506,8 +558,9 @@ Show Trip Completion Dialog
 - `check_kyc_status.php` - KYC verification status
 - `get_account_details.php` - Account details
 - `upload_photo.php` - Photo upload
+- `upload_photo_base64.php` - Base64 photo upload for signup
 - `send_notification.php` - Send push notification
-- `change_password.php` - Password change
+- `change_password.php` - Password change (requires current password)
 - `delete_account.php` - Account deletion
 
 ---
@@ -545,9 +598,13 @@ Already configured to IST (Asia/Kolkata) in:
 2. Enter personal info + vehicle details
 3. Upload Aadhar, Licence, RC photos
 4. Enter bank account details
-5. Submit → KYC verification pending
-6. Wait for admin approval
-7. Login after approval
+5. Submit → OTP sent to phone via SMS
+6. Enter OTP on verification screen
+7. OTP verified → Account created automatically
+8. Device session created
+9. Account set to KYC verification pending
+10. Wait for admin approval
+11. Login after approval
 
 ### **Flow 2: Active Driver Daily Work**
 1. Login → Home screen
@@ -605,7 +662,19 @@ php api/test_connection.php
 ### **Single-Device Login Issues**
 - Check `device_sessions` table
 - Verify `is_active` status
-- Clear old sessions manually in database
+- Sessions are automatically deleted on logout
+- Clear old sessions manually in database if needed
+
+### **OTP Not Received**
+- Check SMS gateway connection
+- Verify phone number format
+- Check error_log for SMS API responses
+- OTP shown on screen for debugging (development only)
+
+### **Password Issues**
+- Old accounts support both hashed and plain-text passwords
+- Password reset available via forgot password flow
+- Password change requires current password verification
 
 ---
 
@@ -624,5 +693,29 @@ This project is licensed under the MIT License.
 
 ---
 
-**Last Updated:** January 2025  
-**Version:** 1.0.0
+**Last Updated:** October 2025  
+**Version:** 2.0.0
+
+## 🆕 Recent Updates (v2.0.0)
+
+### **New Features**
+- ✅ **OTP Verification System** - Two-step signup with SMS OTP verification
+- ✅ **Forgot Password Flow** - Complete password reset with OTP verification
+- ✅ **Enhanced Device Session Management** - Device sessions deleted on logout (not just deactivated)
+- ✅ **Password Compatibility** - Support for both hashed and plain-text passwords for old accounts
+- ✅ **Improved Error Handling** - Better error messages and detailed logging
+
+### **Updated APIs**
+- `verify_otp.php` - Verify OTP and complete signup
+- `resend_otp.php` - Resend OTP during signup
+- `forgot_password.php` - Initiate password reset with OTP
+- `verify_forgot_password_otp.php` - Verify OTP for password reset
+- `reset_password.php` - Reset password after OTP verification
+- `login.php` - Enhanced device session handling (update on same device, create on new device)
+- `logout.php` - Now deletes device sessions instead of deactivating
+
+### **UI Improvements**
+- OTP verification screen with resend functionality
+- Forgot password screens (phone entry → OTP → reset password)
+- Better error messages for user feedback
+- Form data persistence when navigating back

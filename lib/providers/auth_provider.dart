@@ -11,11 +11,13 @@ class AuthProvider extends ChangeNotifier {
   ProfileData? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
+  Map<String, dynamic>? _lastSignupResponse; // Store last signup response
 
   ProfileData? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentUser != null;
+  Map<String, dynamic>? get lastSignupResponse => _lastSignupResponse;
 
   // Initialize authentication state from storage
   Future<void> initializeAuth() async {
@@ -136,6 +138,11 @@ class AuthProvider extends ChangeNotifier {
         deviceName: deviceName,
       );
       
+      print('✅ Login API Response received: $data');
+      print('✅ Success field: ${data['success']}');
+      print('✅ KYC pending field: ${data['kyc_pending']}');
+      print('✅ Driver data present: ${data['driver'] != null}');
+      
       if (data['success'] == true) {
         print('Login response data: $data'); // Debug log
         print('Driver data from API: ${data['driver']}'); // Debug log
@@ -227,10 +234,18 @@ class AuthProvider extends ChangeNotifier {
       
       print('Signup API response: $data'); // Debug log
       
-      if (data['success'] == true) {
+      // Store the response for later use
+      _lastSignupResponse = data;
+      
+      if (data['success'] == true && data['otp_sent'] == true) {
+        // OTP sent successfully - return true to navigate to OTP screen
+        _setLoading(false);
+        return true;
+      } else if (data['success'] == true && data['driver'] != null) {
+        // Old flow - direct account creation (backward compatibility)
         _currentUser = ProfileData.fromJson(data['driver']);
-        await _saveUserData(); // Save user data to storage
-        await _setDefaultOfflineState(); // Set default offline state on signup
+        await _saveUserData();
+        await _setDefaultOfflineState();
         _setLoading(false);
         return true;
       } else {
@@ -271,6 +286,103 @@ class AuthProvider extends ChangeNotifier {
       }
       
       _setError(errorMessage);
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Verify OTP method
+  Future<bool> verifyOtp({
+    required String otp,
+    required String phone,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      // Get session cookie from last signup response
+      String? sessionCookie = _lastSignupResponse?['session_cookie'];
+      
+      final data = await CentralizedApiService.verifyOtp(
+        otp: otp,
+        phone: phone,
+        sessionCookie: sessionCookie,
+      );
+      
+      print('Verify OTP API response: $data'); // Debug log
+      
+      if (data['success'] == true) {
+        if (data['driver'] != null) {
+          _currentUser = ProfileData.fromJson(data['driver']);
+          await _saveUserData(); // Save user data to storage
+          await _setDefaultOfflineState(); // Set default offline state on signup
+          _lastSignupResponse = null; // Clear stored response
+          _setLoading(false);
+          return true;
+        } else {
+          _setError('Account created but driver data not received');
+          _setLoading(false);
+          return false;
+        }
+      } else {
+        print('OTP verification failed: ${data['message']}'); // Debug log
+        _setError(data['message'] ?? 'OTP verification failed');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      print('Verify OTP error: $e'); // Debug log
+      
+      // More specific error handling
+      String errorMessage = 'OTP verification error: $e';
+      if (e.toString().contains('Invalid OTP')) {
+        errorMessage = 'Invalid OTP. Please check and try again.';
+      } else if (e.toString().contains('expired')) {
+        errorMessage = 'OTP has expired. Please request a new one.';
+      } else if (e.toString().contains('session expired')) {
+        errorMessage = 'OTP session expired. Please start signup again.';
+      }
+      
+      _setError(errorMessage);
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Resend OTP method
+  Future<bool> resendOtp({
+    required String phone,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      // Get session cookie from last signup response
+      String? sessionCookie = _lastSignupResponse?['session_cookie'];
+      
+      final data = await CentralizedApiService.resendOtp(
+        phone: phone,
+        sessionCookie: sessionCookie,
+      );
+      
+      print('Resend OTP API response: $data'); // Debug log
+      
+      if (data['success'] == true && data['otp_sent'] == true) {
+        // Update session cookie if provided
+        if (data['session_cookie'] != null) {
+          _lastSignupResponse?['session_cookie'] = data['session_cookie'];
+        }
+        _setLoading(false);
+        return true;
+      } else {
+        print('Resend OTP failed: ${data['message']}'); // Debug log
+        _setError(data['message'] ?? 'Failed to resend OTP');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      print('Resend OTP error: $e'); // Debug log
+      _setError('Resend OTP error: $e');
       _setLoading(false);
       return false;
     }
@@ -436,6 +548,7 @@ class AuthProvider extends ChangeNotifier {
     
     // Remove common API error prefixes
     List<String> prefixesToRemove = [
+      'Password change error: Exception: ',
       'Password change error: ',
       'Profile update error: ',
       'Network error: ',
