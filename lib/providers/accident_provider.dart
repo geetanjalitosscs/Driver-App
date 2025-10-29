@@ -219,6 +219,17 @@ class AccidentProvider extends ChangeNotifier {
       }).toList();
     }
     
+    // Sort by created_at DESC (newest first)
+    filteredAccidents.sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.accidentDate);
+        final dateB = DateTime.parse(b.accidentDate);
+        return dateB.compareTo(dateA); // Descending order (newest first)
+      } catch (e) {
+        return 0;
+      }
+    });
+    
     _accidentList = filteredAccidents;
     _pendingCount = _accidentList.where((accident) => 
         accident.status == 'pending' && 
