@@ -22,6 +22,7 @@ checkDriverStatus($driver_id);
 
 try {
     // Fetch completed trips for the driver (assuming trips with end_time are completed)
+    // Note: client_id is NOT included in the SELECT as per user requirement (not shown in app)
     $stmt = $pdo->prepare("
         SELECT 
             history_id,
@@ -30,12 +31,15 @@ try {
             location,
             timing,
             duration,
+            distance,
             start_time,
             end_time,
             start_latitude,
             start_longitude,
             end_latitude,
             end_longitude,
+            from_location,
+            to_location,
             created_at
         FROM trips 
         WHERE driver_id = ? AND end_time IS NOT NULL
@@ -55,6 +59,10 @@ try {
         $trip['history_id'] = (int)$trip['history_id'];
         $trip['driver_id'] = (int)$trip['driver_id'];
         $trip['duration'] = (int)$trip['duration'];
+        // Convert distance to float if it exists
+        if (isset($trip['distance']) && $trip['distance'] !== null) {
+            $trip['distance'] = (float)$trip['distance'];
+        }
     }
     
     echo json_encode($trips);

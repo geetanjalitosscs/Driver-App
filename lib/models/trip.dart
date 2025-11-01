@@ -20,6 +20,11 @@ class Trip {
   final double? currentLatitude;
   final double? currentLongitude;
   final DateTime? lastLocationUpdate;
+  
+  // New fields: distance, from_location, to_location
+  final double? distance; // Distance in kilometers
+  final String? fromLocation; // Start location address
+  final String? toLocation; // End/destination location address
 
   Trip({
     required this.historyId,
@@ -38,6 +43,9 @@ class Trip {
     this.currentLatitude,
     this.currentLongitude,
     this.lastLocationUpdate,
+    this.distance,
+    this.fromLocation,
+    this.toLocation,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -58,6 +66,9 @@ class Trip {
       currentLatitude: json['current_latitude'] != null ? double.tryParse(json['current_latitude'].toString()) : null,
       currentLongitude: json['current_longitude'] != null ? double.tryParse(json['current_longitude'].toString()) : null,
       lastLocationUpdate: json['last_location_update'] != null ? DateTime.parse(json['last_location_update']) : null,
+      distance: json['distance'] != null ? double.tryParse(json['distance'].toString()) : null,
+      fromLocation: json['from_location']?.toString(),
+      toLocation: json['to_location']?.toString(),
     );
   }
 
@@ -92,6 +103,9 @@ class Trip {
     double? currentLatitude,
     double? currentLongitude,
     DateTime? lastLocationUpdate,
+    double? distance,
+    String? fromLocation,
+    String? toLocation,
   }) {
     return Trip(
       historyId: historyId ?? this.historyId,
@@ -110,6 +124,9 @@ class Trip {
       currentLatitude: currentLatitude ?? this.currentLatitude,
       currentLongitude: currentLongitude ?? this.currentLongitude,
       lastLocationUpdate: lastLocationUpdate ?? this.lastLocationUpdate,
+      distance: distance ?? this.distance,
+      fromLocation: fromLocation ?? this.fromLocation,
+      toLocation: toLocation ?? this.toLocation,
     );
   }
 
@@ -183,11 +200,18 @@ class Trip {
   int get tripId => historyId;
 
   // Location getters for UI compatibility
-  String get startLocation => location; // Using location as start location
-  String get endLocation => location; // Using location as end location for now
+  // Use from_location/to_location if available, otherwise fallback to location
+  String get startLocation => fromLocation ?? location;
+  String get endLocation => toLocation ?? location;
   
-  // Distance getters - calculate from coordinates if available
+  // Distance getters - use stored distance if available, otherwise calculate from coordinates
   double? get distanceKm {
+    // First, use the stored distance from database if available
+    if (distance != null && distance! > 0) {
+      return distance;
+    }
+    
+    // Fallback: calculate from coordinates if available
     if (startLatitude != null && startLongitude != null && 
         endLatitude != null && endLongitude != null) {
       // Use Geolocator's built-in distance calculation
@@ -200,8 +224,8 @@ class Trip {
   }
   
   String get formattedDistance {
-    final distance = distanceKm;
-    if (distance == null) return 'N/A';
-    return '${distance.toStringAsFixed(2)} km';
+    final dist = distanceKm;
+    if (dist == null) return 'N/A';
+    return '${dist.toStringAsFixed(2)} km';
   }
 }

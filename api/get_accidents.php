@@ -144,11 +144,66 @@ try {
                                 $duration = 1; // Minimum 1 second for accident response
                             }
                             
+                            // Get client_id from clients table by matching phone number
+                            $client_id = null;
+                            $accident_phone = $accident['phone'] ?? null;
+                            if ($accident_phone) {
+                                try {
+                                    $clientStmt = $pdo->prepare("SELECT id FROM clients WHERE mobile_no = ? LIMIT 1");
+                                    $clientStmt->execute([$accident_phone]);
+                                    $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
+                                    if ($client) {
+                                        $client_id = (int)$client['id'];
+                                        error_log("Found client_id: $client_id for phone: $accident_phone");
+                                    } else {
+                                        error_log("No client found for phone: $accident_phone");
+                                    }
+                                } catch (Exception $e) {
+                                    error_log("Error fetching client_id: " . $e->getMessage());
+                                }
+                            }
+                            
+                            // Calculate distance in kilometers using Haversine formula
+                            $distance = null;
+                            if ($accident['latitude'] && $accident['longitude'] && $driver_latitude && $driver_longitude) {
+                                // Haversine formula to calculate distance
+                                $lat1 = deg2rad((float)$accident['latitude']);
+                                $lon1 = deg2rad((float)$accident['longitude']);
+                                $lat2 = deg2rad((float)$driver_latitude);
+                                $lon2 = deg2rad((float)$driver_longitude);
+                                
+                                $dlat = $lat2 - $lat1;
+                                $dlon = $lon2 - $lon1;
+                                
+                                $a = sin($dlat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dlon / 2) ** 2;
+                                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                                $distance_km = 6371 * $c; // Earth radius in kilometers
+                                $distance = round($distance_km, 2); // Round to 2 decimal places
+                                
+                                error_log("Calculated distance: $distance km");
+                            }
+                            
+                            // Get from_location (accident location address)
+                            $from_location = $accident['location'] ?? null;
+                            
+                            // Get to_location (end location - try to get from driver's current location or use accident location)
+                            // For now, we'll use accident location as to_location since driver completes at accident location
+                            // In future, this can be updated with actual destination if available
+                            $to_location = $accident['location'] ?? null;
+                            
+                            // Try to get actual destination address if we have coordinates
+                            // For now, we'll store the accident location as to_location
+                            // Note: This can be enhanced to get reverse geocoding address from driver's end coordinates
+                            
                             // Debug logging for trip creation
                             error_log("=== TRIP CREATION DEBUG ===");
                             error_log("Accident ID: $accident_id");
                             error_log("Client Name: $client_name");
+                            error_log("Client ID: " . ($client_id ?? 'NULL'));
                             error_log("Location: $location");
+                            error_log("From Location: $from_location");
+                            error_log("To Location: $to_location");
+                            error_log("Distance: " . ($distance ?? 'NULL') . " km");
                             error_log("Duration: $duration seconds");
                             error_log("=== END DEBUG ===");
                             
@@ -159,24 +214,28 @@ try {
                             $existingTrip = $checkStmt->fetch();
                             
                             if (!$existingTrip) {
-                                // Insert trip record using accident ID as trip ID
+                                // Insert trip record with all new fields
                                 $tripStmt = $pdo->prepare("INSERT INTO trips 
-                                    (history_id, driver_id, client_name, location, timing, duration, start_time, end_time, start_latitude, start_longitude, end_latitude, end_longitude, created_at) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                                    (history_id, driver_id, client_id, client_name, location, timing, duration, distance, start_time, end_time, start_latitude, start_longitude, end_latitude, end_longitude, from_location, to_location, created_at) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
                                 
                                 $tripInserted = $tripStmt->execute([
                                     $accident_id,  // Use accident ID as trip ID
                                     $driver_id,
+                                    $client_id,  // client_id (can be NULL)
                                     $client_name,
                                     $location,
                                     $accepted_at,
                                     $duration,
+                                    $distance,  // distance in km (can be NULL)
                                     $accepted_at,
                                     $completed_at,
                                     $accident['latitude'],  // Accident location (start - where driver went to)
                                     $accident['longitude'],
                                     $driver_latitude,  // Driver's current location (end - where they completed from)
-                                    $driver_longitude
+                                    $driver_longitude,
+                                    $from_location,  // from_location address
+                                    $to_location     // to_location address
                                 ]);
                                 
                                 if ($tripInserted) {
