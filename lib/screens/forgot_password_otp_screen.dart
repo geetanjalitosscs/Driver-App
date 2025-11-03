@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common/app_button.dart';
@@ -12,13 +11,11 @@ import 'reset_password_screen.dart';
 class ForgotPasswordOtpScreen extends StatefulWidget {
   final String phone;
   final String? sessionCookie;
-  final String? debugOtp;  // OTP from error_log for debugging
 
   const ForgotPasswordOtpScreen({
     super.key,
     required this.phone,
     this.sessionCookie,
-    this.debugOtp,
   });
 
   @override
@@ -32,14 +29,12 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   int _resendCooldown = 0;
   Timer? _resendTimer;
   String? _sessionCookie;
-  String? _debugOtp;  // OTP from error_log for debugging
 
   @override
   void initState() {
     super.initState();
     _resendCooldown = 30;
     _sessionCookie = widget.sessionCookie;
-    _debugOtp = widget.debugOtp;  // Set initial debug OTP from parent
     _startResendTimer();
   }
 
@@ -93,7 +88,6 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
         
         setState(() {
           _resendCooldown = 30;
-          _debugOtp = response['debug_otp'];  // Update debug OTP from resend response
         });
         _startResendTimer();
       } else if (mounted) {
@@ -320,55 +314,6 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                         color: AppTheme.textSecondary,
                       ),
                     ),
-                    
-                    // Display debug OTP from error_log
-                    if (_debugOtp != null && _debugOtp!.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.accentOrange.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppTheme.accentOrange,
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: AppTheme.accentOrange,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'OTP: $_debugOtp',
-                                style: GoogleFonts.roboto(
-                                  fontSize: 14,
-                                  color: AppTheme.accentOrange,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.content_copy, size: 18),
-                              color: AppTheme.accentOrange,
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: _debugOtp!));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('OTP copied to clipboard'),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                     
                     const SizedBox(height: 24),
                     

@@ -46,7 +46,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             builder: (context) => ForgotPasswordOtpScreen(
               phone: _phoneController.text.trim(),
               sessionCookie: response['session_cookie'],
-              debugOtp: response['debug_otp'],  // OTP from API for debugging
             ),
           ),
         );

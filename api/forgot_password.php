@@ -3,6 +3,43 @@ require_once './db_config.php';
 
 setApiHeaders();
 
+// SMS OTP Function - EXACT SAME AS signup.php (2-parameter version that works!)
+function sendOTP($mobile_no, $otp_code) {
+    $url = 'http://bhashsms.com/api/sendmsg.php';
+
+    $message = "Dear sir/mam We have received a request to authenticate your account. Please use the One-Time Password OTP " . $otp_code . " below to complete your request: This OTP will expire in 10 minutes. Please ensure it is entered before that time. Team APATKAL -MGAUS INFORMATION TECHNOLOGY PRIVATE LIMITED";
+
+    $params = [
+        'user' => 'MgausSMS',
+        'pass' => '123456',
+        'sender' => 'APTKAL',
+        'phone' => $mobile_no,
+        'text' => $message,
+        'priority' => 'ndnd',
+        'stype' => 'normal'
+    ];
+
+    $postData = http_build_query($params);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    // Log for debugging (same format as signup.php)
+    error_log("Forgot Password SMS API Response: HTTP $httpCode, Response: $response, Error: $curlError");
+
+    // Check if SMS was sent successfully
+    return ($httpCode == 200 && $response !== false);
+}
+
 // Start session for OTP storage
 // Check if session ID is provided in Cookie header
 if (isset($_SERVER['HTTP_COOKIE'])) {
@@ -69,44 +106,8 @@ try {
     // Generate 4-digit OTP
     $otp = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
     
-    function sendOTP($mobile_no, $otp_code, $driver_name) {
-        $url = 'http://bhashsms.com/api/sendmsg.php';
-        
-        $message = "Dear " . $driver_name . ", We have received a request to authenticate your account. Please use the One-Time Password OTP " . $otp_code . " below to complete your request: This OTP will expire in 10 minutes. Please ensure it is entered before that time. Team APATKAL -MGAUS INFORMATION TECHNOLOGY PRIVATE LIMITED";
-        
-        $params = [
-            'user' => 'MgausSMS',
-            'pass' => '123456',
-            'sender' => 'APTKAL',
-            'phone' => $mobile_no,
-            'text' => $message,
-            'priority' => 'ndnd',
-            'stype' => 'normal'
-        ];
-        
-        $postData = http_build_query($params);
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-        
-        // Log for debugging (remove in production)
-        error_log("SMS API Response: HTTP $httpCode, Response: $response, Error: $curlError");
-        
-        // Check if SMS was sent successfully
-        return ($httpCode == 200 && $response !== false);
-    }
-    
-    // Send OTP via SMS
-    $smsSent = sendOTP($phone, $otp, $driverName);
+    // Send OTP via SMS - using 2-parameter function (same as signup.php)
+    $smsSent = sendOTP($phone, $otp);
     if (!$smsSent) {
         error_log("Warning: Failed to send OTP SMS to $phone, but continuing...");
         // Continue anyway - OTP will be stored in session
