@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 25, 2025 at 04:03 PM
+-- Generation Time: Nov 03, 2025 at 05:25 PM
 -- Server version: 10.6.23-MariaDB-cll-lve
 -- PHP Version: 8.4.13
 
@@ -58,7 +58,7 @@ INSERT INTO `accidents` (`id`, `fullname`, `phone`, `vehicle`, `accident_date`, 
 (4, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926030)', 23.15483966, 79.92603031, 'Mental Patient', '', '2025-10-04 10:45:53', 'pending', NULL, NULL, NULL, NULL, 0),
 (5, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154839, Lng: 79.926032)', 23.15483918, 79.92603159, 'Ancle damaged', '', '2025-10-04 10:46:41', 'pending', NULL, NULL, NULL, NULL, 0),
 (6, 'Raj', '7771076100', 'mp20ac3893', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154839, Lng: 79.926032)', 23.15483918, 79.92603159, 'Testing no 2', '', '2025-10-04 10:47:27', 'pending', NULL, NULL, NULL, NULL, 0),
-(8, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154831, Lng: 79.926038)', 23.15483134, 79.92603816, 'Hand damaged', '', '2025-10-04 11:31:25', 'pending', NULL, NULL, NULL, NULL, 0),
+(8, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154831, Lng: 79.926038)', 23.15483134, 79.92603816, 'Hand damaged', '', '2025-10-04 11:31:25', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-27 09:02:26', '2025-10-27 09:02:48', 1),
 (9, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-04', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154840, Lng: 79.926024)', 23.15484042, 79.92602427, 'Testing 7', '', '2025-10-04 11:44:15', 'pending', NULL, NULL, NULL, NULL, 0),
 (10, 'siddharth', '9508570649', 'MP20KJ0005', '2025-10-06', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155037, Lng: 79.925987)', 23.15503750, 79.92598680, 'Full mental patient', '', '2025-10-06 08:37:50', 'pending', NULL, NULL, NULL, NULL, 0),
 (37, 'shivam kumar', '7694975579', 'MP20PH2985', '2025-10-24', '82RX+87C, Railway Colony Main Rd, Ratlam Railway Colony, Railway Colony, Ratlam, Madhya Pradesh 457001, India (Lat: 23.340646, Lng: 75.048550)', 23.34064640, 75.04855040, 'gsa', '', '2025-10-24 07:00:52', 'pending', NULL, NULL, NULL, NULL, 0),
@@ -76,8 +76,23 @@ INSERT INTO `accidents` (`id`, `fullname`, `phone`, `vehicle`, `accident_date`, 
 (49, 'sid', '9508578649', 'MP20PH2652', '2025-10-25', 'H4PX+2MW, Ashok Nagar, Lohia Nagar, Patna, Bihar 800020, India (Lat: 25.584600, Lng: 85.149100)', 25.58460000, 85.14910000, ' i am toss user', '', '2025-10-25 09:05:44', 'pending', NULL, NULL, NULL, NULL, 0),
 (50, 'Geetanjali', '7694975579', 'mp20ch8732', '2025-10-25', '5/1301/53, Padmadhar Colony, Rewa, Madhya Pradesh 486001, India (Lat: 24.546509, Lng: 81.281024)', 24.54650880, 81.28102400, 'tres', '', '2025-10-25 09:10:17', 'pending', NULL, NULL, NULL, NULL, 0),
 (51, 'sid', '9508578649', 'MP20PH2652', '2025-10-25', '5/1301/53, Padmadhar Colony, Rewa, Madhya Pradesh 486001, India (Lat: 24.546509, Lng: 81.281024)', 24.54650880, 81.28102400, 'asfefdvdf', '', '2025-10-25 09:11:19', 'pending', NULL, NULL, NULL, NULL, 0),
-(52, 'Geetanjali', '7694975579', 'MP20CH8732', '2025-10-25', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155026, Lng: 79.925989)', 23.15502570, 79.92598910, 'Shhsvvvsv', '', '2025-10-25 09:13:52', 'pending', NULL, NULL, NULL, NULL, 0),
-(53, 'sid', '9508578649', 'MP20PH2652', '2025-10-25', 'M6Q6+2WF, Pokhra Muhalla, Hajipur, Bihar 844101, India (Lat: 25.687300, Lng: 85.212100)', 25.68730000, 85.21210000, 'vxg jh,jh hfhv ,j,h,', '', '2025-10-25 09:31:25', 'resolved', 'completed', 'Driver: shivam kumar | Vehicle: 374vrjdj4', '2025-10-25 09:31:53', '2025-10-25 09:32:49', 1);
+(52, 'Geetanjali', '7694975579', 'MP20CH8732', '2025-10-25', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155026, Lng: 79.925989)', 23.15502570, 79.92598910, 'Shhsvvvsv', '', '2025-10-25 09:13:52', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-10-25 16:19:20', '2025-10-25 16:19:47', 1),
+(53, 'sid', '9508578649', 'MP20PH2652', '2025-10-25', 'M6Q6+2WF, Pokhra Muhalla, Hajipur, Bihar 844101, India (Lat: 25.687300, Lng: 85.212100)', 25.68730000, 85.21210000, 'vxg jh,jh hfhv ,j,h,', '', '2025-10-25 09:31:25', 'resolved', 'completed', 'Driver: shivam kumar | Vehicle: 374vrjdj4', '2025-10-25 09:31:53', '2025-10-25 09:32:49', 1),
+(54, 'Geetanjali', '7694975579', 'MP20CH8732', '2025-10-25', 'Area, 41, Kanchanpur, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482004, India (Lat: 23.201575, Lng: 79.968701)', 23.20157480, 79.96870060, 'Gwhwjj', '', '2025-10-25 16:22:13', 'pending', NULL, NULL, NULL, NULL, 0),
+(55, 'Geetanjali', '7694975579', 'MP20CH8732', '2025-10-26', '155082, Kanchanpur, Jabalpur, Vehicle Fac. Jabalpur, Madhya Pradesh 482004, India (Lat: 23.201115, Lng: 79.968404)', 23.20111510, 79.96840400, 'Dfghb', '', '2025-10-26 15:28:56', 'pending', NULL, NULL, NULL, NULL, 0),
+(56, 'sid', '9508578649', 'mp20ph2652', '2025-10-29', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155120, Lng: 79.926031)', 23.15512010, 79.92603070, 'ffguf', '', '2025-10-29 05:37:02', 'pending', NULL, NULL, NULL, NULL, 0),
+(57, 'Geetanjali', '7694975579', 'mp20ch8732', '2025-10-29', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155103, Lng: 79.926042)', 23.15510330, 79.92604190, 'jhg', '', '2025-10-29 05:39:20', 'resolved', 'completed', 'Driver: Dhaneshwari Patel | Vehicle: mp20mz4528', '2025-11-01 07:07:10', '2025-11-01 07:07:22', 1),
+(58, 'sid', '7654891234', 'mp20ph2652', '2025-10-29', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155134, Lng: 79.926037)', 23.15513360, 79.92603670, 'test', '', '2025-10-29 05:45:08', 'resolved', 'completed', 'Driver: Mohit Chavhan | Vehicle: mh12pk7894', '2025-10-29 11:47:59', '2025-10-29 11:48:35', 1),
+(59, 'sid', '8596871020', 'MP20PH2285', '2025-10-31', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155108, Lng: 79.926032)', 23.15510810, 79.92603230, 'dsff', '', '2025-10-31 09:49:54', 'pending', NULL, NULL, NULL, NULL, 0),
+(60, 'Geetanjali', '7694975579', 'mp20ch8732', '2025-10-31', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926026)', 23.15507210, 79.92602620, 'wdWFED', '', '2025-10-31 09:50:41', 'investigating', 'assigned', 'Driver: siddharth | Vehicle: mp20cb8765', '2025-10-31 09:59:04', NULL, 0),
+(61, 'Geetanjali', '7694975579', 'mp20ch8732', '2025-10-31', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926026)', 23.15507210, 79.92602620, 'ASDCXz', '', '2025-10-31 09:51:20', 'resolved', 'completed', 'Driver: siddharth | Vehicle: mp20cb8765', '2025-10-31 09:52:04', '2025-10-31 09:52:45', 1),
+(62, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-11-01', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155082, Lng: 79.926028)', 23.15508250, 79.92602780, 'ffhgfhjg', '', '2025-11-01 06:26:53', 'resolved', 'completed', 'Driver: siddharth | Vehicle: mp20cb8765', '2025-11-01 06:28:39', '2025-11-01 06:29:36', 1),
+(63, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-11-01', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155083, Lng: 79.926035)', 23.15508260, 79.92603500, 'sadsad', '', '2025-11-01 07:01:17', 'resolved', 'completed', 'Driver: siddharth | Vehicle: mp20cb8765', '2025-11-01 07:01:55', '2025-11-01 07:04:03', 1),
+(64, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-11-01', 'FV59+768 Unique Complex, near Mubaraka Complex, Bohra Bazar, Saifee Mohalla, Neemuch, Madhya Pradesh 458441, India (Lat: 24.458035, Lng: 74.868326)', 24.45803520, 74.86832640, 'fvhil', '', '2025-11-01 09:21:42', 'pending', NULL, NULL, NULL, NULL, 0),
+(65, 'Krishna Vishwakarma', '8959176446', 'mp20ab2010', '2025-11-01', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155130, Lng: 79.926036)', 23.15513030, 79.92603610, 'erwqrwaf', '', '2025-11-01 09:24:15', 'resolved', 'completed', 'Driver: siddharth | Vehicle: mp20cb8765', '2025-11-01 09:25:17', '2025-11-01 09:26:01', 1),
+(66, 'Yadav', '', 'Mp20ja6567', '2025-11-03', '220, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155193, Lng: 79.926109)', 23.15519350, 79.92610860, '', '', '2025-11-03 09:11:32', 'pending', NULL, NULL, NULL, NULL, 0),
+(67, 'sid', '9508578649', 'MP20PH2652', '2025-11-03', '4WVJ+575, Cantt, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.142784, Lng: 79.930452)', 23.14278440, 79.93045240, 'sghs', '', '2025-11-03 09:13:17', 'pending', NULL, NULL, NULL, NULL, 0),
+(68, 'sid', '9508578649', 'Mp20ph2652', '2025-11-03', '220, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155194, Lng: 79.926115)', 23.15519420, 79.92611490, 'Hi', '', '2025-11-03 09:15:47', 'resolved', 'completed', 'Driver: Rajesh Sharma | Vehicle: DL01AB1234', '2025-11-03 09:16:01', '2025-11-03 09:19:15', 1);
 
 --
 -- Triggers `accidents`
@@ -160,7 +175,18 @@ INSERT INTO `accident_photos` (`id`, `accident_id`, `photo`) VALUES
 (80, 50, '1761383417_giff.gif'),
 (81, 51, '1761383479_apatkal_qr_1001.png'),
 (82, 52, '1761383632_17613836257922329578442644097909.jpg'),
-(83, 53, '1761384685_ChatGPT Image Jul 28, 2025, 05_42_32 PM.png');
+(83, 53, '1761384685_ChatGPT Image Jul 28, 2025, 05_42_32 PM.png'),
+(84, 54, '1761409333_17614093209136885746503473734869.jpg'),
+(85, 55, '1761492536_17614925202224115268090521918822.jpg'),
+(86, 56, '1761716222_Black and Orange Professional Turn Ideas Into Impact LinkedIn Carousel.png'),
+(87, 57, '1761716360_Screenshot 2025-10-25 164050.png'),
+(88, 58, '1761716708_Black and Orange Professional Turn Ideas Into Impact LinkedIn Carousel.png'),
+(89, 59, '1761904194_Snapchat-472251267.jpg'),
+(90, 61, '1761904280_Snapchat-472251267.jpg'),
+(91, 62, '1761978413_Screenshot_2023-06-07-01-08-48-146_com.whatsapp.jpg'),
+(92, 63, '1761980477_WhatsApp Image 2025-10-01 at 01.03.18.jpeg'),
+(93, 64, '1761988902_Black and Orange Professional Turn Ideas Into Impact LinkedIn Carousel.png'),
+(94, 65, '1761989055_WhatsApp Image 2025-10-01 at 01.03.17.jpeg');
 
 -- --------------------------------------------------------
 
@@ -184,7 +210,8 @@ CREATE TABLE `accident_remarks` (
 --
 
 INSERT INTO `accident_remarks` (`id`, `accident_id`, `user_id`, `user_name`, `user_role`, `remark`, `created_at`, `updated_at`) VALUES
-(6, 30, 1, 'Admin ', 'admin', 'done', '2025-10-11 12:21:48', '2025-10-11 12:21:48');
+(6, 30, 1, 'Admin ', 'admin', 'done', '2025-10-11 12:21:48', '2025-10-11 12:21:48'),
+(0, 68, 1, 'Admin ', 'admin', 'case done', '2025-11-03 14:58:37', '2025-11-03 14:58:37');
 
 -- --------------------------------------------------------
 
@@ -318,11 +345,13 @@ CREATE TABLE `clients` (
 INSERT INTO `clients` (`id`, `full_name`, `mobile_no`, `email`, `vehicle_no`, `vehicle_type`, `created_date`, `house_no`, `address`, `landmark`, `state`, `district`, `city`, `pincode`, `added_by`, `assigned_staff`, `photo`, `status`, `amount`, `payment_method`, `transaction_id`, `gateway_transaction_id`, `gateway_response`, `payment_date`, `refund_date`, `refund_amount`, `refund_reason`, `notes`, `created_at`, `updated_at`) VALUES
 (26, 'Krishna Vishwakarma', '8959176446', 'Krishna.vishwakarma@tosssolution.in', 'mp20ab2010', 'four-wheeler', '2025-09-27', NULL, 'Toss solution Jabalpur', NULL, '', '', '', '482001', 1, NULL, NULL, 'paid', 999.00, 'phonepe', 'TXN_1760698191_26', 'PHONEPE_1760698192', '{\"transactionId\":\"PHONEPE_1760698192\",\"state\":\"COMPLETED\",\"amount\":99900,\"currency\":\"INR\"}', '2025-10-17 16:19:52', NULL, NULL, NULL, NULL, '2025-09-27 13:37:09', '2025-10-17 16:19:52'),
 (31, 'Shreyash', '9755833563', 'toss125training@gmail.com', 'mp20ch8790', 'two-wheeler', '2025-10-04', '', 'Shastri nagar', '', 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482001', 1, NULL, 'uploads/clients/client_1759819263_68e4b5ff86706.jpeg', 'paid', 999.00, 'phonepe', 'TXN_1760701130_31', 'PHONEPE_1760701130', '{\"transactionId\":\"PHONEPE_1760701130\",\"state\":\"COMPLETED\",\"amount\":99900,\"currency\":\"INR\",\"responseCode\":\"PAYMENT_SUCCESS\"}', '2025-10-17 17:08:50', NULL, NULL, NULL, NULL, '2025-10-04 16:26:11', '2025-10-17 17:08:50'),
-(32, 'dhaneshwari', '7806062421', 'admin@company.com', 'mp20ch8799', 'two-wheeler', '2025-10-04', '', 'ssd', '', 'Madhya Pradesh', 'Narsinghpur', 'NA', '487118', 1, NULL, 'uploads/clients/client_1759821423_68e4be6f4adcf.jpeg', 'unpaid', 999.00, 'phonepe', 'TXN_FAILED_1760701130_32', NULL, '{\"error\":\"Payment failed due to insufficient funds\",\"state\":\"FAILED\",\"amount\":99900,\"currency\":\"INR\"}', '2025-10-17 17:08:50', NULL, NULL, NULL, NULL, '2025-10-04 16:53:06', '2025-10-17 17:08:50'),
+(32, 'Ansh', '7806062421', 'admin@company.com', 'mp20ch8799', 'two-wheeler', '2025-10-04', '', 'ssd', '', 'Madhya Pradesh', 'Narsinghpur', 'NA', '487118', 1, NULL, 'uploads/clients/client_1759821423_68e4be6f4adcf.jpeg', 'unpaid', 999.00, 'phonepe', 'TXN_FAILED_1760701130_32', NULL, '{\"error\":\"Payment failed due to insufficient funds\",\"state\":\"FAILED\",\"amount\":99900,\"currency\":\"INR\"}', '2025-10-17 17:08:50', NULL, NULL, NULL, NULL, '2025-10-04 16:53:06', '2025-10-29 12:56:29'),
 (40, 'Geetanjali', '7694975579', 'geetanjali.tosscs@gmail.com', 'mp20ch8732', 'four-wheeler', '2025-10-06', '', 'jabalpur mm', '', 'Madhya Pradesh', 'Shahdol', 'Beohari', '484774', 1, NULL, NULL, 'paid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-06 13:40:48', '2025-10-25 14:39:25'),
 (42, 'sid', '8596871020', 'siddharth.toss.cs@gmail.com', 'MP20PH2285', 'four-wheeler', '2025-10-09', '0255', 'sss', 'sd', 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482001', 13, NULL, NULL, 'unpaid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 's', '2025-10-09 11:47:00', '2025-10-17 12:01:55'),
 (44, 'sid', '9508578649', 'siddharth.toss.cs@gmail.com', 'MP20PH2652', 'three-wheeler', '2025-10-10', '0255', 'ewf', 'sd', 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482004', 13, NULL, NULL, 'paid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ed', '2025-10-10 17:35:16', '2025-10-16 12:39:31'),
-(49, 'siddharth', '7898140799', 'siddharth.toss.cs@gmail.com', 'MP20KJ0520', 'three-wheeler', '2025-10-17', '', 'adgar', '', 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482005', 1, NULL, NULL, 'unpaid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-17 16:44:19', '2025-10-18 11:15:50');
+(56, 'Gaus', '8770658824', 'admin@apatkal.com', 'Mp20nm2755', 'two-wheeler', '2025-10-25', NULL, 'Jabalpur', NULL, 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482001', 1, NULL, NULL, 'unpaid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-25 18:49:53', '2025-10-25 18:49:53'),
+(57, 'siddharth', '7898140799', 'Toss150training@gmail.com', 'MP20PH2268', 'two-wheeler', '2025-10-29', '', 'wddq', '', 'Madhya Pradesh', 'Jabalpur', 'Jabalpur', '482002', 1, NULL, NULL, 'unpaid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-29 12:30:06', '2025-11-03 16:39:33'),
+(58, 'dhaneshwari', '7489288334', 'dhaneshwari.tosscs@gmail.com', 'mp20ch8798', 'two-wheeler', '2025-10-29', NULL, 'jabalpur mm', NULL, 'Madhya Pradesh', 'Shahdol', 'Beohari', '484774', 1, NULL, NULL, 'unpaid', NULL, 'phonepe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-29 13:02:48', '2025-10-29 13:02:48');
 
 -- --------------------------------------------------------
 
@@ -354,7 +383,6 @@ INSERT INTO `client_family_members` (`id`, `client_id`, `full_name`, `mobile_no`
 (20, 26, 'Krishna Vishwakarma', '7869722272', 'toss125training@gmail.com', 'son', '2025-10-01', 'Toss solution Jabalpur', NULL, 1, NULL, '2025-09-27 13:59:40', '2025-09-27 13:59:40'),
 (21, 33, 'siddharth', '9555363996', 'sid@gmail.com', 'brother', '2003-02-21', 'few', NULL, 1, NULL, '2025-10-03 13:21:57', '2025-10-03 13:21:57'),
 (23, 40, 'siddharth', '7898140780', 'shreyash.toss.cs@gmail.com', 'brother', NULL, 'rrfff', NULL, 1, 'siish', '2025-10-07 13:03:26', '2025-10-07 13:07:55'),
-(24, 49, 'Swayam', '9555363996', 'siddharthsingh59@gmail.com', 'brother', NULL, 'Dsbbs', NULL, 1, NULL, '2025-10-24 15:09:34', '2025-10-24 15:09:34'),
 (25, 44, 'amay', '7869722272', 'efw@gmail.com', 'brother', NULL, 'qwsa', NULL, 1, 'des', '2025-10-25 14:29:06', '2025-10-25 14:29:06');
 
 -- --------------------------------------------------------
@@ -385,7 +413,9 @@ INSERT INTO `client_logins` (`id`, `client_id`, `mobile_no`, `password`, `status
 (28, 40, '7694975579', '$2y$10$a2glOoM/bamJkcP12om.ruoUyMJaD70BK7T4Xt8J5DoWwi1pmFH2C', 'active', NULL, '2025-10-06 13:40:48', '2025-10-06 13:40:48'),
 (30, 42, '8596871020', '$2y$10$UwVCb81RuDX1GqlUkyl51OGrycgHGpTSecSfR/w01sw8uay5UYbK6', 'active', NULL, '2025-10-09 11:47:00', '2025-10-09 11:47:00'),
 (32, 44, '9508578649', '$2y$10$PNKO5FE.m.4OE9NXtTFexev0m4nF8Oco7iz9dQ/WV2UHiczce.ROi', 'active', NULL, '2025-10-10 17:35:16', '2025-10-10 17:35:16'),
-(37, 49, '7898140799', '$2y$10$.m.3avP/6gwWS28lVIJnkO/DcyrCKwi.yKOgNlDD2iiaVJcJBOTim', 'active', NULL, '2025-10-17 16:44:19', '2025-10-17 16:44:19');
+(39, 56, '8770658824', '$2y$10$ZDdP0decuYMQsx56zsOkTekOrFXlRfNzaD6IOj/U9kwqWF0ucpZaq', 'active', NULL, '2025-10-25 18:49:54', '2025-10-25 18:49:54'),
+(40, 57, '7898140797', '$2y$10$FYdWPlsQVJOQf2eqHnW8dOmi0UFyzDtO6KA7eBZ4O9oM8eeYbDjR2', 'active', NULL, '2025-10-29 12:30:06', '2025-11-03 16:19:32'),
+(41, 58, '7489288334', '$2y$10$ZGWRusSuJZMAzs2Xv8XwU.ERfvMxjGNRay9C/.7nmNZsJjaQIc.jm', 'active', NULL, '2025-10-29 13:02:48', '2025-10-29 13:02:48');
 
 -- --------------------------------------------------------
 
@@ -529,13 +559,6 @@ CREATE TABLE `device_sessions` (
   `user_agent` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Dumping data for table `device_sessions`
---
-
-INSERT INTO `device_sessions` (`id`, `driver_id`, `device_id`, `device_name`, `login_time`, `last_activity`, `is_active`, `ip_address`, `user_agent`) VALUES
-(4, 1, 'test_device_1761302823', 'Test Android Device', '2025-10-24 10:47:03', '2025-10-24 10:47:03', 1, '127.0.0.1', 'Test User Agent');
-
 -- --------------------------------------------------------
 
 --
@@ -569,13 +592,18 @@ CREATE TABLE `drivers` (
 --
 
 INSERT INTO `drivers` (`id`, `driver_name`, `email`, `password`, `number`, `address`, `vehicle_type`, `vehicle_number`, `model_rating`, `aadhar_photo`, `licence_photo`, `rc_photo`, `created_at`, `updated_at`, `kyc_status`, `account_number`, `bank_name`, `ifsc_code`, `account_holder_name`) VALUES
-(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '9876543213', 'Shastri bridge jabalpur', 'Ambulance', 'DL01AB1234', NULL, 'aadhar_rajesh.jpg', 'licence_rajesh.jpg', 'rc_rajesh.jpg', '2025-09-24 05:52:18', '2025-10-25 06:53:36', 'approved', '878484685446335', 'State Bank of India', 'SBIN0001234', 'Rajesh Sharma'),
-(2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'Beohari shahdol', 'Ambulance', 'mp20mz4528', NULL, 'Moon.jpg', 'Flower.jpg', 'Blue Flower.jpg', '2025-09-25 04:20:15', '2025-10-25 07:26:12', 'approved', '94634646313161613', 'sbi', 'SBIN0007178', 'Iqiiwiwiqi'),
+(1, 'Rajesh Sharma', 'rajesh.sharma90@gmail.com', '$2y$10$X7jMStqD5ERzpsgYXhu.Mejq1YKUHLbtN9GpWmj/tbrpZSRf9be5i', '7898140799', 'Shastri bridge jabalpur', 'Ambulance', 'DL01AB1234', NULL, 'aadhar_rajesh.jpg', 'licence_rajesh.jpg', 'rc_rajesh.jpg', '2025-09-24 05:52:18', '2025-11-03 11:52:04', 'approved', '8784846854463', 'State Bank of India', 'SBIN0001235', 'Rajesh Sharma'),
+(2, 'Dhaneshwari Patel', 'dhaneshwari17@gmail.com', '$2y$10$FmHuB6iiE1YqLNBb4hRfjOR2WQfFIR7EcOspYG7FJJqItOK0IRu9q', '7945681234', 'Beohari shahdol', 'Ambulance', 'mp20mz4528', NULL, 'Moon.jpg', 'Flower.jpg', 'Blue Flower.jpg', '2025-09-25 04:20:15', '2025-10-29 06:21:09', 'approved', '94634646313161613', 'sbi', 'SBIN0007178', 'Iqiiwiwiqi'),
 (3, 'amit', 'kalmaliindia@gmail.com', '$2y$10$5umnfnk.EgxwjelKFomLLekkdsYdHe6FKGVNkGWILLhim6j1lgvna', '8770658824', 'jabalpur', 'ambulance', 'mp20ja6365', NULL, 'JPEG_20250927_235821_3502812970878090506.jpg', 'JPEG_20250927_235827_7286715491207715510.jpg', 'default_rc.jpg', '2025-09-27 18:28:45', '2025-10-17 06:45:21', 'rejected', NULL, NULL, NULL, NULL),
-(13, 'siddharth', 'sid@gmail.com', '$2y$10$.DvSwW3Tt2klj9j2vadnCuuZ18sWRXFKJyeLHEMW/WhdvW2iWs6t2', '8956231479', 'adhartal', 'Ambulance', 'mp20cb8765', NULL, '13_aadhar_1759989104_68e74d70cdc33.jpeg', '13_licence_1759989104_68e74d70ce280.jpeg', '13_rc_1759989104_68e74d70ce5fa.jpeg', '2025-10-09 05:51:44', '2025-10-17 06:21:50', 'pending', NULL, NULL, NULL, NULL),
-(23, 'Ansh', 'sahuansh286@gmail.com', '$2y$10$RbbleKEBuKfcI5Fe8z7TE.mntE39qcIErMaU5mVOI8dgeKrU5LtGa', '7806062421', 'jbp', 'Ambulance', '2222222222', NULL, '23_aadhar_1761297212_68fb433caea5d.jpeg', '23_licence_1761297212_68fb433caf4d2.jpeg', '23_rc_1761297212_68fb433cafa8b.jpeg', '2025-10-24 09:13:32', '2025-10-24 09:13:52', 'approved', '25555555555', 'ddddddddd', 'FFFVVVVVVVF', 'sasssasss'),
+(13, 'siddharth', 'sid@gmail.com', '$2y$10$.DvSwW3Tt2klj9j2vadnCuuZ18sWRXFKJyeLHEMW/WhdvW2iWs6t2', '8956231479', 'adhartal', 'Ambulance', 'mp20cb8765', NULL, '13_aadhar_1759989104_68e74d70cdc33.jpeg', '13_licence_1759989104_68e74d70ce280.jpeg', '13_rc_1759989104_68e74d70ce5fa.jpeg', '2025-10-09 05:51:44', '2025-10-31 09:51:23', 'approved', '9668854533358', 'huuj', 'SBIN0004466', 'Guookg'),
+(23, 'Ansh', 'sahuansh286@gmail.com', '$2y$10$RbbleKEBuKfcI5Fe8z7TE.mntE39qcIErMaU5mVOI8dgeKrU5LtGa', '7806062428', 'jbp', 'Ambulance', '2222222222', NULL, '23_aadhar_1761297212_68fb433caea5d.jpeg', '23_licence_1761297212_68fb433caf4d2.jpeg', '23_rc_1761297212_68fb433cafa8b.jpeg', '2025-10-24 09:13:32', '2025-10-29 09:02:24', 'approved', '25555555555', 'ddddddddd', 'FFFVVVVVVVF', 'sasssasss'),
 (25, 'komal', 'komal@gmail.com', '$2y$10$gjf61pvWMGyYjk5vVz4xjOl8nUGwD1Hbg9wGbcvCyNjq0bZ5K4.2u', '9433431313', 'jbp', 'Ambulance', 'mp20kj8899', NULL, '25_aadhar_1761375154_68fc73b2ce20b.jpeg', '25_licence_1761375154_68fc73b2ce8a1.jpeg', '25_rc_1761375154_68fc73b2cf14a.jpeg', '2025-10-25 06:52:34', '2025-10-25 06:52:34', 'pending', '64313131694643', 'sbi', 'SBIN0001199', 'komal'),
-(26, 'shivam kumar', 'shivam@gmail.com', '$2y$10$WqiaYklF2P2ymWokNnw8keL.ydDLRyKd/k0XL1NzKQgF83yP0pis.', '9565864945', 'shre eirbdiebje', 'Van', '374vrjdj4', NULL, '26_aadhar_1761384517_68fc984545fd4.jpeg', '26_licence_1761384517_68fc98454733f.jpeg', '26_rc_1761384517_68fc984547a3e.jpeg', '2025-10-25 09:28:37', '2025-10-25 09:29:30', 'approved', 'SBIN0005241', 'sbi', 'SBIN0005241', 'shivam');
+(26, 'shivam kumar', 'shivam@gmail.com', '$2y$10$WqiaYklF2P2ymWokNnw8keL.ydDLRyKd/k0XL1NzKQgF83yP0pis.', '9565864945', 'shre eirbdiebje', 'Van', '374vrjdj4', NULL, '26_aadhar_1761384517_68fc984545fd4.jpeg', '26_licence_1761384517_68fc98454733f.jpeg', '26_rc_1761384517_68fc984547a3e.jpeg', '2025-10-25 09:28:37', '2025-11-03 09:20:41', 'rejected', 'SBIN0005241', 'sbi', 'SBIN0005241', 'shivam'),
+(27, 'Mohit Chavhan', 'mohit@gmail.com', '$2y$10$4e/Z4xzoOM08DHjaXg2zi.EbExCXsGgLOFfhz55EPZVFpKtBI4NpW', '8463431315', 'Pune Maharashtra', 'Van', 'mh12pk7894', NULL, '27_aadhar_1761719444_6901b4948e3c6.jpeg', '27_licence_1761719445_6901b495adca6.jpeg', '27_rc_1761719447_6901b4974f855.jpeg', '2025-10-29 06:30:44', '2025-10-29 08:39:27', 'approved', '346436494646643', 'Panjab National Bank', 'SBIN0001228', 'Mohit Chavhan'),
+(28, 'tdhyfu', 'ugef@gmail.com', '$2y$10$Zk.w3eqpjPS9tyqUp41jH.PD.yz7FMu3nxjxs7qN/3RBGnlJi48AK', '8563214569', 'yjhkiuhk', 'Van', 'jgyhhugk', NULL, '28_aadhar_1761725569_6901cc81a34f4.png', '28_licence_1761725569_6901cc81a372e.png', '28_rc_1761725569_6901cc81a3d95.jpeg', '2025-10-29 08:12:49', '2025-11-03 10:20:15', 'approved', '626254546544', 'gjngjng', 'SBIN0001264', 'jygjghj'),
+(29, 'esrgrfthy', 'thfh@gmail.com', '$2y$10$avXvdh.m0JFJoD.t0jtpzOhMjT3N5tTN4sr3f8j8xBf58LHmV2/x2', '7806062421', 'ukjfwsuie sedgfro', 'Ambulance', 'gjirfjglkrjg', NULL, '29_aadhar_1761728599_6901d8574fa0b.png', '29_licence_1761728599_6901d85758113.png', '29_rc_1761728600_6901d8581840b.png', '2025-10-29 09:03:19', '2025-10-29 09:06:11', 'approved', 'h78979970', 'kljhlkjklj', 'SBIN0003283', 'hjkkhlkl'),
+(30, 'fbfcb', 'nh@gmail.com', '$2y$10$eUwrqXuffkZOpB83YM1RbOpLBmAzDrdS4rYlk0Wc1CGB3vqN0dx7m', '7694975578', 'cvd', 'Ambulance', 'dsvfdxvvfds435', NULL, '30_aadhar_1762166456_690886b894337.jpeg', '30_licence_1762166457_690886b940468.jpeg', '30_rc_1762166458_690886bacf3a7.jpeg', '2025-11-03 10:40:56', '2025-11-03 10:42:27', 'pending', '323652662353', 'gbfchbgf', 'SBIN0003849', 'dsvfdxgvf'),
+(31, 'thytf', 'rfgd@gmail.com', '$2y$10$EmbhjoLZq/OwUUKEJgzM9e1P2T1QNGb9DKfnlTl6TMq3bLVW1sfUO', '7694975579', 'cxdsac', 'Ambulance', 'fdv4554', NULL, '31_aadhar_1762169496_69089298670c5.jpeg', '31_licence_1762169497_69089299149a8.jpeg', '31_rc_1762169498_6908929a9d126.jpeg', '2025-11-03 11:31:36', '2025-11-03 11:31:39', 'pending', '546532656652', 'cvdsvc', 'SBIN0002874', 'dscfdxzs');
 
 -- --------------------------------------------------------
 
@@ -615,8 +643,11 @@ CREATE TABLE `driver_locations` (
 --
 
 INSERT INTO `driver_locations` (`id`, `driver_id`, `latitude`, `longitude`, `updated_at`) VALUES
-(1, 1, 23.15505440, 79.92600190, '2025-10-25 09:57:13'),
-(11, 2, 23.15482410, 79.92606643, '2025-10-25 07:26:01');
+(1, 1, 23.15506360, 79.92601370, '2025-11-01 09:30:07'),
+(11, 2, 23.15483167, 79.92606664, '2025-11-01 07:00:23'),
+(108, 27, 23.15483605, 79.92602315, '2025-10-29 11:47:47'),
+(127, 28, 23.15482860, 79.92605828, '2025-10-29 10:34:52'),
+(189, 13, 23.15514520, 79.92601930, '2025-10-31 10:07:33');
 
 -- --------------------------------------------------------
 
@@ -5263,7 +5294,508 @@ INSERT INTO `qr_codes` (`id`, `qr_number`, `qr_url`, `created_at`, `vehicle_numb
 (4439, 4307, '/apatkal/submitaccident.php?qr=4307', '2025-10-25 10:41:16', NULL, NULL, NULL, NULL),
 (4440, 4308, '/apatkal/submitaccident.php?qr=4308', '2025-10-25 10:41:16', NULL, NULL, NULL, NULL),
 (4441, 4309, '/apatkal/submitaccident.php?qr=4309', '2025-10-25 10:41:16', NULL, NULL, NULL, NULL),
-(4442, 4310, '/apatkal/submitaccident.php?qr=4310', '2025-10-25 10:41:16', NULL, NULL, NULL, NULL);
+(4442, 4310, '/apatkal/submitaccident.php?qr=4310', '2025-10-25 10:41:16', NULL, NULL, NULL, NULL),
+(4443, 4311, '/apatkal/submitaccident.php?qr=4311', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4444, 4312, '/apatkal/submitaccident.php?qr=4312', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4445, 4313, '/apatkal/submitaccident.php?qr=4313', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4446, 4314, '/apatkal/submitaccident.php?qr=4314', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4447, 4315, '/apatkal/submitaccident.php?qr=4315', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4448, 4316, '/apatkal/submitaccident.php?qr=4316', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4449, 4317, '/apatkal/submitaccident.php?qr=4317', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4450, 4318, '/apatkal/submitaccident.php?qr=4318', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4451, 4319, '/apatkal/submitaccident.php?qr=4319', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4452, 4320, '/apatkal/submitaccident.php?qr=4320', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4453, 4321, '/apatkal/submitaccident.php?qr=4321', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4454, 4322, '/apatkal/submitaccident.php?qr=4322', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4455, 4323, '/apatkal/submitaccident.php?qr=4323', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4456, 4324, '/apatkal/submitaccident.php?qr=4324', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4457, 4325, '/apatkal/submitaccident.php?qr=4325', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4458, 4326, '/apatkal/submitaccident.php?qr=4326', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4459, 4327, '/apatkal/submitaccident.php?qr=4327', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4460, 4328, '/apatkal/submitaccident.php?qr=4328', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4461, 4329, '/apatkal/submitaccident.php?qr=4329', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4462, 4330, '/apatkal/submitaccident.php?qr=4330', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4463, 4331, '/apatkal/submitaccident.php?qr=4331', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4464, 4332, '/apatkal/submitaccident.php?qr=4332', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4465, 4333, '/apatkal/submitaccident.php?qr=4333', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4466, 4334, '/apatkal/submitaccident.php?qr=4334', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4467, 4335, '/apatkal/submitaccident.php?qr=4335', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4468, 4336, '/apatkal/submitaccident.php?qr=4336', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4469, 4337, '/apatkal/submitaccident.php?qr=4337', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4470, 4338, '/apatkal/submitaccident.php?qr=4338', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4471, 4339, '/apatkal/submitaccident.php?qr=4339', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4472, 4340, '/apatkal/submitaccident.php?qr=4340', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4473, 4341, '/apatkal/submitaccident.php?qr=4341', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4474, 4342, '/apatkal/submitaccident.php?qr=4342', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4475, 4343, '/apatkal/submitaccident.php?qr=4343', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4476, 4344, '/apatkal/submitaccident.php?qr=4344', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4477, 4345, '/apatkal/submitaccident.php?qr=4345', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4478, 4346, '/apatkal/submitaccident.php?qr=4346', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4479, 4347, '/apatkal/submitaccident.php?qr=4347', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4480, 4348, '/apatkal/submitaccident.php?qr=4348', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4481, 4349, '/apatkal/submitaccident.php?qr=4349', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4482, 4350, '/apatkal/submitaccident.php?qr=4350', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4483, 4351, '/apatkal/submitaccident.php?qr=4351', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4484, 4352, '/apatkal/submitaccident.php?qr=4352', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4485, 4353, '/apatkal/submitaccident.php?qr=4353', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4486, 4354, '/apatkal/submitaccident.php?qr=4354', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4487, 4355, '/apatkal/submitaccident.php?qr=4355', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4488, 4356, '/apatkal/submitaccident.php?qr=4356', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4489, 4357, '/apatkal/submitaccident.php?qr=4357', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4490, 4358, '/apatkal/submitaccident.php?qr=4358', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4491, 4359, '/apatkal/submitaccident.php?qr=4359', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4492, 4360, '/apatkal/submitaccident.php?qr=4360', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4493, 4361, '/apatkal/submitaccident.php?qr=4361', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4494, 4362, '/apatkal/submitaccident.php?qr=4362', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4495, 4363, '/apatkal/submitaccident.php?qr=4363', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4496, 4364, '/apatkal/submitaccident.php?qr=4364', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4497, 4365, '/apatkal/submitaccident.php?qr=4365', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4498, 4366, '/apatkal/submitaccident.php?qr=4366', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4499, 4367, '/apatkal/submitaccident.php?qr=4367', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4500, 4368, '/apatkal/submitaccident.php?qr=4368', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4501, 4369, '/apatkal/submitaccident.php?qr=4369', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4502, 4370, '/apatkal/submitaccident.php?qr=4370', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4503, 4371, '/apatkal/submitaccident.php?qr=4371', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4504, 4372, '/apatkal/submitaccident.php?qr=4372', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4505, 4373, '/apatkal/submitaccident.php?qr=4373', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4506, 4374, '/apatkal/submitaccident.php?qr=4374', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4507, 4375, '/apatkal/submitaccident.php?qr=4375', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4508, 4376, '/apatkal/submitaccident.php?qr=4376', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4509, 4377, '/apatkal/submitaccident.php?qr=4377', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4510, 4378, '/apatkal/submitaccident.php?qr=4378', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4511, 4379, '/apatkal/submitaccident.php?qr=4379', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4512, 4380, '/apatkal/submitaccident.php?qr=4380', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4513, 4381, '/apatkal/submitaccident.php?qr=4381', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4514, 4382, '/apatkal/submitaccident.php?qr=4382', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4515, 4383, '/apatkal/submitaccident.php?qr=4383', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4516, 4384, '/apatkal/submitaccident.php?qr=4384', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4517, 4385, '/apatkal/submitaccident.php?qr=4385', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4518, 4386, '/apatkal/submitaccident.php?qr=4386', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4519, 4387, '/apatkal/submitaccident.php?qr=4387', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4520, 4388, '/apatkal/submitaccident.php?qr=4388', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4521, 4389, '/apatkal/submitaccident.php?qr=4389', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4522, 4390, '/apatkal/submitaccident.php?qr=4390', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4523, 4391, '/apatkal/submitaccident.php?qr=4391', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4524, 4392, '/apatkal/submitaccident.php?qr=4392', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4525, 4393, '/apatkal/submitaccident.php?qr=4393', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4526, 4394, '/apatkal/submitaccident.php?qr=4394', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4527, 4395, '/apatkal/submitaccident.php?qr=4395', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4528, 4396, '/apatkal/submitaccident.php?qr=4396', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4529, 4397, '/apatkal/submitaccident.php?qr=4397', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4530, 4398, '/apatkal/submitaccident.php?qr=4398', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4531, 4399, '/apatkal/submitaccident.php?qr=4399', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4532, 4400, '/apatkal/submitaccident.php?qr=4400', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4533, 4401, '/apatkal/submitaccident.php?qr=4401', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4534, 4402, '/apatkal/submitaccident.php?qr=4402', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4535, 4403, '/apatkal/submitaccident.php?qr=4403', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4536, 4404, '/apatkal/submitaccident.php?qr=4404', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4537, 4405, '/apatkal/submitaccident.php?qr=4405', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4538, 4406, '/apatkal/submitaccident.php?qr=4406', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4539, 4407, '/apatkal/submitaccident.php?qr=4407', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4540, 4408, '/apatkal/submitaccident.php?qr=4408', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4541, 4409, '/apatkal/submitaccident.php?qr=4409', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4542, 4410, '/apatkal/submitaccident.php?qr=4410', '2025-10-25 22:00:25', NULL, NULL, NULL, NULL),
+(4543, 4411, '/apatkal/submitaccident.php?qr=4411', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4544, 4412, '/apatkal/submitaccident.php?qr=4412', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4545, 4413, '/apatkal/submitaccident.php?qr=4413', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4546, 4414, '/apatkal/submitaccident.php?qr=4414', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4547, 4415, '/apatkal/submitaccident.php?qr=4415', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4548, 4416, '/apatkal/submitaccident.php?qr=4416', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4549, 4417, '/apatkal/submitaccident.php?qr=4417', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4550, 4418, '/apatkal/submitaccident.php?qr=4418', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4551, 4419, '/apatkal/submitaccident.php?qr=4419', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4552, 4420, '/apatkal/submitaccident.php?qr=4420', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4553, 4421, '/apatkal/submitaccident.php?qr=4421', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4554, 4422, '/apatkal/submitaccident.php?qr=4422', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4555, 4423, '/apatkal/submitaccident.php?qr=4423', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4556, 4424, '/apatkal/submitaccident.php?qr=4424', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4557, 4425, '/apatkal/submitaccident.php?qr=4425', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4558, 4426, '/apatkal/submitaccident.php?qr=4426', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4559, 4427, '/apatkal/submitaccident.php?qr=4427', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4560, 4428, '/apatkal/submitaccident.php?qr=4428', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4561, 4429, '/apatkal/submitaccident.php?qr=4429', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4562, 4430, '/apatkal/submitaccident.php?qr=4430', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4563, 4431, '/apatkal/submitaccident.php?qr=4431', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4564, 4432, '/apatkal/submitaccident.php?qr=4432', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4565, 4433, '/apatkal/submitaccident.php?qr=4433', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4566, 4434, '/apatkal/submitaccident.php?qr=4434', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4567, 4435, '/apatkal/submitaccident.php?qr=4435', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4568, 4436, '/apatkal/submitaccident.php?qr=4436', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4569, 4437, '/apatkal/submitaccident.php?qr=4437', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4570, 4438, '/apatkal/submitaccident.php?qr=4438', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4571, 4439, '/apatkal/submitaccident.php?qr=4439', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4572, 4440, '/apatkal/submitaccident.php?qr=4440', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4573, 4441, '/apatkal/submitaccident.php?qr=4441', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4574, 4442, '/apatkal/submitaccident.php?qr=4442', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4575, 4443, '/apatkal/submitaccident.php?qr=4443', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4576, 4444, '/apatkal/submitaccident.php?qr=4444', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4577, 4445, '/apatkal/submitaccident.php?qr=4445', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4578, 4446, '/apatkal/submitaccident.php?qr=4446', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4579, 4447, '/apatkal/submitaccident.php?qr=4447', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4580, 4448, '/apatkal/submitaccident.php?qr=4448', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4581, 4449, '/apatkal/submitaccident.php?qr=4449', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4582, 4450, '/apatkal/submitaccident.php?qr=4450', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4583, 4451, '/apatkal/submitaccident.php?qr=4451', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4584, 4452, '/apatkal/submitaccident.php?qr=4452', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4585, 4453, '/apatkal/submitaccident.php?qr=4453', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4586, 4454, '/apatkal/submitaccident.php?qr=4454', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4587, 4455, '/apatkal/submitaccident.php?qr=4455', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4588, 4456, '/apatkal/submitaccident.php?qr=4456', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4589, 4457, '/apatkal/submitaccident.php?qr=4457', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4590, 4458, '/apatkal/submitaccident.php?qr=4458', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4591, 4459, '/apatkal/submitaccident.php?qr=4459', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4592, 4460, '/apatkal/submitaccident.php?qr=4460', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4593, 4461, '/apatkal/submitaccident.php?qr=4461', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4594, 4462, '/apatkal/submitaccident.php?qr=4462', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4595, 4463, '/apatkal/submitaccident.php?qr=4463', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4596, 4464, '/apatkal/submitaccident.php?qr=4464', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4597, 4465, '/apatkal/submitaccident.php?qr=4465', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4598, 4466, '/apatkal/submitaccident.php?qr=4466', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4599, 4467, '/apatkal/submitaccident.php?qr=4467', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4600, 4468, '/apatkal/submitaccident.php?qr=4468', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4601, 4469, '/apatkal/submitaccident.php?qr=4469', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4602, 4470, '/apatkal/submitaccident.php?qr=4470', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4603, 4471, '/apatkal/submitaccident.php?qr=4471', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4604, 4472, '/apatkal/submitaccident.php?qr=4472', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4605, 4473, '/apatkal/submitaccident.php?qr=4473', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4606, 4474, '/apatkal/submitaccident.php?qr=4474', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4607, 4475, '/apatkal/submitaccident.php?qr=4475', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4608, 4476, '/apatkal/submitaccident.php?qr=4476', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4609, 4477, '/apatkal/submitaccident.php?qr=4477', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4610, 4478, '/apatkal/submitaccident.php?qr=4478', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4611, 4479, '/apatkal/submitaccident.php?qr=4479', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4612, 4480, '/apatkal/submitaccident.php?qr=4480', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4613, 4481, '/apatkal/submitaccident.php?qr=4481', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4614, 4482, '/apatkal/submitaccident.php?qr=4482', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4615, 4483, '/apatkal/submitaccident.php?qr=4483', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4616, 4484, '/apatkal/submitaccident.php?qr=4484', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4617, 4485, '/apatkal/submitaccident.php?qr=4485', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4618, 4486, '/apatkal/submitaccident.php?qr=4486', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4619, 4487, '/apatkal/submitaccident.php?qr=4487', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4620, 4488, '/apatkal/submitaccident.php?qr=4488', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4621, 4489, '/apatkal/submitaccident.php?qr=4489', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4622, 4490, '/apatkal/submitaccident.php?qr=4490', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4623, 4491, '/apatkal/submitaccident.php?qr=4491', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4624, 4492, '/apatkal/submitaccident.php?qr=4492', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4625, 4493, '/apatkal/submitaccident.php?qr=4493', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4626, 4494, '/apatkal/submitaccident.php?qr=4494', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4627, 4495, '/apatkal/submitaccident.php?qr=4495', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4628, 4496, '/apatkal/submitaccident.php?qr=4496', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4629, 4497, '/apatkal/submitaccident.php?qr=4497', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4630, 4498, '/apatkal/submitaccident.php?qr=4498', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4631, 4499, '/apatkal/submitaccident.php?qr=4499', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4632, 4500, '/apatkal/submitaccident.php?qr=4500', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4633, 4501, '/apatkal/submitaccident.php?qr=4501', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4634, 4502, '/apatkal/submitaccident.php?qr=4502', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4635, 4503, '/apatkal/submitaccident.php?qr=4503', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4636, 4504, '/apatkal/submitaccident.php?qr=4504', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4637, 4505, '/apatkal/submitaccident.php?qr=4505', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4638, 4506, '/apatkal/submitaccident.php?qr=4506', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4639, 4507, '/apatkal/submitaccident.php?qr=4507', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4640, 4508, '/apatkal/submitaccident.php?qr=4508', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4641, 4509, '/apatkal/submitaccident.php?qr=4509', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4642, 4510, '/apatkal/submitaccident.php?qr=4510', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4643, 4511, '/apatkal/submitaccident.php?qr=4511', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4644, 4512, '/apatkal/submitaccident.php?qr=4512', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4645, 4513, '/apatkal/submitaccident.php?qr=4513', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4646, 4514, '/apatkal/submitaccident.php?qr=4514', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4647, 4515, '/apatkal/submitaccident.php?qr=4515', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4648, 4516, '/apatkal/submitaccident.php?qr=4516', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4649, 4517, '/apatkal/submitaccident.php?qr=4517', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4650, 4518, '/apatkal/submitaccident.php?qr=4518', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4651, 4519, '/apatkal/submitaccident.php?qr=4519', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4652, 4520, '/apatkal/submitaccident.php?qr=4520', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4653, 4521, '/apatkal/submitaccident.php?qr=4521', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4654, 4522, '/apatkal/submitaccident.php?qr=4522', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4655, 4523, '/apatkal/submitaccident.php?qr=4523', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4656, 4524, '/apatkal/submitaccident.php?qr=4524', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4657, 4525, '/apatkal/submitaccident.php?qr=4525', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4658, 4526, '/apatkal/submitaccident.php?qr=4526', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4659, 4527, '/apatkal/submitaccident.php?qr=4527', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4660, 4528, '/apatkal/submitaccident.php?qr=4528', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4661, 4529, '/apatkal/submitaccident.php?qr=4529', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4662, 4530, '/apatkal/submitaccident.php?qr=4530', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4663, 4531, '/apatkal/submitaccident.php?qr=4531', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4664, 4532, '/apatkal/submitaccident.php?qr=4532', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4665, 4533, '/apatkal/submitaccident.php?qr=4533', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4666, 4534, '/apatkal/submitaccident.php?qr=4534', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4667, 4535, '/apatkal/submitaccident.php?qr=4535', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4668, 4536, '/apatkal/submitaccident.php?qr=4536', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4669, 4537, '/apatkal/submitaccident.php?qr=4537', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4670, 4538, '/apatkal/submitaccident.php?qr=4538', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4671, 4539, '/apatkal/submitaccident.php?qr=4539', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4672, 4540, '/apatkal/submitaccident.php?qr=4540', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4673, 4541, '/apatkal/submitaccident.php?qr=4541', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4674, 4542, '/apatkal/submitaccident.php?qr=4542', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4675, 4543, '/apatkal/submitaccident.php?qr=4543', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4676, 4544, '/apatkal/submitaccident.php?qr=4544', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4677, 4545, '/apatkal/submitaccident.php?qr=4545', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4678, 4546, '/apatkal/submitaccident.php?qr=4546', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4679, 4547, '/apatkal/submitaccident.php?qr=4547', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4680, 4548, '/apatkal/submitaccident.php?qr=4548', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4681, 4549, '/apatkal/submitaccident.php?qr=4549', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4682, 4550, '/apatkal/submitaccident.php?qr=4550', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4683, 4551, '/apatkal/submitaccident.php?qr=4551', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4684, 4552, '/apatkal/submitaccident.php?qr=4552', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4685, 4553, '/apatkal/submitaccident.php?qr=4553', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4686, 4554, '/apatkal/submitaccident.php?qr=4554', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4687, 4555, '/apatkal/submitaccident.php?qr=4555', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4688, 4556, '/apatkal/submitaccident.php?qr=4556', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4689, 4557, '/apatkal/submitaccident.php?qr=4557', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4690, 4558, '/apatkal/submitaccident.php?qr=4558', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4691, 4559, '/apatkal/submitaccident.php?qr=4559', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4692, 4560, '/apatkal/submitaccident.php?qr=4560', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4693, 4561, '/apatkal/submitaccident.php?qr=4561', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4694, 4562, '/apatkal/submitaccident.php?qr=4562', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4695, 4563, '/apatkal/submitaccident.php?qr=4563', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4696, 4564, '/apatkal/submitaccident.php?qr=4564', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4697, 4565, '/apatkal/submitaccident.php?qr=4565', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4698, 4566, '/apatkal/submitaccident.php?qr=4566', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4699, 4567, '/apatkal/submitaccident.php?qr=4567', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4700, 4568, '/apatkal/submitaccident.php?qr=4568', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4701, 4569, '/apatkal/submitaccident.php?qr=4569', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4702, 4570, '/apatkal/submitaccident.php?qr=4570', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4703, 4571, '/apatkal/submitaccident.php?qr=4571', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4704, 4572, '/apatkal/submitaccident.php?qr=4572', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4705, 4573, '/apatkal/submitaccident.php?qr=4573', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4706, 4574, '/apatkal/submitaccident.php?qr=4574', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4707, 4575, '/apatkal/submitaccident.php?qr=4575', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4708, 4576, '/apatkal/submitaccident.php?qr=4576', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4709, 4577, '/apatkal/submitaccident.php?qr=4577', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4710, 4578, '/apatkal/submitaccident.php?qr=4578', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4711, 4579, '/apatkal/submitaccident.php?qr=4579', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4712, 4580, '/apatkal/submitaccident.php?qr=4580', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4713, 4581, '/apatkal/submitaccident.php?qr=4581', '2025-11-03 14:39:06', 'Mp20ja6567', 'Yadav', '', '2025-11-03 14:41:32'),
+(4714, 4582, '/apatkal/submitaccident.php?qr=4582', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4715, 4583, '/apatkal/submitaccident.php?qr=4583', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4716, 4584, '/apatkal/submitaccident.php?qr=4584', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4717, 4585, '/apatkal/submitaccident.php?qr=4585', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4718, 4586, '/apatkal/submitaccident.php?qr=4586', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4719, 4587, '/apatkal/submitaccident.php?qr=4587', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4720, 4588, '/apatkal/submitaccident.php?qr=4588', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4721, 4589, '/apatkal/submitaccident.php?qr=4589', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4722, 4590, '/apatkal/submitaccident.php?qr=4590', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4723, 4591, '/apatkal/submitaccident.php?qr=4591', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4724, 4592, '/apatkal/submitaccident.php?qr=4592', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4725, 4593, '/apatkal/submitaccident.php?qr=4593', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4726, 4594, '/apatkal/submitaccident.php?qr=4594', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4727, 4595, '/apatkal/submitaccident.php?qr=4595', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4728, 4596, '/apatkal/submitaccident.php?qr=4596', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4729, 4597, '/apatkal/submitaccident.php?qr=4597', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4730, 4598, '/apatkal/submitaccident.php?qr=4598', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4731, 4599, '/apatkal/submitaccident.php?qr=4599', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4732, 4600, '/apatkal/submitaccident.php?qr=4600', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4733, 4601, '/apatkal/submitaccident.php?qr=4601', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4734, 4602, '/apatkal/submitaccident.php?qr=4602', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4735, 4603, '/apatkal/submitaccident.php?qr=4603', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4736, 4604, '/apatkal/submitaccident.php?qr=4604', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4737, 4605, '/apatkal/submitaccident.php?qr=4605', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4738, 4606, '/apatkal/submitaccident.php?qr=4606', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4739, 4607, '/apatkal/submitaccident.php?qr=4607', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4740, 4608, '/apatkal/submitaccident.php?qr=4608', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4741, 4609, '/apatkal/submitaccident.php?qr=4609', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4742, 4610, '/apatkal/submitaccident.php?qr=4610', '2025-11-03 14:39:06', NULL, NULL, NULL, NULL),
+(4743, 4611, '/apatkal/submitaccident.php?qr=4611', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4744, 4612, '/apatkal/submitaccident.php?qr=4612', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4745, 4613, '/apatkal/submitaccident.php?qr=4613', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4746, 4614, '/apatkal/submitaccident.php?qr=4614', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4747, 4615, '/apatkal/submitaccident.php?qr=4615', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4748, 4616, '/apatkal/submitaccident.php?qr=4616', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4749, 4617, '/apatkal/submitaccident.php?qr=4617', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4750, 4618, '/apatkal/submitaccident.php?qr=4618', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4751, 4619, '/apatkal/submitaccident.php?qr=4619', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4752, 4620, '/apatkal/submitaccident.php?qr=4620', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4753, 4621, '/apatkal/submitaccident.php?qr=4621', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4754, 4622, '/apatkal/submitaccident.php?qr=4622', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4755, 4623, '/apatkal/submitaccident.php?qr=4623', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4756, 4624, '/apatkal/submitaccident.php?qr=4624', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4757, 4625, '/apatkal/submitaccident.php?qr=4625', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4758, 4626, '/apatkal/submitaccident.php?qr=4626', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4759, 4627, '/apatkal/submitaccident.php?qr=4627', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4760, 4628, '/apatkal/submitaccident.php?qr=4628', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4761, 4629, '/apatkal/submitaccident.php?qr=4629', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4762, 4630, '/apatkal/submitaccident.php?qr=4630', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4763, 4631, '/apatkal/submitaccident.php?qr=4631', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4764, 4632, '/apatkal/submitaccident.php?qr=4632', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4765, 4633, '/apatkal/submitaccident.php?qr=4633', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4766, 4634, '/apatkal/submitaccident.php?qr=4634', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4767, 4635, '/apatkal/submitaccident.php?qr=4635', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4768, 4636, '/apatkal/submitaccident.php?qr=4636', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4769, 4637, '/apatkal/submitaccident.php?qr=4637', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4770, 4638, '/apatkal/submitaccident.php?qr=4638', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4771, 4639, '/apatkal/submitaccident.php?qr=4639', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4772, 4640, '/apatkal/submitaccident.php?qr=4640', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4773, 4641, '/apatkal/submitaccident.php?qr=4641', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4774, 4642, '/apatkal/submitaccident.php?qr=4642', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4775, 4643, '/apatkal/submitaccident.php?qr=4643', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4776, 4644, '/apatkal/submitaccident.php?qr=4644', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4777, 4645, '/apatkal/submitaccident.php?qr=4645', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4778, 4646, '/apatkal/submitaccident.php?qr=4646', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4779, 4647, '/apatkal/submitaccident.php?qr=4647', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4780, 4648, '/apatkal/submitaccident.php?qr=4648', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4781, 4649, '/apatkal/submitaccident.php?qr=4649', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4782, 4650, '/apatkal/submitaccident.php?qr=4650', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4783, 4651, '/apatkal/submitaccident.php?qr=4651', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4784, 4652, '/apatkal/submitaccident.php?qr=4652', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4785, 4653, '/apatkal/submitaccident.php?qr=4653', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4786, 4654, '/apatkal/submitaccident.php?qr=4654', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4787, 4655, '/apatkal/submitaccident.php?qr=4655', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4788, 4656, '/apatkal/submitaccident.php?qr=4656', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4789, 4657, '/apatkal/submitaccident.php?qr=4657', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4790, 4658, '/apatkal/submitaccident.php?qr=4658', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4791, 4659, '/apatkal/submitaccident.php?qr=4659', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4792, 4660, '/apatkal/submitaccident.php?qr=4660', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4793, 4661, '/apatkal/submitaccident.php?qr=4661', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4794, 4662, '/apatkal/submitaccident.php?qr=4662', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4795, 4663, '/apatkal/submitaccident.php?qr=4663', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4796, 4664, '/apatkal/submitaccident.php?qr=4664', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4797, 4665, '/apatkal/submitaccident.php?qr=4665', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4798, 4666, '/apatkal/submitaccident.php?qr=4666', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4799, 4667, '/apatkal/submitaccident.php?qr=4667', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4800, 4668, '/apatkal/submitaccident.php?qr=4668', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4801, 4669, '/apatkal/submitaccident.php?qr=4669', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4802, 4670, '/apatkal/submitaccident.php?qr=4670', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4803, 4671, '/apatkal/submitaccident.php?qr=4671', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4804, 4672, '/apatkal/submitaccident.php?qr=4672', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4805, 4673, '/apatkal/submitaccident.php?qr=4673', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4806, 4674, '/apatkal/submitaccident.php?qr=4674', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4807, 4675, '/apatkal/submitaccident.php?qr=4675', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4808, 4676, '/apatkal/submitaccident.php?qr=4676', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4809, 4677, '/apatkal/submitaccident.php?qr=4677', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4810, 4678, '/apatkal/submitaccident.php?qr=4678', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4811, 4679, '/apatkal/submitaccident.php?qr=4679', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4812, 4680, '/apatkal/submitaccident.php?qr=4680', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4813, 4681, '/apatkal/submitaccident.php?qr=4681', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4814, 4682, '/apatkal/submitaccident.php?qr=4682', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4815, 4683, '/apatkal/submitaccident.php?qr=4683', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4816, 4684, '/apatkal/submitaccident.php?qr=4684', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4817, 4685, '/apatkal/submitaccident.php?qr=4685', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4818, 4686, '/apatkal/submitaccident.php?qr=4686', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4819, 4687, '/apatkal/submitaccident.php?qr=4687', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4820, 4688, '/apatkal/submitaccident.php?qr=4688', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4821, 4689, '/apatkal/submitaccident.php?qr=4689', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4822, 4690, '/apatkal/submitaccident.php?qr=4690', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4823, 4691, '/apatkal/submitaccident.php?qr=4691', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4824, 4692, '/apatkal/submitaccident.php?qr=4692', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4825, 4693, '/apatkal/submitaccident.php?qr=4693', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4826, 4694, '/apatkal/submitaccident.php?qr=4694', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4827, 4695, '/apatkal/submitaccident.php?qr=4695', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4828, 4696, '/apatkal/submitaccident.php?qr=4696', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4829, 4697, '/apatkal/submitaccident.php?qr=4697', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4830, 4698, '/apatkal/submitaccident.php?qr=4698', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4831, 4699, '/apatkal/submitaccident.php?qr=4699', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4832, 4700, '/apatkal/submitaccident.php?qr=4700', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4833, 4701, '/apatkal/submitaccident.php?qr=4701', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4834, 4702, '/apatkal/submitaccident.php?qr=4702', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4835, 4703, '/apatkal/submitaccident.php?qr=4703', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4836, 4704, '/apatkal/submitaccident.php?qr=4704', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4837, 4705, '/apatkal/submitaccident.php?qr=4705', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4838, 4706, '/apatkal/submitaccident.php?qr=4706', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4839, 4707, '/apatkal/submitaccident.php?qr=4707', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4840, 4708, '/apatkal/submitaccident.php?qr=4708', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4841, 4709, '/apatkal/submitaccident.php?qr=4709', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4842, 4710, '/apatkal/submitaccident.php?qr=4710', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4843, 4711, '/apatkal/submitaccident.php?qr=4711', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4844, 4712, '/apatkal/submitaccident.php?qr=4712', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4845, 4713, '/apatkal/submitaccident.php?qr=4713', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL);
+INSERT INTO `qr_codes` (`id`, `qr_number`, `qr_url`, `created_at`, `vehicle_number`, `full_name`, `phone`, `last_used_at`) VALUES
+(4846, 4714, '/apatkal/submitaccident.php?qr=4714', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4847, 4715, '/apatkal/submitaccident.php?qr=4715', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4848, 4716, '/apatkal/submitaccident.php?qr=4716', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4849, 4717, '/apatkal/submitaccident.php?qr=4717', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4850, 4718, '/apatkal/submitaccident.php?qr=4718', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4851, 4719, '/apatkal/submitaccident.php?qr=4719', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4852, 4720, '/apatkal/submitaccident.php?qr=4720', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4853, 4721, '/apatkal/submitaccident.php?qr=4721', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4854, 4722, '/apatkal/submitaccident.php?qr=4722', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4855, 4723, '/apatkal/submitaccident.php?qr=4723', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4856, 4724, '/apatkal/submitaccident.php?qr=4724', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4857, 4725, '/apatkal/submitaccident.php?qr=4725', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4858, 4726, '/apatkal/submitaccident.php?qr=4726', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4859, 4727, '/apatkal/submitaccident.php?qr=4727', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4860, 4728, '/apatkal/submitaccident.php?qr=4728', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4861, 4729, '/apatkal/submitaccident.php?qr=4729', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4862, 4730, '/apatkal/submitaccident.php?qr=4730', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4863, 4731, '/apatkal/submitaccident.php?qr=4731', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4864, 4732, '/apatkal/submitaccident.php?qr=4732', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4865, 4733, '/apatkal/submitaccident.php?qr=4733', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4866, 4734, '/apatkal/submitaccident.php?qr=4734', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4867, 4735, '/apatkal/submitaccident.php?qr=4735', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4868, 4736, '/apatkal/submitaccident.php?qr=4736', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4869, 4737, '/apatkal/submitaccident.php?qr=4737', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4870, 4738, '/apatkal/submitaccident.php?qr=4738', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4871, 4739, '/apatkal/submitaccident.php?qr=4739', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4872, 4740, '/apatkal/submitaccident.php?qr=4740', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4873, 4741, '/apatkal/submitaccident.php?qr=4741', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4874, 4742, '/apatkal/submitaccident.php?qr=4742', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4875, 4743, '/apatkal/submitaccident.php?qr=4743', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4876, 4744, '/apatkal/submitaccident.php?qr=4744', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4877, 4745, '/apatkal/submitaccident.php?qr=4745', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4878, 4746, '/apatkal/submitaccident.php?qr=4746', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4879, 4747, '/apatkal/submitaccident.php?qr=4747', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4880, 4748, '/apatkal/submitaccident.php?qr=4748', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4881, 4749, '/apatkal/submitaccident.php?qr=4749', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4882, 4750, '/apatkal/submitaccident.php?qr=4750', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4883, 4751, '/apatkal/submitaccident.php?qr=4751', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4884, 4752, '/apatkal/submitaccident.php?qr=4752', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4885, 4753, '/apatkal/submitaccident.php?qr=4753', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4886, 4754, '/apatkal/submitaccident.php?qr=4754', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4887, 4755, '/apatkal/submitaccident.php?qr=4755', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4888, 4756, '/apatkal/submitaccident.php?qr=4756', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4889, 4757, '/apatkal/submitaccident.php?qr=4757', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4890, 4758, '/apatkal/submitaccident.php?qr=4758', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4891, 4759, '/apatkal/submitaccident.php?qr=4759', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4892, 4760, '/apatkal/submitaccident.php?qr=4760', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4893, 4761, '/apatkal/submitaccident.php?qr=4761', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4894, 4762, '/apatkal/submitaccident.php?qr=4762', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4895, 4763, '/apatkal/submitaccident.php?qr=4763', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4896, 4764, '/apatkal/submitaccident.php?qr=4764', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4897, 4765, '/apatkal/submitaccident.php?qr=4765', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4898, 4766, '/apatkal/submitaccident.php?qr=4766', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4899, 4767, '/apatkal/submitaccident.php?qr=4767', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4900, 4768, '/apatkal/submitaccident.php?qr=4768', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4901, 4769, '/apatkal/submitaccident.php?qr=4769', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4902, 4770, '/apatkal/submitaccident.php?qr=4770', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4903, 4771, '/apatkal/submitaccident.php?qr=4771', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4904, 4772, '/apatkal/submitaccident.php?qr=4772', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4905, 4773, '/apatkal/submitaccident.php?qr=4773', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4906, 4774, '/apatkal/submitaccident.php?qr=4774', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4907, 4775, '/apatkal/submitaccident.php?qr=4775', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4908, 4776, '/apatkal/submitaccident.php?qr=4776', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4909, 4777, '/apatkal/submitaccident.php?qr=4777', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4910, 4778, '/apatkal/submitaccident.php?qr=4778', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4911, 4779, '/apatkal/submitaccident.php?qr=4779', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4912, 4780, '/apatkal/submitaccident.php?qr=4780', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4913, 4781, '/apatkal/submitaccident.php?qr=4781', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4914, 4782, '/apatkal/submitaccident.php?qr=4782', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4915, 4783, '/apatkal/submitaccident.php?qr=4783', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4916, 4784, '/apatkal/submitaccident.php?qr=4784', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4917, 4785, '/apatkal/submitaccident.php?qr=4785', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4918, 4786, '/apatkal/submitaccident.php?qr=4786', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4919, 4787, '/apatkal/submitaccident.php?qr=4787', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4920, 4788, '/apatkal/submitaccident.php?qr=4788', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4921, 4789, '/apatkal/submitaccident.php?qr=4789', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4922, 4790, '/apatkal/submitaccident.php?qr=4790', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4923, 4791, '/apatkal/submitaccident.php?qr=4791', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4924, 4792, '/apatkal/submitaccident.php?qr=4792', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4925, 4793, '/apatkal/submitaccident.php?qr=4793', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4926, 4794, '/apatkal/submitaccident.php?qr=4794', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4927, 4795, '/apatkal/submitaccident.php?qr=4795', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4928, 4796, '/apatkal/submitaccident.php?qr=4796', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4929, 4797, '/apatkal/submitaccident.php?qr=4797', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4930, 4798, '/apatkal/submitaccident.php?qr=4798', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4931, 4799, '/apatkal/submitaccident.php?qr=4799', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4932, 4800, '/apatkal/submitaccident.php?qr=4800', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4933, 4801, '/apatkal/submitaccident.php?qr=4801', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4934, 4802, '/apatkal/submitaccident.php?qr=4802', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4935, 4803, '/apatkal/submitaccident.php?qr=4803', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4936, 4804, '/apatkal/submitaccident.php?qr=4804', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4937, 4805, '/apatkal/submitaccident.php?qr=4805', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4938, 4806, '/apatkal/submitaccident.php?qr=4806', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4939, 4807, '/apatkal/submitaccident.php?qr=4807', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4940, 4808, '/apatkal/submitaccident.php?qr=4808', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4941, 4809, '/apatkal/submitaccident.php?qr=4809', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL),
+(4942, 4810, '/apatkal/submitaccident.php?qr=4810', '2025-11-03 14:39:16', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -5403,37 +5935,50 @@ INSERT INTO `sms_logs` (`id`, `client_id`, `family_member_id`, `phone_number`, `
 CREATE TABLE `trips` (
   `history_id` int(11) NOT NULL,
   `driver_id` int(11) NOT NULL,
+  `client_id` int(11) DEFAULT NULL,
   `client_name` varchar(100) NOT NULL,
   `location` text NOT NULL,
   `timing` timestamp NULL DEFAULT NULL,
   `duration` int(11) NOT NULL,
+  `distance` decimal(10,2) DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `start_latitude` decimal(10,8) DEFAULT NULL,
   `start_longitude` decimal(11,8) DEFAULT NULL,
   `end_latitude` decimal(10,8) DEFAULT NULL,
-  `end_longitude` decimal(11,8) DEFAULT NULL
+  `end_longitude` decimal(11,8) DEFAULT NULL,
+  `from_location` text DEFAULT NULL,
+  `to_location` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `trips`
 --
 
-INSERT INTO `trips` (`history_id`, `driver_id`, `client_name`, `location`, `timing`, `duration`, `start_time`, `end_time`, `created_at`, `start_latitude`, `start_longitude`, `end_latitude`, `end_longitude`) VALUES
-(0, 1, '', 'XGWG+8J Pathar Kansiya, Madhya Pradesh, India (Lat: 22.995800, Lng: 77.526600)', '2025-10-04 09:11:59', 1, '2025-10-04 09:11:59', '2025-10-04 03:42:16', '2025-10-04 09:12:16', NULL, NULL, NULL, NULL),
-(1, 1, 'Priya Sharma', 'Apollo Hospital, Indore', '2025-09-20 09:00:00', 45, '2025-09-20 09:05:00', '2025-09-20 09:50:00', '2025-09-20 09:00:00', NULL, NULL, NULL, NULL),
-(2, 1, 'Rajesh Kumar', 'Fortis Hospital, Bhopal', '2025-09-27 03:45:00', 60, '2025-09-27 03:50:00', '2025-09-27 04:50:00', '2025-09-27 03:45:00', NULL, NULL, NULL, NULL),
-(3, 1, 'Meera Patel', 'Manipal Hospital, Jabalpur', '2025-10-01 11:15:00', 50, '2025-10-01 11:20:00', '2025-10-01 12:10:00', '2025-10-01 11:15:00', NULL, NULL, NULL, NULL),
-(4, 1, 'Vikram Singh', 'AIIMS Hospital, Delhi', '2025-10-02 06:00:00', 75, '2025-10-02 06:05:00', '2025-10-02 06:15:00', '2025-10-02 06:00:00', NULL, NULL, NULL, NULL),
-(14, 1, 'Shreyash', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', '2025-10-16 11:19:38', 93, '2025-10-16 11:19:38', '2025-10-16 11:21:11', '2025-10-16 11:21:11', 23.15508940, 79.92603490, 23.15511290, 79.92601890),
-(30, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926022)', '2025-10-15 06:42:00', 38, '2025-10-15 06:42:00', '2025-10-15 06:42:38', '2025-10-15 06:42:38', 23.15484058, 79.92602221, 23.15500100, 79.92600770),
-(32, 1, 'siddharth', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154842, Lng: 79.926027)', '2025-10-16 06:03:48', 29, '2025-10-16 06:03:48', '2025-10-16 06:04:17', '2025-10-16 06:04:17', 23.15484178, 79.92602680, 23.15484556, 79.92601821),
-(34, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926038)', '2025-10-15 06:16:25', 57, '2025-10-15 06:16:25', '2025-10-15 06:17:22', '2025-10-15 06:17:22', 23.15484074, 79.92603774, 23.15484729, 79.92602640),
-(35, 1, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', '2025-10-15 06:15:59', 12, '2025-10-15 06:15:59', '2025-10-15 06:16:11', '2025-10-15 06:16:11', 23.15484466, 79.92603483, 23.15484729, 79.92602640),
-(41, 2, 'sid', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155042, Lng: 79.926017)', '2025-10-24 08:36:49', 69, '2025-10-24 08:36:49', '2025-10-24 08:37:58', '2025-10-24 08:37:58', 23.15504240, 79.92601740, 23.15483176, 79.92604691),
-(43, 1, 'Shreyash', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154836, Lng: 79.926040)', '2025-10-24 09:07:25', 35, '2025-10-24 09:07:25', '2025-10-24 09:08:00', '2025-10-24 09:08:00', 23.15483599, 79.92603998, 23.15483528, 79.92603756),
-(53, 26, 'sid', 'M6Q6+2WF, Pokhra Muhalla, Hajipur, Bihar 844101, India (Lat: 25.687300, Lng: 85.212100)', '2025-10-25 09:31:53', 56, '2025-10-25 09:31:53', '2025-10-25 09:32:49', '2025-10-25 09:32:49', 25.68730000, 85.21210000, 26.61261261, 85.18727243);
+INSERT INTO `trips` (`history_id`, `driver_id`, `client_id`, `client_name`, `location`, `timing`, `duration`, `distance`, `start_time`, `end_time`, `created_at`, `start_latitude`, `start_longitude`, `end_latitude`, `end_longitude`, `from_location`, `to_location`) VALUES
+(0, 1, NULL, '', 'XGWG+8J Pathar Kansiya, Madhya Pradesh, India (Lat: 22.995800, Lng: 77.526600)', '2025-10-04 09:11:59', 1, NULL, '2025-10-04 09:11:59', '2025-10-04 03:42:16', '2025-10-04 09:12:16', NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 1, NULL, 'Priya Sharma', 'Apollo Hospital, Indore', '2025-09-20 09:00:00', 45, NULL, '2025-09-20 09:05:00', '2025-09-20 09:50:00', '2025-09-20 09:00:00', NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 1, NULL, 'Rajesh Kumar', 'Fortis Hospital, Bhopal', '2025-09-27 03:45:00', 60, NULL, '2025-09-27 03:50:00', '2025-09-27 04:50:00', '2025-09-27 03:45:00', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 1, NULL, 'Meera Patel', 'Manipal Hospital, Jabalpur', '2025-10-01 11:15:00', 50, NULL, '2025-10-01 11:20:00', '2025-10-01 12:10:00', '2025-10-01 11:15:00', NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 1, NULL, 'Vikram Singh', 'AIIMS Hospital, Delhi', '2025-10-02 06:00:00', 75, NULL, '2025-10-02 06:05:00', '2025-10-02 06:15:00', '2025-10-02 06:00:00', NULL, NULL, NULL, NULL, NULL, NULL),
+(8, 1, NULL, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154831, Lng: 79.926038)', '2025-10-27 09:02:26', 22, NULL, '2025-10-27 09:02:26', '2025-10-27 09:02:48', '2025-10-27 09:02:48', 23.15483134, 79.92603816, 23.15501690, 79.92600940, NULL, NULL),
+(14, 1, NULL, 'Shreyash', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155089, Lng: 79.926035)', '2025-10-16 11:19:38', 93, NULL, '2025-10-16 11:19:38', '2025-10-16 11:21:11', '2025-10-16 11:21:11', 23.15508940, 79.92603490, 23.15511290, 79.92601890, NULL, NULL),
+(30, 1, NULL, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926022)', '2025-10-15 06:42:00', 38, NULL, '2025-10-15 06:42:00', '2025-10-15 06:42:38', '2025-10-15 06:42:38', 23.15484058, 79.92602221, 23.15500100, 79.92600770, NULL, NULL),
+(32, 1, NULL, 'siddharth', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154842, Lng: 79.926027)', '2025-10-16 06:03:48', 29, NULL, '2025-10-16 06:03:48', '2025-10-16 06:04:17', '2025-10-16 06:04:17', 23.15484178, 79.92602680, 23.15484556, 79.92601821, NULL, NULL),
+(34, 1, NULL, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154841, Lng: 79.926038)', '2025-10-15 06:16:25', 57, NULL, '2025-10-15 06:16:25', '2025-10-15 06:17:22', '2025-10-15 06:17:22', 23.15484074, 79.92603774, 23.15484729, 79.92602640, NULL, NULL),
+(35, 1, NULL, 'Krishna Vishwakarma', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154845, Lng: 79.926035)', '2025-10-15 06:15:59', 12, NULL, '2025-10-15 06:15:59', '2025-10-15 06:16:11', '2025-10-15 06:16:11', 23.15484466, 79.92603483, 23.15484729, 79.92602640, NULL, NULL),
+(41, 2, NULL, 'sid', 'Khandelwal Complex, 1, Nagpur Rd, near gulzar Hotel, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155042, Lng: 79.926017)', '2025-10-24 08:36:49', 69, NULL, '2025-10-24 08:36:49', '2025-10-24 08:37:58', '2025-10-24 08:37:58', 23.15504240, 79.92601740, 23.15483176, 79.92604691, NULL, NULL),
+(43, 1, NULL, 'Shreyash', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.154836, Lng: 79.926040)', '2025-10-24 09:07:25', 35, NULL, '2025-10-24 09:07:25', '2025-10-24 09:08:00', '2025-10-24 09:08:00', 23.15483599, 79.92603998, 23.15483528, 79.92603756, NULL, NULL),
+(52, 1, NULL, 'Geetanjali', 'Shop no 2 First Floor Shivhari Complex Besides Gulzar Hotel Mahanadda, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155026, Lng: 79.925989)', '2025-10-25 16:19:20', 27, NULL, '2025-10-25 16:19:20', '2025-10-25 16:19:47', '2025-10-25 16:19:47', 23.15502570, 79.92598910, 23.20157480, 79.96870060, NULL, NULL),
+(53, 26, NULL, 'sid', 'M6Q6+2WF, Pokhra Muhalla, Hajipur, Bihar 844101, India (Lat: 25.687300, Lng: 85.212100)', '2025-10-25 09:31:53', 56, NULL, '2025-10-25 09:31:53', '2025-10-25 09:32:49', '2025-10-25 09:32:49', 25.68730000, 85.21210000, 26.61261261, 85.18727243, NULL, NULL),
+(57, 2, 40, 'Geetanjali', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155103, Lng: 79.926042)', '2025-11-01 07:07:10', 12, 0.03, '2025-11-01 07:07:10', '2025-11-01 07:07:22', '2025-11-01 07:07:22', 23.15510330, 79.92604190, 23.15482993, 79.92607617, '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155103, Lng: 79.926042)', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155103, Lng: 79.926042)'),
+(58, 27, NULL, 'sid', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155134, Lng: 79.926037)', '2025-10-29 11:47:59', 36, NULL, '2025-10-29 11:47:59', '2025-10-29 11:48:35', '2025-10-29 11:48:35', 23.15513360, 79.92603670, 23.15483082, 79.92603070, NULL, NULL),
+(61, 13, NULL, 'Geetanjali', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155072, Lng: 79.926026)', '2025-10-31 09:52:04', 41, NULL, '2025-10-31 09:52:04', '2025-10-31 09:52:45', '2025-10-31 09:52:45', 23.15507210, 79.92602620, 23.15516690, 79.92609280, NULL, NULL),
+(62, 13, NULL, 'Krishna Vishwakarma', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155082, Lng: 79.926028)', '2025-11-01 06:28:39', 57, NULL, '2025-11-01 06:28:39', '2025-11-01 06:29:36', '2025-11-01 06:29:36', 23.15508250, 79.92602780, 23.15505400, 79.92600470, NULL, NULL),
+(63, 13, 26, 'Krishna Vishwakarma', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155083, Lng: 79.926035)', '2025-11-01 07:01:55', 128, 0.01, '2025-11-01 07:01:55', '2025-11-01 07:04:03', '2025-11-01 07:04:03', 23.15508260, 79.92603500, 23.15504080, 79.92601310, '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155083, Lng: 79.926035)', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155083, Lng: 79.926035)'),
+(65, 13, 26, 'Krishna Vishwakarma', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155130, Lng: 79.926036)', '2025-11-01 09:25:17', 44, 0.01, '2025-11-01 09:25:17', '2025-11-01 09:26:01', '2025-11-01 09:26:01', 23.15513030, 79.92603610, 23.15506450, 79.92601670, '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155130, Lng: 79.926036)', '1724, 1724, Nagpur Rd, near Hotel Gulzar, Madan Mahal, Area, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155130, Lng: 79.926036)'),
+(68, 1, 44, 'sid', '220, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155194, Lng: 79.926115)', '2025-11-03 09:16:01', 194, 0.00, '2025-11-03 09:16:01', '2025-11-03 09:19:15', '2025-11-03 09:19:15', 23.15519420, 79.92611490, 23.15518540, 79.92610470, '220, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155194, Lng: 79.926115)', '220, Cheevani Phamad Nagar, Jabalpur, Madhya Pradesh 482001, India (Lat: 23.155194, Lng: 79.926115)');
 
 -- --------------------------------------------------------
 
@@ -5469,7 +6014,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `phone`, `password`, `username`, `date_of_birth`, `gender`, `address`, `city`, `state`, `pincode`, `profile_image`, `role`, `is_verified`, `is_active`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'Gulam', 'Gaus', 'admin@apatkal.com', '7521369779', '$2y$10$MwM62gNOKcbw5RIxp2LpHOumiuD.i7vqxupBpir9no7Uv0/Hz6/Fy', 'admin', '2004-02-10', 'male', 'ranjhi jbp', 'Jabalpur', 'madhya pradesh', '482004', NULL, 'admin', 0, 1, '2025-10-25 14:25:41', '2025-09-13 08:01:19', '2025-10-25 14:25:41'),
+(1, 'Gulam', 'Gaus', 'admin@apatkal.com', '7521369779', '$2y$10$MwM62gNOKcbw5RIxp2LpHOumiuD.i7vqxupBpir9no7Uv0/Hz6/Fy', 'admin', '2004-02-10', 'male', 'ranjhi jbp', 'Jabalpur', 'madhya pradesh', '482004', NULL, 'admin', 0, 1, '2025-11-03 16:39:16', '2025-09-13 08:01:19', '2025-11-03 16:39:16'),
 (2, 'Krishna', 'Vish', 'Toss125traininag@gmai.com', '7723065844', '$2y$10$pZ8DQ4CufH1drx2OF5qMnuPXgpPuWCT.Z5.wnHc38Oy7.HR036jVq', 'sales', NULL, NULL, '', NULL, NULL, NULL, NULL, 'sales', 0, 1, NULL, '2025-09-13 15:46:08', '2025-09-13 17:02:04'),
 (3, 'Sarah', 'Johnson', 'hr@apatkal.com', '9876543210', '$2y$10$wDNv.mYbXpnet7re8If.keP.NPDOHoLOXgsqJBK1YBITQi2aWKn6u', 'hr_manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'hr', 0, 1, NULL, '2025-09-13 16:58:30', '2025-09-13 16:59:37'),
 (4, 'Mike', 'Davis', 'sales@apatkal.com', '9876543211', '$2y$10$4AYUzkUaaGtu5nnXGguB4.aPA.DgfCprSC5hnBGj4Mm7H1wkt4sti', 'sales_rep', NULL, NULL, '', NULL, NULL, NULL, NULL, 'sales', 0, 1, '2025-10-08 11:01:15', '2025-09-13 16:58:30', '2025-10-08 11:01:15'),
@@ -5481,7 +6026,7 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `phone`, `passwor
 (10, 'siddharth', 'singh', 'shreyash.toss.cs@gmail.com', '7898140799', '$2y$10$WxVsjnomImnEgZyqMhz9XeI6JB9BTUL02Q2KhqgNNa3OlYa.WssyS', 'siddharth', NULL, NULL, 'jbp', NULL, NULL, NULL, NULL, 'hr', 0, 1, NULL, '2025-09-23 15:10:59', '2025-09-24 11:25:17'),
 (11, 'aavi', 'thakur', 'sidhusingh7898thakur@gmail.com', '7898140799', '$2y$10$sN9jAh2LzTWxwcfT1s0NGuRnkAmvempf2LH0keRV54rN13hMC/xHW', 'aaavi', NULL, NULL, 'dsffsd', NULL, NULL, NULL, NULL, 'sales', 0, 0, NULL, '2025-09-24 11:27:41', '2025-09-24 15:31:43'),
 (12, 'Krishna', 'Vishwakarma', 'Toss125training@gmail.com', '7723065844', '$2y$10$ImdXHAGbRAbMY8GGOP3xE.zfwXSJYusqVUZeGkIaOVljqqaNX2Aq2', 'krishnaToss', NULL, NULL, '', NULL, NULL, NULL, NULL, 'hr', 0, 1, '2025-09-26 11:40:00', '2025-09-26 11:39:03', '2025-09-26 11:40:00'),
-(13, 'akuu', 'val', 'shreyas.toss.cs@gmail.com', '8520122520', '$2y$10$nWlgxIdoPvj3GPX861lQY.zPCidGRxRj.4SUnrCJCc5aVbZ52jSCa', 'akuu bal', NULL, NULL, 'mp', NULL, NULL, NULL, NULL, 'office_staff', 0, 1, '2025-10-25 15:30:22', '2025-10-06 13:59:48', '2025-10-25 15:30:22'),
+(13, 'ankush', 'val', 'shreyas.toss.cs@gmail.com', '8520122520', '$2y$10$nWlgxIdoPvj3GPX861lQY.zPCidGRxRj.4SUnrCJCc5aVbZ52jSCa', 'akuu bal', '0000-00-00', '', 'mp', '', '', '', NULL, 'office_staff', 0, 0, '2025-11-03 14:52:14', '2025-10-06 13:59:48', '2025-11-03 14:53:52'),
 (14, 'shivam', 'sah', 'siddarth.toss.cs@gmail.com', '8520122536', '$2y$10$2J7tOA5xfU4hSEYU.Z8BqeqE0uEde8/l2PU.KEzWLjJLCJSwnp4tq', 'shivammm', NULL, NULL, 'bajnamath', NULL, NULL, NULL, NULL, 'sales', 0, 1, NULL, '2025-10-17 17:29:18', '2025-10-17 17:29:18'),
 (15, 'siddharth', 'singh rajput', 'siddharth@gmail.com', '7898140798', '$2y$10$ir7z0J11NGfySEALhOa.Quk/zkYp3ISpfZIZyMoxNq.sz0hWtOLfe', 'siddharth21', NULL, 'male', 'adhartal', NULL, NULL, NULL, NULL, 'admin', 0, 1, '2025-10-18 17:46:11', '2025-10-18 17:41:54', '2025-10-18 17:46:11');
 
@@ -5506,9 +6051,9 @@ CREATE TABLE `wallet` (
 --
 
 INSERT INTO `wallet` (`wallet_id`, `driver_id`, `balance`, `total_earned`, `total_withdrawn`, `created_at`, `updated_at`) VALUES
-(1, 1, 4600.00, 5950.00, 1350.00, '2025-08-01 04:30:00', '2025-10-25 09:33:39'),
-(13, 2, 0.00, 0.00, 0.00, '2025-10-08 11:09:43', '2025-10-24 08:01:33'),
-(14, 13, 0.00, 0.00, 0.00, '2025-10-09 05:51:44', '2025-10-09 05:52:20'),
+(1, 1, 4600.00, 5950.00, 1350.00, '2025-08-01 04:30:00', '2025-11-03 09:27:21'),
+(13, 2, 0.00, 0.00, 0.00, '2025-10-08 11:09:43', '2025-10-29 06:42:50'),
+(14, 13, 0.00, 0.00, 0.00, '2025-10-09 05:51:44', '2025-11-01 09:25:15'),
 (15, 14, 0.00, 0.00, 0.00, '2025-10-16 08:56:13', '2025-10-16 08:56:13'),
 (16, 15, 0.00, 0.00, 0.00, '2025-10-16 09:37:18', '2025-10-16 09:37:18'),
 (17, 16, 0.00, 0.00, 0.00, '2025-10-16 09:56:04', '2025-10-16 09:56:04'),
@@ -5518,7 +6063,7 @@ INSERT INTO `wallet` (`wallet_id`, `driver_id`, `balance`, `total_earned`, `tota
 (21, 20, 0.00, 0.00, 0.00, '2025-10-16 10:42:53', '2025-10-16 10:42:53'),
 (22, 21, 0.00, 0.00, 0.00, '2025-10-16 11:00:34', '2025-10-16 11:00:34'),
 (23, 22, 0.00, 0.00, 0.00, '2025-10-16 11:16:41', '2025-10-16 11:16:41'),
-(24, 23, 0.00, 0.00, 0.00, '2025-10-24 09:13:32', '2025-10-24 09:18:15'),
+(24, 23, 0.00, 0.00, 0.00, '2025-10-24 09:13:32', '2025-11-02 06:04:53'),
 (25, 26, 0.00, 0.00, 0.00, '2025-10-25 09:31:39', '2025-10-25 09:31:39');
 
 -- --------------------------------------------------------
@@ -5593,7 +6138,7 @@ INSERT INTO `website_config` (`id`, `config_key`, `config_value`, `created_at`, 
 (680, 'footer_connect_title', 'Connect with Us', '2025-10-18 06:52:08', '2025-10-18 06:52:08'),
 (994, 'footer_copyright_url', 'index.php', '2025-10-18 07:09:23', '2025-10-18 07:11:00'),
 (1120, 'homepage_main_title', 'APATKAL', '2025-10-18 07:28:42', '2025-10-18 07:29:06'),
-(1121, 'homepage_emergency_button_text', 'EMERGENCY SERVICES', '2025-10-18 07:28:42', '2025-10-24 09:19:52'),
+(1121, 'homepage_emergency_button_text', 'EMERGENCY SERVICES 24/7', '2025-10-18 07:28:42', '2025-11-03 09:35:54'),
 (1122, 'homepage_feature1_title', '24/7 AVAILABILITY', '2025-10-18 07:28:42', '2025-10-18 07:33:22'),
 (1123, 'homepage_feature1_description', 'Round-the-clock emergency medical services ready to respond to your call anytime, anywhere.', '2025-10-18 07:28:42', '2025-10-18 07:28:42'),
 (1124, 'homepage_feature2_title', 'AMBULANCE DISPATCH', '2025-10-18 07:28:42', '2025-10-18 07:28:42'),
@@ -5648,9 +6193,9 @@ INSERT INTO `website_config` (`id`, `config_key`, `config_value`, `created_at`, 
 (1787, 'plan_page_title', 'Choose Your Plan', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
 (1788, 'plan_page_subtitle', 'Select the perfect plan that fits your emergency service needs', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
 (1789, 'plan_name', 'Emergency Response Plan', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
-(1790, 'plan_price', '₹999', '2025-10-18 09:47:09', '2025-10-18 09:47:25'),
+(1790, 'plan_price', '₹999', '2025-10-18 09:47:09', '2025-11-03 09:08:56'),
 (1791, 'plan_duration', 'per year', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
-(1792, 'plan_features', '24/7 Emergency Response|GPS Location Tracking|Immediate Alert System|Emergency Contact Notifications|Accident Report Management|24/7 Customer Support', '2025-10-18 09:47:09', '2025-10-18 09:48:38'),
+(1792, 'plan_features', '24/7 Emergency Response|GPS Location Tracking|Immediate Alert System|Emergency Contact Notifications|Accident Report Management|24/7 Customer Support', '2025-10-18 09:47:09', '2025-11-03 09:08:56'),
 (1793, 'plan_button_text', 'Get Started', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
 (1794, 'plan_button_url', 'client_login.php', '2025-10-18 09:47:09', '2025-10-18 09:47:09'),
 (1795, 'plan_learn_more_text', 'Learn More', '2025-10-18 09:47:09', '2025-10-18 09:47:58'),
@@ -6053,7 +6598,8 @@ ALTER TABLE `sms_logs`
 -- Indexes for table `trips`
 --
 ALTER TABLE `trips`
-  ADD PRIMARY KEY (`history_id`);
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `idx_client_id` (`client_id`);
 
 --
 -- Indexes for table `users`
@@ -6092,19 +6638,19 @@ ALTER TABLE `withdrawals`
 -- AUTO_INCREMENT for table `accidents`
 --
 ALTER TABLE `accidents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `accident_photos`
 --
 ALTER TABLE `accident_photos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `clients`
 --
 ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `client_family_members`
@@ -6116,19 +6662,19 @@ ALTER TABLE `client_family_members`
 -- AUTO_INCREMENT for table `client_logins`
 --
 ALTER TABLE `client_logins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `device_sessions`
 --
 ALTER TABLE `device_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `driver_assignments`
@@ -6140,7 +6686,7 @@ ALTER TABLE `driver_assignments`
 -- AUTO_INCREMENT for table `driver_locations`
 --
 ALTER TABLE `driver_locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=304;
 
 --
 -- AUTO_INCREMENT for table `earnings`
@@ -6212,7 +6758,7 @@ ALTER TABLE `payment_transactions`
 -- AUTO_INCREMENT for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4443;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4943;
 
 --
 -- AUTO_INCREMENT for table `sections`
@@ -6242,7 +6788,7 @@ ALTER TABLE `sms_logs`
 -- AUTO_INCREMENT for table `trips`
 --
 ALTER TABLE `trips`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -6260,7 +6806,7 @@ ALTER TABLE `wallet`
 -- AUTO_INCREMENT for table `website_config`
 --
 ALTER TABLE `website_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3282;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3336;
 
 --
 -- AUTO_INCREMENT for table `withdrawals`
