@@ -103,27 +103,29 @@ Apatkal-App/
    - Bank details (account, IFSC, holder name)
    - KYC documents (Aadhar, Licence, RC photos)
 2. User submits form → `signup.php` is called
-3. API generates 4-digit OTP and sends SMS to phone number
-4. All signup data stored in PHP session (temporary)
-5. User navigates to OTP verification screen
-6. User enters OTP → `verify_otp.php` is called
-7. OTP verified → API creates driver record in `drivers` table
-8. Photos uploaded to `uploads/` directory
-9. Device session created in `device_sessions` table
-10. Bank details added to `driver_bank_accounts`
-11. KYC documents updated
-12. Returns driver data for auto-login
+3. API generates 4-digit OTP using unified 2-parameter function
+4. OTP sent via SMS to phone number (bhashsms.com gateway)
+5. All signup data stored in PHP session (temporary)
+6. User navigates to OTP verification screen
+7. User enters OTP → `verify_otp.php` is called
+8. OTP verified → API creates driver record in `drivers` table
+9. Photos uploaded to `uploads/` directory
+10. Device session created in `device_sessions` table
+11. Bank details added to `driver_bank_accounts`
+12. KYC documents updated
+13. Returns driver data for auto-login
 
 #### **Forgot Password Process** (`forgot_password_screen.dart` → `forgot_password.php` → `verify_forgot_password_otp.php` → `reset_password.php`)
 1. User clicks "Forgot Password?" on login screen
 2. User enters phone number → `forgot_password.php`
-3. API finds driver by phone number
-4. Generates OTP and sends SMS
-5. User enters OTP → `verify_forgot_password_otp.php`
-6. OTP verified → Navigate to reset password screen
-7. User enters new password → `reset_password.php`
-8. Password updated in database (hashed)
-9. Returns to login screen
+3. API finds driver by phone number (returns error if not registered)
+4. Generates OTP using unified 2-parameter function (same as signup)
+5. OTP sent via SMS to phone number (bhashsms.com gateway)
+6. User enters OTP → `verify_forgot_password_otp.php`
+7. OTP verified → Navigate to reset password screen
+8. User enters new password → `reset_password.php`
+9. Password updated in database (hashed)
+10. Returns to login screen
 
 #### **Logout Process** (`logout.php`)
 1. User taps logout
@@ -210,7 +212,14 @@ Always → 10 kilometers fixed radius
 3. **Trip location updates** → `update_trip_location.php`
    - Tracks driver path during trip
    - Shows on map for client tracking
-4. **Trip completion** → `get_completed_trips.php`
+4. **Trip completion** → `get_accidents.php`
+   - Calculates distance using Haversine formula
+   - Captures client_id from clients table (by phone number)
+   - Records from_location (accident address) and to_location
+   - Calculates duration (start_time to end_time)
+   - Updates trip record with all data
+5. **Trip history** → `get_completed_trips.php`
+   - Returns trips with distance, duration, and location data
    - Adds to earnings
    - Updates wallet balance
 
@@ -288,8 +297,13 @@ Always → 10 kilometers fixed radius
 - id (PRIMARY KEY)
 - driver_id (FOREIGN KEY)
 - accident_id (FOREIGN KEY)
+- client_id (FOREIGN KEY to clients table)
 - start_time, end_time
 - driver_latitude, driver_longitude
+- duration (in seconds)
+- distance (in kilometers, DECIMAL)
+- from_location (TEXT - starting address)
+- to_location (TEXT - destination address)
 - status (pending/accepted/in_progress/completed)
 ```
 
@@ -326,11 +340,12 @@ Always → 10 kilometers fixed radius
 
 ### **2. OTP Verification**
 - Two-step signup process with SMS OTP verification
-- OTP sent via SMS gateway (bhashsms.com)
+- OTP sent via SMS gateway (bhashsms.com) using unified 2-parameter function
+- All OTP functions (signup, resend, forgot password) use identical implementation
 - OTP valid for 10 minutes
 - Resend OTP with 30-second cooldown
 - Session-based OTP storage (not stored in database)
-- Forgot password flow also uses OTP verification
+- Forgot password flow uses same OTP verification system as signup
 
 ### **3. Password Security**
 - Passwords stored as bcrypt hashes
@@ -357,9 +372,9 @@ Always → 10 kilometers fixed radius
 ✅ Dynamic radius accident detection  
 ✅ GPS tracking every 5 seconds  
 ✅ Trip navigation with live map  
+✅ Trip history with distance, duration, and location details  
 ✅ Wallet & earnings management  
 ✅ Withdrawal requests  
-✅ Trip history  
 ✅ KYC verification  
 ✅ Profile management  
 ✅ Single-device login security  
@@ -465,7 +480,20 @@ Pick Up Client
   ↓
 Drive to Hospital
   ↓
-Trip Complete
+Trip Complete (via get_accidents.php)
+  ↓
+Calculate Distance (Haversine formula)
+  ↓
+Capture Client ID from clients table
+  ↓
+Capture From Location & To Location
+  ↓
+Update Trip Record with:
+  - client_id
+  - distance (in km)
+  - duration (in seconds)
+  - from_location
+  - to_location
   ↓
 Update Trip Status
   ↓
@@ -545,7 +573,8 @@ Show Trip Completion Dialog
 #### **Trip APIs**
 - `update_trip_location.php` - Trip tracking during navigation
 - `get_driver_trips.php` - Trip history
-- `get_completed_trips.php` - Completed trips
+- `get_completed_trips.php` - Completed trips with distance, duration, and location data
+- `get_accidents.php` - Creates trips with client_id, distance, from_location, to_location on completion
 
 #### **Wallet APIs**
 - `get_wallet.php` - Wallet balance
@@ -666,10 +695,11 @@ php api/test_connection.php
 - Clear old sessions manually in database if needed
 
 ### **OTP Not Received**
-- Check SMS gateway connection
-- Verify phone number format
+- Check SMS gateway connection (bhashsms.com)
+- Verify phone number format (10-digit Indian numbers)
 - Check error_log for SMS API responses
-- OTP shown on screen for debugging (development only)
+- All OTP functions use unified 2-parameter implementation
+- Ensure phone number starts with 6, 7, 8, or 9 (valid Indian numbers)
 
 ### **Password Issues**
 - Old accounts support both hashed and plain-text passwords
@@ -693,12 +723,14 @@ This project is licensed under the MIT License.
 
 ---
 
-**Last Updated:** October 2025  
+**Last Updated:** January 2025  
 **Version:** 2.0.0
 
 ## 🆕 Recent Updates (v2.0.0)
 
 ### **New Features**
+- ✅ **Unified OTP System** - All OTP functions (signup, resend, forgot password) use identical 2-parameter implementation
+- ✅ **Enhanced Trip Data** - Trips now capture client_id, distance, duration, from_location, and to_location
 - ✅ **OTP Verification System** - Two-step signup with SMS OTP verification
 - ✅ **Forgot Password Flow** - Complete password reset with OTP verification
 - ✅ **Enhanced Device Session Management** - Device sessions deleted on logout (not just deactivated)
@@ -706,16 +738,26 @@ This project is licensed under the MIT License.
 - ✅ **Improved Error Handling** - Better error messages and detailed logging
 
 ### **Updated APIs**
+- `signup.php` - Uses unified 2-parameter OTP function
+- `resend_otp.php` - Uses unified 2-parameter OTP function
+- `forgot_password.php` - Uses unified 2-parameter OTP function (same as signup)
 - `verify_otp.php` - Verify OTP and complete signup
-- `resend_otp.php` - Resend OTP during signup
-- `forgot_password.php` - Initiate password reset with OTP
 - `verify_forgot_password_otp.php` - Verify OTP for password reset
 - `reset_password.php` - Reset password after OTP verification
+- `get_accidents.php` - Captures trip data (client_id, distance, from_location, to_location) on completion
+- `get_completed_trips.php` - Returns trip distance, duration, and location data
 - `login.php` - Enhanced device session handling (update on same device, create on new device)
 - `logout.php` - Now deletes device sessions instead of deactivating
+
+### **Database Updates**
+- Added `client_id` column to `trips` table (foreign key to clients)
+- Added `distance` column (DECIMAL) to `trips` table
+- Added `from_location` column (TEXT) to `trips` table
+- Added `to_location` column (TEXT) to `trips` table
 
 ### **UI Improvements**
 - OTP verification screen with resend functionality
 - Forgot password screens (phone entry → OTP → reset password)
+- Trip history displays distance, duration, and location information
 - Better error messages for user feedback
 - Form data persistence when navigating back
