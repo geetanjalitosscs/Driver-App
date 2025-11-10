@@ -360,30 +360,30 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               
               // Demo Account Info
-              AppCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Text(
-                      'Demo Account',
-                      style: GoogleFonts.roboto(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryBlue,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Email: rajesh.sharma90@gmail.com\nPassword: Raj@123',
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+              // AppCard(
+              //   padding: const EdgeInsets.all(16),
+              //   child: Column(
+              //     children: [
+              //       Text(
+              //         'Demo Account',
+              //         style: GoogleFonts.roboto(
+              //           fontSize: 16,
+              //           fontWeight: FontWeight.w600,
+              //           color: AppTheme.primaryBlue,
+              //         ),
+              //       ),
+              //       const SizedBox(height: 8),
+              //       Text(
+              //         'Email: rajesh.sharma90@gmail.com\nPassword: Raj@123',
+              //         style: GoogleFonts.roboto(
+              //           fontSize: 14,
+              //           color: Colors.grey[700],
+              //         ),
+              //         textAlign: TextAlign.center,
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),
